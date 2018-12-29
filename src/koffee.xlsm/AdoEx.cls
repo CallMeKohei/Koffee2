@@ -100,7 +100,7 @@ Public Function CreateAdoRS(ByVal sql As String, _
 End Function
 
 Public Function JagArrAdoRsHeader(ByVal sql As String) As Variant
-    Dim v As Variant, arrx As New ArrayEx
+    Dim v As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In CreateAdoRS(sql).Fields
         arrx.addval v.Name
     Next v

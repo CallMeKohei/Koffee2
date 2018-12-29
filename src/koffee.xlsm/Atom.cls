@@ -110,7 +110,7 @@ Private Function ApplyPrep(ByVal args As Variant)
 
         Case Is = VBA.CLng(AddressOf PartialMark)
 
-            Dim arrx As New ArrayEx
+            Dim arrx As ArrayEx : Set arrx = New ArrayEx
             PartialBindPrep arrx
             MergeArgs2 arrx, args
             ps = arrx.ToArray

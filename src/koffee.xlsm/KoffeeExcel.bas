@@ -29,7 +29,7 @@ End Function
 
 Public Function GetVal(ByVal R As Range, ByVal GetValOption As GetValOption, Optional ByVal direction As Boolean = False) As Variant
 
-    Dim v As Variant, arr As Variant, arrx As New ArrayEx
+    Dim v As Variant, arr As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
     Dim lRow As Long: lRow = (LastRow(R, direction) - R.row)
     Dim lCol As Long: lCol = (LastCol(R, direction) - R.Column)
 
@@ -92,7 +92,7 @@ Public Function ArrSheetsName(Optional ByVal bk As Workbook = Nothing) As Varian
 
     If TypeName(bk) = "Nothing" Then Set bk = Application.ThisWorkbook
 
-    Dim sh As Worksheet, arrx As New ArrayEx
+    Dim sh As Worksheet, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each sh In bk.Worksheets
         arrx.addval ToStr(sh.Name)
     Next sh

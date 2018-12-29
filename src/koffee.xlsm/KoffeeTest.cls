@@ -54,7 +54,8 @@ Public Function ArrJoin(ByVal arr As Variant) As Variant
 End Function
 
 Public Function zero() As Variant
-    Dim a As New Atom: Set zero = a.AddFunc(Init(New Func, vbVariant, AddressOf zeroImpl, vbVariant, vbVariant))
+    Dim a As Atom: Set a = New Atom
+    Set zero = a.AddFunc(Init(New Func, vbVariant, AddressOf zeroImpl, vbVariant, vbVariant))
 End Function
 
 Private Function zeroImpl(ByVal f As Variant, ByVal x As Variant) As Variant
@@ -62,7 +63,8 @@ Private Function zeroImpl(ByVal f As Variant, ByVal x As Variant) As Variant
 End Function
 
 Public Function fst() As Atom
-    Dim a As New Atom: Set fst = a.AddFunc(Init(New Func, vbVariant, AddressOf fstImpl, vbVariant, vbVariant))
+    Dim a As Atom: Set a = New Atom
+    Set fst = a.AddFunc(Init(New Func, vbVariant, AddressOf fstImpl, vbVariant, vbVariant))
 End Function
 
 Private Function fstImpl(ByVal f As Variant, ByVal x As Variant) As Variant
@@ -70,7 +72,8 @@ Private Function fstImpl(ByVal f As Variant, ByVal x As Variant) As Variant
 End Function
 
 Public Function snd() As Atom
-    Dim a As New Atom: Set snd = a.AddFunc(Init(New Func, vbVariant, AddressOf sndImpl, vbVariant, vbVariant))
+    Dim a As Atom: Set a = New Atom
+    Set snd = a.AddFunc(Init(New Func, vbVariant, AddressOf sndImpl, vbVariant, vbVariant))
 End Function
 
 Private Function sndImpl(ByVal f As Variant, ByVal x As Variant) As Variant
@@ -277,7 +280,8 @@ Sub KoffeePuzzle_Test()
     Assert.AreEqualArr Array("A", "C", "B"), ClctToArr(Permut(Array("A", "B", "C"), 3))(4)
     Assert.AreEqualArr Array("A", "B", "C"), ClctToArr(Permut(Array("A", "B", "C"), 3))(5)
 
-    Dim clct As New collection: PermutLimited 1, 3, 3, clct
+    Dim clct As collection: Set clct = New collection
+    PermutLimited 1, 3, 3, clct
     Assert.AreEqualArr Array(CByte(3), CByte(2), CByte(1)), ClctToArr(clct)(0)
     Assert.AreEqualArr Array(CByte(3), CByte(1), CByte(2)), ClctToArr(clct)(1)
     Assert.AreEqualArr Array(CByte(2), CByte(3), CByte(1)), ClctToArr(clct)(2)
@@ -439,7 +443,7 @@ Public Sub KoffeeExcel_Test()
 
 
 
-    Dim v1 As Worksheet, arrx1 As New ArrayEx
+    Dim v1 As Worksheet, arrx1 As ArrayEx: Set arrx1 = New ArrayEx
     For Each v1 In ThisWorkbook.Worksheets
         arrx1.addval v1.Name
     Next v1
@@ -448,7 +452,7 @@ Public Sub KoffeeExcel_Test()
 
 
 
-    Dim v2 As Worksheet, arrx2 As New ArrayEx
+    Dim v2 As Worksheet, arrx2 As ArrayEx: Set arrx2 = New ArrayEx
     For Each v2 In ThisWorkbook.Worksheets
         arrx2.addval v2.Name
     Next v2
@@ -459,7 +463,7 @@ Public Sub KoffeeExcel_Test()
 
     Set sh = AddSheet("myTestTemporarySheet")
 
-    Dim v3 As Worksheet, arrx3 As New ArrayEx
+    Dim v3 As Worksheet, arrx3 As ArrayEx: Set arrx3 = New ArrayEx
     For Each v3 In ThisWorkbook.Worksheets
         arrx3.addval v3.Name
     Next v3
@@ -525,7 +529,8 @@ Public Sub Map_Test()
     Dim f As Func: Set f = Init(New Func, vbVariant, AddressOf ToStr2, vbVariant)
     Assert.AreEqualArr Array("1", "2", "3"), Map(f).Bind(Array(1, 2, 3)).Apply
 
-    Dim a As New Atom: Set a = a.AddFunc(Init(New Func, vbVariant, AddressOf ToStr2, vbVariant))
+    Dim a As Atom: Set a = New Atom
+    Set a = a.AddFunc(Init(New Func, vbVariant, AddressOf ToStr2, vbVariant))
     Assert.AreEqualArr Array("1", "2", "3"), Map(a).Bind(Array(1, 2, 3)).Apply
 
     Assert.AreEqualArr Array("1", "2", "3"), Map(AddressOf ToStr2).Bind(Array(1, 2, 3)).Apply
@@ -742,7 +747,8 @@ Public Sub Repeat_Test()
     Assert.AreEqualArr Array(-1, -1, -1), Repeat(3, Always(-1))
     Assert.AreEqualArr Array(Empty, Empty, Empty), Repeat(3, Always(Empty))
 
-    Dim f As New Func: Set f = Init(New Func, vbVariant, AddressOf SayVBA)
+    Dim f As Func: Set f = New Func
+    Set f = Init(New Func, vbVariant, AddressOf SayVBA)
     Assert.AreEqualArr Array("VBA!", "VBA!", "VBA!"), Repeat(3, f)
 End Sub
 

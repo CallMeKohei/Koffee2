@@ -37,7 +37,8 @@ Public Function Flow(ByVal seed As Variant, ParamArray funcs() As Variant) As Va
 End Function
 
 Public Function Compose(ParamArray funcs() As Variant) As Variant
-    Dim a As New Atom: Set Compose = a.AddFunc(Init(New Func, vbVariant, AddressOf ComposeImpl, vbVariant, vbVariant)).Bind(funcs)
+    Dim a As Atom: Set a = New Atom
+    Set Compose = a.AddFunc(Init(New Func, vbVariant, AddressOf ComposeImpl, vbVariant, vbVariant)).Bind(funcs)
 End Function
 
 Public Function ComposeImpl(ByVal funcs As Variant, ByVal seed As Variant) As Variant
@@ -74,7 +75,8 @@ End Function
 Public Function Partial(ByVal fun As Variant, ParamArray args() As Variant) As Atom
 
     If Not (TypeName(fun) = "Atom" Or TypeName(fun) = "Func") Then Err.Raise 13
-    Dim a As New Atom: a.LetAddr = VBA.CLng(AddressOf PartialMark)
+    Dim a As Atom: Set a = New Atom
+    a.LetAddr = VBA.CLng(AddressOf PartialMark)
 
     Dim tmp As Variant
     If UBound(args) = -1 Then
@@ -121,7 +123,8 @@ End Function
 Public Function fnull(ByVal fun As Variant, ByVal Alt As Variant) As Atom
 
     If Not (TypeName(fun) = "Atom" Or TypeName(fun) = "Func") Then Err.Raise 13
-    Dim a As New Atom: Set fnull = a.AddFunc(Init(New Func, vbVariant, AddressOf fnullImpl, vbVariant, vbVariant, vbVariant)).Bind(fun).Bind(Alt)
+    Dim a As Atom: Set a = New Atom
+    Set fnull = a.AddFunc(Init(New Func, vbVariant, AddressOf fnullImpl, vbVariant, vbVariant, vbVariant)).Bind(fun).Bind(Alt)
 
     If TypeName(fun) = "Atom" Then
         If fun.GetAddr = VBA.CLng(AddressOf PartialMark) Then
@@ -157,7 +160,8 @@ Public Function Map(ByVal f As Variant) As Atom
     Select Case TypeName(f)
         Case Is = "Func", "Atom", "Long"
             If TypeName(f) = "Long" Then Set f = Init(New Func, vbVariant, f, vbVariant)
-            Dim a As New Atom: Set Map = a.AddFunc(Init(New Func, vbVariant, AddressOf MapImpl, vbVariant, vbVariant)).Bind(f)
+            Dim a As Atom: Set a = New Atom
+            Set Map = a.AddFunc(Init(New Func, vbVariant, AddressOf MapImpl, vbVariant, vbVariant)).Bind(f)
         Case Else
             Err.Raise 13
     End Select
@@ -196,7 +200,8 @@ Public Function Filter(ByVal f As Variant) As Atom
     Select Case TypeName(f)
         Case Is = "Func", "Atom", "Long"
             If TypeName(f) = "Long" Then Set f = Init(New Func, vbBoolean, f, vbVariant)
-            Dim a As New Atom: Set Filter = a.AddFunc(Init(New Func, vbVariant, AddressOf FilterImpl, vbObject, vbVariant)).Bind(f)
+            Dim a As Atom: Set a = New Atom
+            Set Filter = a.AddFunc(Init(New Func, vbVariant, AddressOf FilterImpl, vbObject, vbVariant)).Bind(f)
         Case Else
             Err.Raise 13
     End Select
@@ -268,7 +273,8 @@ Public Function Fold(ByVal f As Variant) As Atom
     Select Case TypeName(f)
         Case Is = "Func", "Atom", "Long"
             If TypeName(f) = "Long" Then Set f = Init(New Func, vbVariant, f, vbVariant, vbVariant)
-            Dim a As New Atom: Set Fold = a.AddFunc(Init(New Func, vbVariant, AddressOf FoldImpl, vbObject, vbVariant, vbVariant)).Bind(f)
+            Dim a As Atom: Set a = New Atom
+            Set Fold = a.AddFunc(Init(New Func, vbVariant, AddressOf FoldImpl, vbObject, vbVariant, vbVariant)).Bind(f)
             a.LetAddr = VBA.CLng(AddressOf FoldMark)
         Case Else
             Err.Raise 13
@@ -313,7 +319,8 @@ Public Function Scan(ByVal f As Variant) As Atom
     Select Case TypeName(f)
         Case Is = "Func", "Atom", "Long"
             If TypeName(f) = "Long" Then Set f = Init(New Func, vbVariant, f, vbVariant, vbVariant)
-            Dim a As New Atom: Set Scan = a.AddFunc(Init(New Func, vbVariant, AddressOf ScanImpl, vbObject, vbVariant, vbVariant)).Bind(f)
+            Dim a As Atom: Set a = New Atom
+            Set Scan = a.AddFunc(Init(New Func, vbVariant, AddressOf ScanImpl, vbObject, vbVariant, vbVariant)).Bind(f)
             a.LetAddr = VBA.CLng(AddressOf ScanMark)
         Case Else
             Err.Raise 13
@@ -377,7 +384,8 @@ Public Function Zip(ByVal f As Variant) As Atom
     Select Case TypeName(f)
         Case Is = "Func", "Atom", "Long"
             If TypeName(f) = "Long" Then Set f = Init(New Func, vbObject, f, vbVariant, vbVariant)
-            Dim a As New Atom: Set Zip = a.AddFunc(Init(New Func, vbVariant, AddressOf ZipImpl, vbObject, vbVariant, vbVariant)).Bind(f)
+            Dim a As Atom: Set a = New Atom
+            Set Zip = a.AddFunc(Init(New Func, vbVariant, AddressOf ZipImpl, vbObject, vbVariant, vbVariant)).Bind(f)
             a.LetAddr = VBA.CLng(AddressOf ZipMark)
         Case Else
             Err.Raise 13
@@ -427,7 +435,8 @@ Public Function Unfold(ByVal f As Variant) As Atom
     Select Case TypeName(f)
         Case Is = "Func", "Atom", "Long"
             If TypeName(f) = "Long" Then Set f = Init(New Func, vbVariant, f, vbObject)
-            Dim a As New Atom: Set Unfold = a.AddFunc(Init(New Func, vbVariant, AddressOf ArrUnfold, vbObject, vbVariant)).Bind(f)
+            Dim a As Atom: Set a = New Atom
+            Set Unfold = a.AddFunc(Init(New Func, vbVariant, AddressOf ArrUnfold, vbObject, vbVariant)).Bind(f)
         Case Else
             Err.Raise 13
     End Select
@@ -437,7 +446,8 @@ Public Function GroupBy(ByVal f As Variant) As Atom
     Select Case TypeName(f)
         Case Is = "Func", "Atom", "Long"
             If TypeName(f) = "Long" Then Set f = Init(New Func, vbVariant, f, vbObject)
-            Dim a As New Atom: Set GroupBy = a.AddFunc(Init(New Func, vbVariant, AddressOf ArrGroupBy, vbObject, vbVariant)).Bind(f)
+            Dim a As Atom: Set a = New Atom
+            Set GroupBy = a.AddFunc(Init(New Func, vbVariant, AddressOf ArrGroupBy, vbObject, vbVariant)).Bind(f)
         Case Else
             Err.Raise 13
     End Select
@@ -470,7 +480,8 @@ Public Function FoldR(ByVal f As Variant) As Atom
     Select Case TypeName(f)
         Case Is = "Func", "Atom", "Long"
             If TypeName(f) = "Long" Then Set f = Init(New Func, vbVariant, f, vbVariant, vbVariant)
-            Dim a As New Atom: Set FoldR = a.AddFunc(Init(New Func, vbVariant, AddressOf FoldRImpl, vbObject, vbVariant, vbVariant)).Bind(f)
+            Dim a As Atom: Set a = New Atom
+            Set FoldR = a.AddFunc(Init(New Func, vbVariant, AddressOf FoldRImpl, vbObject, vbVariant, vbVariant)).Bind(f)
             a.LetAddr = VBA.CLng(AddressOf FoldRMark)
         Case Else
             Err.Raise 13
@@ -514,7 +525,8 @@ Public Function ScanR(ByVal f As Variant) As Atom
     Select Case TypeName(f)
         Case Is = "Func", "Atom", "Long"
             If TypeName(f) = "Long" Then Set f = Init(New Func, vbVariant, f, vbVariant, vbVariant)
-            Dim a As New Atom: Set ScanR = a.AddFunc(Init(New Func, vbVariant, AddressOf ScanRImpl, vbObject, vbVariant, vbVariant)).Bind(f)
+            Dim a As Atom: Set a = New Atom
+            Set ScanR = a.AddFunc(Init(New Func, vbVariant, AddressOf ScanRImpl, vbObject, vbVariant, vbVariant)).Bind(f)
             a.LetAddr = VBA.CLng(AddressOf ScanRMark)
         Case Else
             Err.Raise 13
@@ -585,7 +597,8 @@ Public Function Reject(ByVal f As Variant) As Atom
 End Function
 
 Private Function Complement(ByVal pred As Variant) As Atom
-    Dim a As New Atom: Set Complement = a.AddFunc(Init(New Func, vbBoolean, AddressOf ComplementImpl, vbVariant, vbVariant)).Bind(pred)
+    Dim a As Atom: Set a = New Atom
+    Set Complement = a.AddFunc(Init(New Func, vbBoolean, AddressOf ComplementImpl, vbVariant, vbVariant)).Bind(pred)
     a.LetAddr = VBA.CLng(AddressOf ComplementMark)
 End Function
 
@@ -601,7 +614,8 @@ Public Function All(ByVal fun As Variant) As Atom
     Select Case TypeName(fun)
         Case Is = "Func", "Atom", "Long"
             If TypeName(fun) = "Long" Then Set fun = Init(New Func, vbBoolean, fun, vbVariant)
-            Dim a As New Atom: Set All = a.AddFunc(Init(New Func, vbBoolean, AddressOf AllImpl, vbVariant, vbVariant)).Bind(fun)
+            Dim a As Atom: Set a = New Atom
+            Set All = a.AddFunc(Init(New Func, vbBoolean, AddressOf AllImpl, vbVariant, vbVariant)).Bind(fun)
         Case Else
             Err.Raise 13
     End Select
@@ -628,7 +642,8 @@ Public Function Any_(ByVal fun As Variant) As Atom
     Select Case TypeName(fun)
         Case Is = "Func", "Atom", "Long"
             If TypeName(fun) = "Long" Then Set fun = Init(New Func, vbBoolean, fun, vbVariant)
-            Dim a As New Atom: Set Any_ = a.AddFunc(Init(New Func, vbBoolean, AddressOf AnyImpl, vbVariant, vbVariant)).Bind(fun)
+            Dim a As Atom: Set a = New Atom
+            Set Any_ = a.AddFunc(Init(New Func, vbBoolean, AddressOf AnyImpl, vbVariant, vbVariant)).Bind(fun)
         Case Else
             Err.Raise 13
     End Select
@@ -653,7 +668,8 @@ Public Function Find(ByVal fun As Variant) As Atom
     Select Case TypeName(fun)
         Case Is = "Func", "Atom", "Long"
             If TypeName(fun) = "Long" Then Set fun = Init(New Func, vbBoolean, fun, vbVariant)
-            Dim a As New Atom: Set Find = a.AddFunc(Init(New Func, vbVariant, AddressOf FindImpl, vbVariant, vbVariant)).Bind(fun)
+            Dim a As Atom: Set a = New Atom
+            Set Find = a.AddFunc(Init(New Func, vbVariant, AddressOf FindImpl, vbVariant, vbVariant)).Bind(fun)
         Case Else
             Err.Raise 13
     End Select
@@ -681,7 +697,7 @@ End Function
 
 Public Function AllOf(ParamArray funs() As Variant) As Boolean
 
-    Dim arrx As New ArrayEx
+    Dim arrx As ArrayEx: Set arrx = New ArrayEx
     If UBound(funs) <> -1 Then
         Dim v
         For Each v In funs: arrx.AddObj v: Next v
@@ -698,7 +714,7 @@ End Function
 
 Public Function AnyOf(ParamArray funs() As Variant) As Boolean
 
-    Dim arrx As New ArrayEx
+    Dim arrx As ArrayEx : Set arrx = New ArrayEx
     If UBound(funs) <> -1 Then
         Dim v
         For Each v In funs: arrx.AddObj v: Next v
@@ -781,7 +797,8 @@ Public Function ShiftA() As Func
 End Function
 
 Private Function ArrShift2(ByVal val As Variant, ByVal arr As Variant) As Variant
-    Dim clct As New collection: Set clct = ArrToClct(arr)
+    Dim clct As collection: Set clct = New collection
+    Set clct = ArrToClct(arr)
     Shift clct, val
     ArrShift2 = ClctToArr(clct)
 End Function
@@ -837,7 +854,8 @@ Public Function Truthy(ByVal x As Variant) As Variant
 End Function
 
 Public Function Always(ByVal x As Variant) As Atom
-    Dim a As New Atom: Set Always = a.AddFunc(Init(New Func, vbVariant, AddressOf AlwaysImpl, vbVariant)).Bind(x): a.LetAddr = VBA.CLng(AddressOf AlwaysImpl)
+    Dim a As Atom: Set a = New Atom
+    Set Always = a.AddFunc(Init(New Func, vbVariant, AddressOf AlwaysImpl, vbVariant)).Bind(x): a.LetAddr = VBA.CLng(AddressOf AlwaysImpl)
 End Function
 
 Public Function AlwaysImpl(ByVal x As Variant) As Variant
@@ -849,7 +867,7 @@ Public Function AlwaysImpl(ByVal x As Variant) As Variant
 End Function
 
 Public Function Repeat(ByVal n As Variant, ByVal f As Variant) As Variant
-    Dim v As Variant, arrx As New ArrayEx
+    Dim v As Variant, arrx As ArrayEx : Set arrx = New ArrayEx
     For Each v In ArrRange(1, n)
         Select Case TypeName(f)
             Case "Func", "Atom"
@@ -870,7 +888,8 @@ Public Function NLVImpl(ByVal AltArg As Variant, ByVal arg As Variant) As Varian
 End Function
 
 Public Function Array2Of() As Atom
-    Dim a As New Atom: Set Array2Of = a.AddFunc(Init(New Func, vbVariant, AddressOf Array2OfImpl, vbVariant, vbVariant))
+    Dim a As Atom: Set a = New Atom
+    Set Array2Of = a.AddFunc(Init(New Func, vbVariant, AddressOf Array2OfImpl, vbVariant, vbVariant))
 End Function
 
 Private Function Array2OfImpl(ByVal x As Variant, ByVal y As Variant) As Variant
@@ -991,18 +1010,19 @@ End Function
 
 'About Actions
 Public Function Actions(ParamArray funcs() As Variant) As Atom
-    Dim a As New Atom: Set Actions = a.AddFunc(Init(New Func, vbVariant, AddressOf ActionsImpl, vbVariant, vbVariant)).Bind(funcs)
+    Dim a As Atom: Set a = New Atom
+    Set Actions = a.AddFunc(Init(New Func, vbVariant, AddressOf ActionsImpl, vbVariant, vbVariant)).Bind(funcs)
 End Function
 
 Private Function ActionsImpl(ByVal fArgs As Variant, ByVal seed As Variant) As Variant
 
-    Dim tpl As New Tuple
+    Dim tpl As Tuple : Set tpl = New Tuple
     If TypeName(seed) <> "Tuple" Then
         Set tpl = Init(New Tuple, seed, seed)
     End If
 
     Dim Status As Variant
-    Dim Values As New ArrayEx
+    Dim Values As ArrayEx : Set Values = New ArrayEx
 
     Dim v As Variant, v2 As Variant
     For Each v In fArgs
@@ -1011,7 +1031,7 @@ Private Function ActionsImpl(ByVal fArgs As Variant, ByVal seed As Variant) As V
             If Err.Number = 0 Then
                 Status = tpl.Item1
                 If IsArray(tpl.Item2) Then
-                    Dim tmpEx As New ArrayEx
+                    Dim tmpEx As ArrayEx : Set tmpEx = New ArrayEx
                     For Each v2 In tpl.Item2
                         tmpEx.addval v2
                     Next v2
@@ -1034,7 +1054,8 @@ End Function
 
 Public Function Lift(ByVal AnserFun As Variant, Optional ByVal StateFun As Variant) As Atom
     If IsEmpty(StateFun) Then: StateFun = Missing
-    Dim a As New Atom: Set Lift = a.AddFunc(Init(New Func, vbObject, AddressOf LiftImpl, vbVariant, vbVariant, vbObject)).Bind(AnserFun).Bind(StateFun)
+    Dim a As Atom: Set a = New Atom
+    Set Lift = a.AddFunc(Init(New Func, vbObject, AddressOf LiftImpl, vbVariant, vbVariant, vbObject)).Bind(AnserFun).Bind(StateFun)
 End Function
 
 Private Function LiftImpl(ByVal AnserFun As Variant, ByVal StateFun As Variant, ByVal tpl As Tuple) As Tuple
@@ -1053,7 +1074,7 @@ Private Function LiftImpl(ByVal AnserFun As Variant, ByVal StateFun As Variant, 
 End Function
 
 Public Function EliminateMissing(ByVal arr As Variant) As Variant
-    Dim v As Variant, arrx As New ArrayEx
+    Dim v As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In arr
         If Not IsMissing(v) Then
             If IsObject(v) Then arrx.AddObj v Else arrx.addval v
@@ -1063,11 +1084,12 @@ Public Function EliminateMissing(ByVal arr As Variant) As Variant
 End Function
 
 Public Function Checker(ParamArray Preds() As Variant) As Atom
-    Dim a As New Atom: Set Checker = a.AddFunc(Init(New Func, vbVariant, AddressOf CheckerImpl, vbVariant, vbVariant)).Bind(Preds)
+    Dim a As Atom: Set a = New Atom
+    Set Checker = a.AddFunc(Init(New Func, vbVariant, AddressOf CheckerImpl, vbVariant, vbVariant)).Bind(Preds)
 End Function
 
 Private Function CheckerImpl(ByVal prds As Variant, ByVal x As Variant) As Variant
-    Dim f, tmp As Variant, arrx As New ArrayEx
+    Dim f, tmp As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each f In prds
             tmp = f.Apply(x)
             If tmp <> True Then arrx.addval tmp
@@ -1076,7 +1098,7 @@ Private Function CheckerImpl(ByVal prds As Variant, ByVal x As Variant) As Varia
 End Function
 
 Public Function Validator(ByVal message As String, ByVal pred As Variant) As Atom
-    Dim a As New Atom
+    Dim a As Atom: Set a = New Atom
     Set Validator = a.AddFunc(Init(New Func, vbVariant, AddressOf ValidatorImpl, vbVariant, vbVariant, vbVariant)).Bind(message).Bind(pred)
 End Function
 

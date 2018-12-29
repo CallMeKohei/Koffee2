@@ -29,7 +29,8 @@ Public Function FetchSh(ByVal sql As String, Optional ByVal fPath As String = ""
         Case Else:    fPath = fPath
     End Select
 
-    Dim ado As New AdoEx:   ado.Init adExcel, fPath
+    Dim ado As AdoEx: Set ado = New AdoEx
+    ado.Init adExcel, fPath
     Select Case isHeader
         Case False: FetchSh = ado.JagArrAdoRS(sql)
         Case True:  FetchSh = Array(ado.JagArrAdoRS(sql), ado.JagArrAdoRsHeader(sql))
@@ -39,7 +40,8 @@ Public Function FetchSh(ByVal sql As String, Optional ByVal fPath As String = ""
 End Function
 
 Public Function FetchCSV(ByVal sql As String, ByVal fPath As String, Optional ByVal isHeader As Boolean = False) As Variant
-    Dim ado As New AdoEx:   ado.Init adCsv, fPath
+    Dim ado As AdoEx: Set ado = New AdoEx
+    ado.Init adCsv, fPath
     FetchCSV = ado.JagArrAdoRS(sql)
 
     Select Case isHeader
@@ -332,7 +334,7 @@ Public Function ArrPlus(ByVal arr1 As Variant, ByVal arr2 As Variant) As Variant
     Dim a(): ReDim a(32)
     Dim ub As Long:  ub = 32
 
-    Dim i As Long, arrx As New ArrayEx
+    Dim i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
     For i = 0 To UBound(arr1)
 
         If ub = i Then
@@ -357,7 +359,7 @@ Public Function ArrMinus(ByVal arr1 As Variant, ByVal arr2 As Variant) As Varian
     Dim a(): ReDim a(32)
     Dim ub As Long:  ub = 32
 
-    Dim i As Long, arrx As New ArrayEx
+    Dim i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
     For i = 0 To UBound(arr1)
 
         If ub = i Then
@@ -382,7 +384,7 @@ Public Function ArrDivide(ByVal arr1 As Variant, ByVal arr2 As Variant) As Varia
     Dim a(): ReDim a(32)
     Dim ub As Long:  ub = 32
 
-    Dim i As Long, arrx As New ArrayEx
+    Dim i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
     For i = 0 To UBound(arr1)
 
         If ub = i Then
@@ -413,7 +415,7 @@ Public Function ArrDiff(ByVal s1 As Variant, s2 As Variant) As Variant
     If IsJagArr(s1) Or IsJagArr(s2) Then Err.Raise 13
     If Not (ArrRank(s1) = 1 Or ArrRank(s2) = 1) Then Err.Raise 13
 
-    Dim v As Variant, arrx As New ArrayEx
+        Dim v As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In s1
         If ArrIndexOf(s2, v) = -1 Then arrx.addval v
     Next v
@@ -433,7 +435,7 @@ Public Function ArrIntersect(ByVal s1 As Variant, s2 As Variant) As Variant
     If IsJagArr(s1) Or IsJagArr(s2) Then Err.Raise 13
     If Not (ArrRank(s1) = 1 Or ArrRank(s2) = 1) Then Err.Raise 13
 
-    Dim v As Variant, arrx As New ArrayEx
+    Dim v As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In s1
         If ArrIndexOf(s2, v) > -1 Then arrx.addval v
     Next v
@@ -501,7 +503,7 @@ Public Function ArrCLng(ByVal arr As Variant) As Variant
     Dim ub As Long:  ub = 32
     Dim i As Long: i = 0
 
-    Dim v, arrx As New ArrayEx
+    Dim v, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In arr
 
         If ub = i Then
@@ -522,7 +524,7 @@ Public Function ArrCCur(ByVal arr As Variant) As Variant
     Dim ub As Long:  ub = 32
     Dim i As Long: i = 0
 
-    Dim v, arrx As New ArrayEx
+    Dim v, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In arr
 
         If ub = i Then
@@ -583,7 +585,7 @@ Public Function Nz2(ByVal arr As Variant, Optional ByVal ValueIfNull As Variant,
         alt = ValueIfNull
     End If
 
-    Dim v, arrx As New ArrayEx
+    Dim v, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In arr
         arrx.addval IIf(IsNull(v), alt, v)
     Next v

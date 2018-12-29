@@ -71,7 +71,7 @@ End Function
 
 'Permutations
 Public Function Permut(ByVal arr As Variant, ByVal R As Long) As collection
-    Dim clct As New collection
+    Dim clct As collection: Set clct = New collection
     PermutImpl arr, R, clct
     Set Permut = clct
 End Function
@@ -179,7 +179,7 @@ End Sub
 'Repeated Permutations
 Public Function ReptPermut(ByVal arr As Variant, Optional ByVal R As Long = 0) As Variant
 
-    Dim v, v2, tmp, i As Long, arrx As New ArrayEx
+    Dim v, v2, tmp, i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In ReptPermutImpl(UBound(arr) + 1, R)
         tmp = Array()
         For Each v2 In v
@@ -194,7 +194,7 @@ End Function
 
 Public Function ReptPermutImpl(ByVal n As Variant, Optional R As Long = 0) As Variant
 
-    Dim v, bitflg, arrx As New ArrayEx
+    Dim v, bitflg, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In ArrRange(0, (n ^ R - 1))
         bitflg = SplitStr(Dec2N(v, n))
         If UBound(bitflg) <> -1 Then
@@ -319,7 +319,7 @@ Public Function BitAnd(ByVal flg1 As Variant, ByVal flg2 As Variant) As Variant
         flg1 = ArrFill(flg1, ub, , True)
     End If
 
-    Dim i As Long, arrx As New ArrayEx
+    Dim i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
     For i = 0 To ub
         arrx.addval IIf(CLng(flg1(i)) = CLng(flg2(i)) And CLng(flg1(i)) = 1, 1, 0)
     Next i
@@ -338,7 +338,7 @@ Public Function BitOr(ByVal flg1 As Variant, ByVal flg2 As Variant) As Variant
         flg1 = ArrFill(flg1, ub, , True)
     End If
 
-    Dim i As Long, arrx As New ArrayEx
+    Dim i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
     For i = 0 To UBound(flg1)
         arrx.addval IIf(CLng(flg1(i)) = CLng(flg2(i)) And CLng(flg1(i)) = 0, 0, 1)
     Next i
@@ -357,7 +357,7 @@ Public Function BitXor(ByVal flg1 As Variant, ByVal flg2 As Variant) As Variant
         flg1 = ArrFill(flg1, ub, , True)
     End If
 
-    Dim i As Long, arrx As New ArrayEx
+    Dim i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
     For i = 0 To UBound(flg1)
         arrx.addval IIf(CLng(flg1(i)) = CLng(flg2(i)), 0, 1)
     Next i
@@ -367,7 +367,7 @@ End Function
 
 Public Function BitNOT(ByVal flg As Variant) As Variant
 
-    Dim i As Long, arrx As New ArrayEx
+    Dim i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
     For i = 0 To UBound(flg)
         arrx.addval IIf(CLng(flg(i)) = 1, 0, 1)
     Next i

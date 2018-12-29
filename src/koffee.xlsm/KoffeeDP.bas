@@ -34,7 +34,7 @@ Sub DP(ByVal arr As Variant, Optional Lheader As Variant, Optional ByVal header 
 
     If Not IsMissing(header) Then
 
-        Dim v, arrx As New ArrayEx
+        Dim v, arrx As ArrayEx : Set arrx = New ArrayEx
         For Each v In header
             arrx.addval ArrUnflatten(v)
         Next v
