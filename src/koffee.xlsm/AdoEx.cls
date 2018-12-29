@@ -43,75 +43,151 @@ Public Enum CommandTypeEnum
 End Enum
 
 Public Enum SourceTypeEnum
-    adCsv = 0
-    adExcel = 1
-    adSQLite = 2
+    srcText = 0
+    srcDBF = 1
+    srcAccess = 2
+    srcExcel = 3
 End Enum
 
-Const PROVIDER01    As String = "PROVIDER=MSDASQL;Extended Properties="""
-Const DRIVER01      As String = "DRIVER={Microsoft Text Driver (*.txt; *.csv)};"
-Const PATH01        As String = "DBQ="
-
-Const PROVIDER02    As String = "PROVIDER=MSDASQL;"
-Const DRIVER02      As String = "DRIVER={Microsoft Excel Driver (*.xls)};"
-Const PATH02        As String = "DBQ="
-
-Const PROVIDER03    As String = "PROVIDER=MSDASQL;charset=cp932;"
-Const DRIVER03      As String = "Driver=SQLite3 ODBC Driver;"
-Const PATH03        As String = ""
-
 Private cn_ As Object
+Private rs_ As Object
+Private dbEngine As String
+Private filePath As String
 
 Private Sub Class_Initialize()
+
     Set cn_ = CreateObject("ADODB.Connection")
+
+    ''' Microsoft Access Database Engine 2016 Redistributable
+    ''' https://www.microsoft.com/en-us/download/details.aspx?id=54920
+    If is64bitOS() Then
+        dbEngine = "Microsoft.ACE.OLEDB.12.0"
+    Else
+        dbEngine = "Microsoft.Jet.OLEDB.4.0"
+    End If
+
+    filePath = ThisWorkbook.Path & "\" & ThisWorkbook.Name
+
 End Sub
 
 Private Sub Class_Terminate()
-    cn_.Close: Set cn_ = Nothing
+
+    On Error Resume Next
+    If Not rs_ Is Nothing Then rs_.Close
+    Set rs_ = Nothing
+
+    cn_.Close
+    Set cn_ = Nothing
+
 End Sub
 
-Public Sub Init(ByVal propSourceType As SourceTypeEnum, ByVal fPath As String)
-    Dim str As String: str = ""
-    Select Case propSourceType
-        Case Is = 0: str = PROVIDER01 & DRIVER01 & PATH01 & Fso.GetParentFolderName(fPath) & "\" & """"
-        Case Is = 1: str = PROVIDER02 & DRIVER02 & PATH02 & fPath
-        Case Is = 2: str = PROVIDER03 & DRIVER03 & PATH03 & fPath
+Public Sub Init(ByVal srcType As SourceTypeEnum, Optional ByVal fpath As String = "")
+
+    If fpath = "" Then
+        If srcType = srcAccess Then Err.Raise 76 ''' Path not found
+        fpath = filePath
+    Else
+        fpath = fpath
+    End If
+
+    Select Case srcType
+
+        Case 0: ''' Text
+
+            With cn_
+                .Provider = dbEngine
+                .Properties("Data Source") = Fso.GetParentFolderName(fpath)
+                .Properties("Extended Properties") = Join(Array("text", "HDR=yes"), ";")
+                .Open
+            End With
+
+        Case 1: ''' DBF
+
+            With cn_
+                .Provider = dbEngine
+                .Properties("Data Source") = Fso.GetParentFolderName(fpath)
+                .Properties("Extended Properties") = Join(Array("dBASE IV", "User ID=Admin"), ";")
+                .Open
+            End With
+
+        Case 2: ''' Access
+
+            With cn_
+                .Provider = dbEngine
+                .Properties("Data Source") = fpath
+                .Open
+            End With
+
+        Case 3: ''' Excel
+
+            With cn_
+                .Provider = dbEngine
+                .Properties("Data Source") = fpath
+                .Properties("Extended Properties") = Join(Array("Excel 12.0", "HDR=YES"), ";")
+                .Open
+            End With
+
     End Select
-    cn_.ConnectionString = str
-    cn_.Open
+
 End Sub
 
-Public Function CreateAdoRS(ByVal sql As String, _
+Public Function Select_(ByVal sql As String, _
+    Optional ByVal isHeader As Boolean = False, _
     Optional ByVal propCursorType As CursorTypeEnum = adOpenStatic, _
     Optional ByVal propLockType As LockTypeEnum = adLockReadOnly, _
     Optional ByVal propCommandType As CommandTypeEnum = adCmdText _
-    ) As Object
+    )
 
-    Set CreateAdoRS = CreateObject("ADODB.Recordset")
-    With CreateAdoRS
-        .Open _
-            Source:=sql, _
-            ActiveConnection:=cn_, _
-            CursorType:=propCursorType, _
-            LockType:=propLockType, _
-            Options:=propCommandType
-    End With
+    Set rs_ = CreateObject("ADODB.Recordset")
+    rs_.Open Source:=sql, ActiveConnection:=cn_, CursorType:=propCursorType, LockType:=propLockType, Options:=propCommandType
 
-End Function
-
-Public Function JagArrAdoRsHeader(ByVal sql As String) As Variant
-    Dim v As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
-    For Each v In CreateAdoRS(sql).Fields
-        arrx.addval v.Name
+    ''' Should be defaulte date with header?
+    Dim v As Variant, arrx As New ArrayEx
+    For Each v In rs_.Fields
+        arrx.AddVal v.Name
     Next v
-    JagArrAdoRsHeader = arrx.ToArray
+
+    If isHeader Then
+        Select_ = Array(Arr2DToJagArr(rs_.GetRows()), arrx.ToArray)
+    Else
+        Select_ = Arr2DToJagArr(rs_.GetRows())
+    End If
+
 End Function
 
-Public Function JagArrAdoRS(ByVal sql As String) As Variant
-    JagArrAdoRS = Arr2DToJagArr(CreateAdoRS(sql).GetRows())
+Public Function Execute(ByVal sql As String) As Long
+    Dim rcdNumbers As Long
+    cn_.Execute sql, ARecNum
+    Execute = rcdNumbers
 End Function
 
-Public Sub pos(ByVal sql As String, Optional ByVal rng As Range = Nothing)
+Public Sub BeginTrans()
+    cn.BeginTrans
+End Sub
+
+Public Sub CommitTrans()
+    cn_.CommitTrans
+End Sub
+
+Public Sub RollbackTrans()
+    cn.RollbackTrans
+End Sub
+
+Private Function is64bitOS() As Boolean
+
+  Dim v As Variant
+  For Each v In Core.Wmi.connectServer.execQuery("Select * From Win32_OperatingSystem")
+
+    If InStr(v.OSArchitecture, "64") Then
+        is64bitOS = True
+        Exit Function
+    End If
+
+  Next
+
+End Function
+
+Public Sub pos(ByVal sql As String, Optional ByRef rng As Range = Nothing)
 
     If CreateAdoRS(sql).EOF Then Debug.Print "No Date!: " & Now(): Exit Sub
 
@@ -121,4 +197,5 @@ Public Sub pos(ByVal sql As String, Optional ByVal rng As Range = Nothing)
     End If
 
     rng.CopyFromRecordset CreateAdoRS(sql)
+
 End Sub
