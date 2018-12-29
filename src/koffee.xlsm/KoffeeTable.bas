@@ -50,63 +50,93 @@ Public Function Record(ByVal tbl As Variant, ByVal n As Long) As Variant
 
 End Function
 
-Public Function ToRecord(ByVal tbl As Variant, Optional ByVal ExistsKeys As Boolean = True) As Variant
+Private Function foo(ByVal n As Long, ByRef xxx As Variant) As Variant
 
-    Dim a(): ReDim a(32)
+    Dim arr() As Variant: ReDim arr(32)
     Dim ub As Long:  ub = 32
 
+    Dim i As Long
+    For i = 0 To n
+
+        Dim arrx As ArrayEx: Set arrx = New ArrayEx
+        Dim v As Variant
+        For Each v In xxx
+            arrx.AddVal v(i)
+        Next v
+
+        If ub = i Then
+            ub = ub + 1
+            ub = -1 + ub + ub
+            ReDim Preserve arr(ub - 1)
+        End If
+
+        arr(i) = arrx.ToArray
+        Set arrx = Nothing
+
+    Next i
+    
+    foo = Truncate(arr)
+
+End Function
+
+Public Function ToRecord(ByVal tbl As Variant, Optional ByVal ExistsKeys As Boolean = True) As Variant
+
+'    Dim a(): ReDim a(32)
+'    Dim ub As Long:  ub = 32
+'
     Dim vals, ub2 As Long
     If ExistsKeys Then
         vals = Values(tbl)
     Else
         vals = IIf(IsJagArr(tbl), tbl, Array(tbl))
     End If
-
-    Dim v, i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
-    For i = 0 To UBound(vals(0))
-
-        For Each v In vals
-            arrx.addval v(i)
-        Next v
-
-        If ub = i Then
-            ub = ub + 1
-            ub = -1 + ub + ub
-            ReDim Preserve a(ub - 1)
-        End If
-
-        a(i) = arrx.ToArray
-
-        Set arrx = Nothing
-    Next i
-    ToRecord = Truncate(a)
+'
+'    Dim v, i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
+'    For i = 0 To UBound(vals(0))
+'
+'        For Each v In vals
+'            arrx.AddVal v(i)
+'        Next v
+'
+'        If ub = i Then
+'            ub = ub + 1
+'            ub = -1 + ub + ub
+'            ReDim Preserve a(ub - 1)
+'        End If
+'
+'        a(i) = arrx.ToArray
+'
+'        Set arrx = Nothing
+'    Next i
+    
+    ToRecord = foo(UBound(vals(0)), vals)
 
 End Function
 
 Public Function ToTable(ByVal ArrKey As Variant, ByVal Records As Variant) As Variant
 
-    Dim a(): ReDim a(32)
-    Dim ub As Long:  ub = 32
+'    Dim a(): ReDim a(32)
+'    Dim ub As Long:  ub = 32
+'
+'    Dim v, i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
+'    For i = 0 To UBound(ArrKey)
+'
+'        For Each v In Records
+'            arrx.AddVal v(i)
+'        Next v
+'
+'        If ub = i Then
+'            ub = ub + 1
+'            ub = -1 + ub + ub
+'            ReDim Preserve a(ub - 1)
+'        End If
+'
+'        a(i) = arrx.ToArray
+'        Set arrx = Nothing
+'
+'    Next i
 
-    Dim v, i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
-    For i = 0 To UBound(ArrKey)
-
-        For Each v In Records
-            arrx.addval v(i)
-        Next v
-
-        If ub = i Then
-            ub = ub + 1
-            ub = -1 + ub + ub
-            ReDim Preserve a(ub - 1)
-        End If
-
-        a(i) = arrx.ToArray
-        Set arrx = Nothing
-
-    Next i
-
-    ToTable = CreateTable(ArrKey, Truncate(a))
+    ToTable = CreateTable(ArrKey, foo(UBound(ArrKey), Records))
 
 End Function
 
@@ -114,17 +144,17 @@ Public Function Project(ByVal ArrKeys As Variant, ByVal tbl As Variant) As Varia
 
     Dim v, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In ArrKeys
-        arrx.addval ArrIndexOf(keys(tbl), v)
+        arrx.AddVal ArrIndexOf(keys(tbl), v)
     Next v
 
     Dim nk, header As ArrayEx: Set header = New ArrayEx
     For Each nk In arrx.ToArray
-        header.addval keys(tbl)(nk)
+        header.AddVal keys(tbl)(nk)
     Next nk
 
     Dim nv, vals As ArrayEx: Set vals = New ArrayEx
     For Each nv In arrx.ToArray
-        vals.addval Values(tbl)(nv)
+        vals.AddVal Values(tbl)(nv)
     Next nv
 
     Project = CreateTable(header.ToArray, vals.ToArray)
@@ -150,7 +180,7 @@ Public Function Restrict(ByVal pred As Variant, ByVal tbl As Variant) As Variant
         Next ky
 
         If pred.Apply(dict) Then
-            arrx.addval rcd
+            arrx.AddVal rcd
         End If
 
     Next rcd
@@ -264,14 +294,14 @@ Public Function Intersect(ByVal tbl1 As Variant, ByVal idx1 As Variant, ByVal tb
     Dim rcd2: rcd2 = ToRecord(tbl2)
 
     Dim v1, v2
-    Dim comA  As ArrayEx: Set comA  = New ArrayEx
-    Dim comB  As ArrayEx: Set comB  = New ArrayEx
+    Dim comA  As ArrayEx: Set comA = New ArrayEx
+    Dim comB  As ArrayEx: Set comB = New ArrayEx
     Dim comAB As ArrayEx: Set comAB = New ArrayEx
     For Each v1 In rcd1
         For Each v2 In rcd2
             If ArrEquals(ArrPickup(v1, idx1), ArrPickup(v2, idx2)) Then
-                comA.addval v1
-                comB.addval v2
+                comA.AddVal v1
+                comB.AddVal v2
                 comAB.AddObj Init(New Tuple, v1, v2)
             End If
         Next v2
