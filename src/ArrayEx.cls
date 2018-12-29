@@ -29,7 +29,7 @@ Private Sub Extend()
     xLength = xLength + 1 'possible overflow (Err.Raise 6)
     xLength = -1 + xLength + xLength
     ReDim Preserve xItems(xLength - 1)
-    
+
 Escape:
 End Sub
 

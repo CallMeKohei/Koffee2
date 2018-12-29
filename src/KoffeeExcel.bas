@@ -32,7 +32,7 @@ Public Function GetVal(ByVal R As Range, ByVal GetValOption As GetValOption, Opt
     Dim v As Variant, arr As Variant, arrx As New ArrayEx
     Dim lRow As Long: lRow = (LastRow(R, direction) - R.row)
     Dim lCol As Long: lCol = (LastCol(R, direction) - R.Column)
-    
+
     Select Case GetValOption
         Case Is = 0
             arr = R.Resize(lRow + 1, lCol + 1)
@@ -45,17 +45,17 @@ Public Function GetVal(ByVal R As Range, ByVal GetValOption As GetValOption, Opt
         Case Is = 2: For v = 0 To lCol: arrx.addval R.Cells(1, v + 1).Value: Next v
         Case Is = 3: For v = 0 To lRow: arrx.addval R.Cells(v + 1, 1).Value: Next v
     End Select
-    
+
     GetVal = arrx.ToArray
-    
+
 End Function
 
 Public Sub PutVal(ByVal arr As Variant, ByVal R As Range, Optional isVertical As Boolean = False)
     Dim wf As WorksheetFunction: Set wf = Application.WorksheetFunction
-    
+
     If Not IsArray(arr) Then arr = Array(arr)
     If IsJagArr(arr) Then arr = JagArrToArr2D(arr)
-    
+
     Select Case ArrRank(arr)
         Case Is > 2: Err.Raise 13
         Case Is = 2 And LBound(arr, 1) = 1 ' Array based '1' from Worksheets
@@ -89,21 +89,21 @@ Public Sub Hankaku(ByVal sh As Worksheet)
 End Sub
 
 Public Function ArrSheetsName(Optional ByVal bk As Workbook = Nothing) As Variant
-    
+
     If TypeName(bk) = "Nothing" Then Set bk = Application.ThisWorkbook
-    
+
     Dim sh As Worksheet, arrx As New ArrayEx
     For Each sh In bk.Worksheets
         arrx.addval ToStr(sh.Name)
     Next sh
-    
+
     ArrSheetsName = arrx.ToArray
-    
+
 End Function
 
 Public Function ExistsSheet(ByVal SheetName As String, Optional ByVal bk As Workbook = Nothing) As Boolean
     If TypeName(bk) = "Nothing" Then Set bk = Application.ThisWorkbook
-    
+
     Select Case ArrIndexOf(ArrSheetsName(bk), SheetName)
         Case -1:   ExistsSheet = False
         Case Else: ExistsSheet = True
@@ -112,33 +112,33 @@ Public Function ExistsSheet(ByVal SheetName As String, Optional ByVal bk As Work
 End Function
 
 Public Function AddSheet(ByVal SheetName As String, Optional ByVal bk As Workbook = Nothing) As Worksheet
-    
+
     If TypeName(bk) = "Nothing" Then Set bk = Application.ThisWorkbook
     If ExistsSheet(SheetName, bk) Then Exit Function
-    
+
     With bk.Worksheets.Add()
         .Name = SheetName
     End With
-    
+
     Set AddSheet = bk.Worksheets(SheetName)
-    
+
 End Function
 
 Public Function CopySheet(ByVal SourceSheetName As String, ByVal SheetName As String, Optional ByVal bk As Workbook = Nothing) As Worksheet
 
     If TypeName(bk) = "Nothing" Then Set bk = Application.ThisWorkbook
     If ExistsSheet(SheetName, bk) Then Exit Function
-    
+
     With bk.Worksheets(SourceSheetName)
         .Copy after:=bk.Worksheets(SourceSheetName)
     End With
-    
+
     With bk.ActiveSheet
         .Name = SheetName
     End With
-    
+
     Set CopySheet = bk.ActiveSheet
-    
+
 End Function
 
 Public Sub ProtectSheet(ByVal sh As Worksheet, Optional myPassword As String = "1234")
@@ -167,7 +167,7 @@ Public Sub ExcelStatus( _
     Optional ByVal aDisplayAlerts As Boolean = True, _
     Optional ByVal aStatusBar = False, _
     Optional ByVal aDisplayStatusBar = True)
-                    
+
     With Application
       .ScreenUpdating = aScreenUpDating
       .Calculation = aCalculation

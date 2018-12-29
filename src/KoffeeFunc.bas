@@ -20,7 +20,7 @@ Public Function Flow(ByVal seed As Variant, ParamArray funcs() As Variant) As Va
                 End If
         End Select
     End If
-    
+
     If Not IsEmpty(funcs(0)) Then
         Dim fun As Variant
         For Each fun In funcs
@@ -54,7 +54,7 @@ Public Function ComposeImpl(ByVal funcs As Variant, ByVal seed As Variant) As Va
                 End If
         End Select
     End If
-    
+
     If Not IsEmpty(funcs(0)) Then
         Dim fun As Variant
         For Each fun In funcs
@@ -75,7 +75,7 @@ Public Function Partial(ByVal fun As Variant, ParamArray args() As Variant) As A
 
     If Not (TypeName(fun) = "Atom" Or TypeName(fun) = "Func") Then Err.Raise 13
     Dim a As New Atom: a.LetAddr = VBA.CLng(AddressOf PartialMark)
-    
+
     Dim tmp As Variant
     If UBound(args) = -1 Then
         tmp = Missing
@@ -86,16 +86,16 @@ Public Function Partial(ByVal fun As Variant, ParamArray args() As Variant) As A
             Set tmp = Tuple2Of(args, args)
         End If
     End If
-    
+
     Set Partial = a.AddFunc(Init(New Func, vbVariant, AddressOf PartialImpl, vbVariant, vbVariant)).Bind(fun).Bind(tmp)
-        
+
 End Function
 
 Public Function PartialMark() As Byte
 End Function
 
 Private Function PartialImpl(ByVal f As Variant, ByVal arg As Variant) As Variant
-    
+
     Dim tmp
     If IsArray(arg) Then
         Select Case UBound(arg)
@@ -112,9 +112,9 @@ Private Function PartialImpl(ByVal f As Variant, ByVal arg As Variant) As Varian
     Else
         tmp = Array(arg)
     End If
-    
+
     f.CallByPtr PartialImpl, tmp
-    
+
 End Function
 
 'About fnull
@@ -122,7 +122,7 @@ Public Function fnull(ByVal fun As Variant, ByVal Alt As Variant) As Atom
 
     If Not (TypeName(fun) = "Atom" Or TypeName(fun) = "Func") Then Err.Raise 13
     Dim a As New Atom: Set fnull = a.AddFunc(Init(New Func, vbVariant, AddressOf fnullImpl, vbVariant, vbVariant, vbVariant)).Bind(fun).Bind(Alt)
-    
+
     If TypeName(fun) = "Atom" Then
         If fun.GetAddr = VBA.CLng(AddressOf PartialMark) Then
             a.LetAddr = VBA.CLng(AddressOf fnullPartialMark)
@@ -148,7 +148,7 @@ Private Function fnullImpl(ByVal f As Variant, ByVal AltArg As Variant, ByVal ar
     ElseIf Not IsArray(arg) Then
         arg = Array(arg)
     End If
-    
+
     f.CallByPtr fnullImpl, Flow(arg, Map(Partial(NLV, AltArg)))
 
 End Function
@@ -287,7 +287,7 @@ Public Function FoldImpl( _
     Dim stat As Variant
     Dim i As Long: i = LBound(arr)
     ArrFoldPrep arr, seedv, i, stat
-    
+
     For i = i To UBound(arr)
         If TypeName(f) = "Atom" Then
             If f.GetAddr = VBA.CLng(AddressOf fnullMark) Then
@@ -489,7 +489,7 @@ Private Function FoldRImpl( _
     Dim stat As Variant
     Dim i As Long: i = UBound(arr)
     ArrFoldRPrep arr, seedv, i, stat
-    
+
     For i = i To 0 Step -1
         If TypeName(f) = "Atom" Then
             If f.GetAddr = VBA.CLng(AddressOf fnullMark) Then

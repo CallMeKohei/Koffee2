@@ -47,7 +47,7 @@ Public Enum SourceTypeEnum
     adExcel = 1
     adSQLite = 2
 End Enum
-  
+
 Const PROVIDER01    As String = "PROVIDER=MSDASQL;Extended Properties="""
 Const DRIVER01      As String = "DRIVER={Microsoft Text Driver (*.txt; *.csv)};"
 Const PATH01        As String = "DBQ="
@@ -59,7 +59,7 @@ Const PATH02        As String = "DBQ="
 Const PROVIDER03    As String = "PROVIDER=MSDASQL;charset=cp932;"
 Const DRIVER03      As String = "Driver=SQLite3 ODBC Driver;"
 Const PATH03        As String = ""
-  
+
 Private cn_ As Object
 
 Private Sub Class_Initialize()
@@ -86,7 +86,7 @@ Public Function CreateAdoRS(ByVal sql As String, _
     Optional ByVal propLockType As LockTypeEnum = adLockReadOnly, _
     Optional ByVal propCommandType As CommandTypeEnum = adCmdText _
     ) As Object
-    
+
     Set CreateAdoRS = CreateObject("ADODB.Recordset")
     With CreateAdoRS
         .Open _
@@ -96,7 +96,7 @@ Public Function CreateAdoRS(ByVal sql As String, _
             LockType:=propLockType, _
             Options:=propCommandType
     End With
-    
+
 End Function
 
 Public Function JagArrAdoRsHeader(ByVal sql As String) As Variant
@@ -110,15 +110,15 @@ End Function
 Public Function JagArrAdoRS(ByVal sql As String) As Variant
     JagArrAdoRS = Arr2DToJagArr(CreateAdoRS(sql).GetRows())
 End Function
-   
+
 Public Sub pos(ByVal sql As String, Optional ByVal rng As Range = Nothing)
-    
+
     If CreateAdoRS(sql).EOF Then Debug.Print "No Date!: " & Now(): Exit Sub
-    
+
     If TypeName(rng) = "Nothing" Then
         AddSheet "test"
         Set rng = ThisWorkbook.Worksheets("test").Range("C5")
     End If
-    
+
     rng.CopyFromRecordset CreateAdoRS(sql)
 End Sub

@@ -74,9 +74,9 @@ Escape:
 End Function
 
 Public Function Truncate(ByVal arr As Variant) As Variant
-    
+
     Dim lb As Long: lb = LBound(arr)
-    
+
     Dim i As Long, n As Long: n = UBound(arr)
     For i = 0 To UBound(arr)
         If Not IsEmpty(arr(n - i)) Then
@@ -89,7 +89,7 @@ Public Function Truncate(ByVal arr As Variant) As Variant
             GoTo Escape
         End If
     Next i
-    
+
 Escape:
     If UBound(arr) = -1 Or IsEmpty(Truncate) Then
         Truncate = Array(Empty)
@@ -118,7 +118,7 @@ Public Function Base01(ByVal arr As Variant, Optional ByVal BaseOne As Boolean =
             Base01 = Base01(v, BaseOne, acc, acc_i, acc_ub, level + 1, leaf)
         Next v
     Else
-        
+
         Dim a(), i As Long
         If BaseOne = True Then
             ReDim a(1 To 32)
@@ -151,7 +151,7 @@ Public Function Base01(ByVal arr As Variant, Optional ByVal BaseOne As Boolean =
             i = i + 1
 
         Next v
-        
+
         If acc_ub = acc_i Then
             acc_ub = acc_ub + 1
             acc_ub = -1 + acc_ub + acc_ub
@@ -163,14 +163,14 @@ Public Function Base01(ByVal arr As Variant, Optional ByVal BaseOne As Boolean =
                 acc_ub = UBound(acc)
             End If
         End If
-        
+
         acc(acc_i) = Truncate(a)
         acc_i = acc_i + 1
 
     End If
-    
+
     leaf = IIf(leaf < level, level, leaf)
-    
+
     If level = 0 Then
         Base01 = ArrUnflatten(Truncate(acc), leaf - 1, BaseOne)
     Else
@@ -216,15 +216,15 @@ Public Function ArrUnflatten(ByVal arr As Variant, Optional ByVal n As Long = 1,
 End Function
 
 Public Function ArrFill(ByVal arr As Variant, ByVal n As Long, Optional ByVal filled As Variant = 0, Optional isRear As Boolean = False) As Variant
-    
+
     If n <= UBound(arr) Then
         ArrFill = arr
         GoTo Escape
     End If
-    
+
     Dim a(): ReDim a(32)
     Dim ub As Long:  ub = 32
-    
+
     Dim i As Long
     For i = 0 To n - UBound(arr) - 1
         If ub = i Then
@@ -237,7 +237,7 @@ Public Function ArrFill(ByVal arr As Variant, ByVal n As Long, Optional ByVal fi
         Else
             Let a(i) = filled
         End If
-        
+
     Next i
 
     If isRear Then
@@ -265,7 +265,7 @@ End Function
 Public Function Rest(ByVal arr As Variant) As Variant
 
     Dim lb As Long: lb = LBound(arr)
-    
+
     Dim k As Long, cnt As Long, n As Long: n = UBound(arr)
     For k = 0 To UBound(arr)
         If IsEmpty(arr(n - k)) Then
@@ -282,29 +282,29 @@ Public Function Rest(ByVal arr As Variant) As Variant
 
     Dim i As Long
     For i = 1 To UBound(arr)
-        
+
         If ub = j Then
             ub = ub + 1
             ub = -1 + ub + ub
             ReDim Preserve a(ub - 1)
         End If
-    
+
         If IsObject(arr(i)) Then
             Set a(j) = arr(i)
         Else
             a(j) = arr(i)
         End If
-        
+
         j = j + 1
-        
+
     Next i
-    
+
     If cnt <> 0 Then
         Rest = ArrConcat(Truncate(a), ArrFill(Array(), cnt, Empty))
     Else
         Rest = Truncate(a)
     End If
-    
+
 End Function
 
 'About Array sort
@@ -328,75 +328,75 @@ Public Function ArrPlus(ByVal arr1 As Variant, ByVal arr2 As Variant) As Variant
 
     If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
     If (ArrRank(arr1) <> ArrRank(arr2)) And (UBound(arr1) <> UBound(arr2)) Then Err.Raise 13
-    
+
     Dim a(): ReDim a(32)
     Dim ub As Long:  ub = 32
 
     Dim i As Long, arrx As New ArrayEx
     For i = 0 To UBound(arr1)
-    
+
         If ub = i Then
             ub = ub + 1
             ub = -1 + ub + ub
             ReDim Preserve a(ub - 1)
         End If
-        
+
         a(i) = CCur(arr1(i)) + CCur(arr2(i))
-        
+
     Next i
-    
+
     ArrPlus = Truncate(a)
-    
+
 End Function
 
 Public Function ArrMinus(ByVal arr1 As Variant, ByVal arr2 As Variant) As Variant
 
     If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
     If (ArrRank(arr1) <> ArrRank(arr2)) And (UBound(arr1) <> UBound(arr2)) Then Err.Raise 13
-    
+
     Dim a(): ReDim a(32)
     Dim ub As Long:  ub = 32
 
     Dim i As Long, arrx As New ArrayEx
     For i = 0 To UBound(arr1)
-    
+
         If ub = i Then
             ub = ub + 1
             ub = -1 + ub + ub
             ReDim Preserve a(ub - 1)
         End If
-        
+
         a(i) = CCur(arr1(i)) - CCur(arr2(i))
-        
+
     Next i
-    
+
     ArrMinus = Truncate(a)
-    
+
 End Function
 
 Public Function ArrDivide(ByVal arr1 As Variant, ByVal arr2 As Variant) As Variant
 
     If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
     If (ArrRank(arr1) <> ArrRank(arr2)) And (UBound(arr1) <> UBound(arr2)) Then Err.Raise 13
-    
+
     Dim a(): ReDim a(32)
     Dim ub As Long:  ub = 32
 
     Dim i As Long, arrx As New ArrayEx
     For i = 0 To UBound(arr1)
-    
+
         If ub = i Then
             ub = ub + 1
             ub = -1 + ub + ub
             ReDim Preserve a(ub - 1)
         End If
-        
+
         a(i) = CCur(arr1(i)) / CCur(arr2(i))
-        
+
     Next i
-    
+
     ArrDivide = Truncate(a)
-    
+
 End Function
 
 'About SET operation
@@ -446,33 +446,33 @@ Public Function ArrShift(ByVal val As Variant, ByVal arr As Variant, Optional By
     Dim a(): If BaseOne Then ReDim a(1 To 32) Else ReDim a(32)
     Dim ub As Long:  ub = 32
     Dim i As Long:  If BaseOne Then i = 2 Else i = 1
-    
+
     If IsObject(val) Then
         If BaseOne Then Set a(1) = val Else Set a(0) = val
     Else
         If BaseOne Then Let a(1) = val Else Let a(0) = val
     End If
-    
+
     Dim v
     For Each v In arr
-        
+
         If ub = i Then
             ub = ub + 1
             ub = -1 + ub + ub
             If BaseOne Then ReDim Preserve a(1 To ub - 1) Else ReDim Preserve a(ub - 1)
         End If
-        
+
         If IsObject(v) Then
             Set a(i) = v
         Else
             Let a(i) = v
         End If
-        
+
         i = i + 1
     Next v
-    
+
     ArrShift = Truncate(a)
-    
+
 End Function
 
 Public Function ArrUnshift(ByVal arr As Variant) As Variant
@@ -575,25 +575,25 @@ Public Function StepTotal(ByVal arr As Variant, Optional ByRef acc As Variant) A
 End Function
 
 Public Function Nz2(ByVal arr As Variant, Optional ByVal ValueIfNull As Variant, Optional ByVal EnableSpeedUp As Boolean = False) As Variant
-    
+
     Dim alt
     If IsMissing(ValueIfNull) Then
         alt = IIf(IsNumericArray(arr, EnableSpeedUp), 0, "")
     Else
         alt = ValueIfNull
     End If
-    
+
     Dim v, arrx As New ArrayEx
     For Each v In arr
         arrx.addval IIf(IsNull(v), alt, v)
     Next v
-    
+
     Nz2 = arrx.ToArray
 
 End Function
 
 Private Function IsNumericArray(ByVal arr As Variant, Optional ByVal Economy As Boolean = False) As Boolean
-    
+
     Dim myChoice:      myChoice = ArrShuffle(ArrRange(LBound(arr), UBound(arr)))
     Dim JudgeRange
     If Economy Then
@@ -601,7 +601,7 @@ Private Function IsNumericArray(ByVal arr As Variant, Optional ByVal Economy As 
     Else
         JudgeRange = myChoice
     End If
-    
+
     Dim v
     For Each v In JudgeRange
         If Not IsNumeric(arr(v)) Then
@@ -611,8 +611,8 @@ Private Function IsNumericArray(ByVal arr As Variant, Optional ByVal Economy As 
             End If
         End If
     Next
-    
+
     IsNumericArray = True
-    
+
 Escape:
 End Function

@@ -8,7 +8,7 @@ Option Explicit
 
 'Basic Function
 Public Function LogN(ByVal xs As Variant) As Variant
-    
+
     If Not IsArray(xs) Then
         LogN = Log(xs)
     Else
@@ -18,7 +18,7 @@ Public Function LogN(ByVal xs As Variant) As Variant
         Next v
         LogN = arrx.ToArray
     End If
-    
+
 End Function
 
 Public Function Sqr2(ByVal xs As Variant) As Variant
@@ -32,13 +32,13 @@ Public Function Sqr2(ByVal xs As Variant) As Variant
         Next v
         Sqr2 = arrx.ToArray
     End If
-    
+
 End Function
 
 Public Function PowerN(ByVal xs As Variant, ByVal nth As Variant) As Variant
-    
+
     Dim wf As WorksheetFunction: Set wf = Application.WorksheetFunction
-    
+
     If Not IsArray(xs) Then
         PowerN = wf.Power(xs, nth)
     Else
@@ -63,27 +63,27 @@ End Function
 
 'Trend Line
 Public Function TLTrd(ByVal New_xs As Variant, ByVal known_y, ByVal known_xs) As Variant
-    
+
     If IsJagArr(New_xs) Then
-    
+
         Dim ub As Long
         If IsJagArr(known_xs) Then
             ub = UBound(known_xs(0))
         Else
             ub = UBound(known_xs)
         End If
-        
+
         Dim i As Long, arrx As New ArrayEx, rcd:  rcd = ToRecord(New_xs, False)
         For i = 0 To ub
             arrx.addval WorksheetFunction.Trend(known_y, known_xs, PartialPackage(rcd(i)))(1)
         Next i
-        
+
         TLTrd = arrx.ToArray
-        
+
     Else
         TLTrd = ArrFlatten(Base01(WorksheetFunction.Trend(known_y, known_xs, PartialPackage(New_xs))))
     End If
-        
+
 End Function
 
 Private Function PartialPackage(ByVal arr As Variant) As Variant
@@ -100,7 +100,7 @@ Public Function TLTrdU(ByVal New_x As Variant, ByVal known_y As Variant, ByVal k
         If IsJagArr(New_x) And UBound(New_x) = 0 Then New_x = ArrFlatten(New_x)
     End If
     If IsJagArr(known_y) And UBound(known_y) = 0 Then known_y = ArrFlatten(known_y)
-    
+
     TLTrdU = TLTrd(New_x, known_y, known_xs)(0) + Tvalue(UBound(known_y), UBound(New_x), dc) * SEP(TLTrd(known_xs, known_y, known_xs), known_y, known_xs, New_x)(0)
 
 End Function
@@ -111,7 +111,7 @@ Public Function TLTrdL(ByVal New_x As Variant, ByVal known_y As Variant, ByVal k
         If IsJagArr(New_x) And UBound(New_x) = 0 Then New_x = ArrFlatten(New_x)
     End If
     If IsJagArr(known_y) And UBound(known_y) = 0 Then known_y = ArrFlatten(known_y)
-    
+
     TLTrdL = TLTrd(New_x, known_y, known_xs)(0) - Tvalue(UBound(known_y), UBound(New_x), dc) * SEP(TLTrd(known_xs, known_y, known_xs), known_y, known_xs, New_x)(0)
 
 End Function
@@ -120,48 +120,48 @@ Public Function TLLin(ByVal New_x As Variant, ByVal known_y As Variant, ByVal kn
 
     If Not IsArray(New_x) And IsNumeric(New_x) Then New_x = Array(New_x)
     If Not IsArray(New_x) Then Err.Raise 13
-    
+
     If IsJagArr(New_x) And UBound(New_x) = 0 Then New_x = ArrFlatten(New_x)
-    
+
     Dim v As Variant, arrx As New ArrayEx
     For Each v In New_x
         arrx.addval Application.WorksheetFunction.Forecast(v, known_y, known_xs)
     Next v
-    
+
     TLLin = arrx.ToArray
-    
+
 End Function
 
 Public Function TLLinU(ByVal New_x As Variant, ByVal known_y As Variant, ByVal known_xs As Variant)
-  
+
     If IsArray(New_x) Then
         If IsJagArr(New_x) And UBound(New_x) = 0 Then New_x = ArrFlatten(New_x)
     End If
     If IsJagArr(known_y) And UBound(known_y) = 0 Then known_y = ArrFlatten(known_y)
     If IsJagArr(known_xs) And UBound(known_xs) = 0 Then known_xs = ArrFlatten(known_xs)
-  
+
     If ArrEquals(IIf(IsArray(New_x), New_x, Array(New_x)), known_xs) Then
         TLLinU = ArrPlus(TLLin(New_x, known_y, known_xs), SEP(New_x, known_y, known_xs))
     Else
         TLLinU = ArrPlus(TLLin(New_x, known_y, known_xs), SEP(TLLin(known_xs, known_y, known_xs), known_y, known_xs, New_x))
     End If
-    
+
 End Function
 
 Public Function TLLinL(ByVal New_x As Variant, ByVal known_y As Variant, ByVal known_xs As Variant)
-    
+
     If IsArray(New_x) Then
         If IsJagArr(New_x) And UBound(New_x) = 0 Then New_x = ArrFlatten(New_x)
     End If
     If IsJagArr(known_y) And UBound(known_y) = 0 Then known_y = ArrFlatten(known_y)
     If IsJagArr(known_xs) And UBound(known_xs) = 0 Then known_xs = ArrFlatten(known_xs)
-    
+
     If ArrEquals(IIf(IsArray(New_x), New_x, Array(New_x)), known_xs) Then
         TLLinL = ArrMinus(TLLin(New_x, known_y, known_xs), SEP(New_x, known_y, known_xs))
     Else
         TLLinL = ArrMinus(TLLin(New_x, known_y, known_xs), SEP(TLLin(known_xs, known_y, known_xs), known_y, known_xs, New_x))
     End If
-    
+
 End Function
 
 Public Function TLExp(ByVal New_x As Variant, ByVal known_y As Variant, ByVal known_xs As Variant) As Variant
@@ -171,35 +171,35 @@ Public Function TLExp(ByVal New_x As Variant, ByVal known_y As Variant, ByVal kn
 End Function
 
 Public Function TLExpU(ByVal New_x As Variant, ByVal known_y As Variant, ByVal known_xs As Variant)
-   
+
     If IsArray(New_x) Then
         If IsJagArr(New_x) And UBound(New_x) = 0 Then New_x = ArrFlatten(New_x)
     End If
     If IsJagArr(known_y) And UBound(known_y) = 0 Then known_y = ArrFlatten(known_y)
     If IsJagArr(known_xs) And UBound(known_xs) = 0 Then known_xs = ArrFlatten(known_xs)
-   
+
     If ArrEquals(IIf(IsArray(New_x), New_x, Array(New_x)), known_xs) Then
         TLExpU = ArrPlus(TLExp(New_x, known_y, known_xs), SEP(New_x, known_y, known_xs))
     Else
         TLExpU = ArrPlus(TLExp(New_x, known_y, known_xs), SEP(TLExp(known_xs, known_y, known_xs), known_y, known_xs, New_x))
     End If
-    
+
 End Function
 
 Public Function TLExpL(ByVal New_x As Variant, ByVal known_y As Variant, ByVal known_xs As Variant)
-    
+
     If IsArray(New_x) Then
         If IsJagArr(New_x) And UBound(New_x) = 0 Then New_x = ArrFlatten(New_x)
     End If
     If IsJagArr(known_y) And UBound(known_y) = 0 Then known_y = ArrFlatten(known_y)
     If IsJagArr(known_xs) And UBound(known_xs) = 0 Then known_xs = ArrFlatten(known_xs)
-    
+
     If ArrEquals(IIf(IsArray(New_x), New_x, Array(New_x)), known_xs) Then
         TLExpL = ArrMinus(TLExp(New_x, known_y, known_xs), SEP(New_x, known_y, known_xs))
     Else
         TLExpL = ArrMinus(TLExp(New_x, known_y, known_xs), SEP(TLExp(known_xs, known_y, known_xs), known_y, known_xs, New_x))
     End If
-    
+
 End Function
 
 Public Function TLLog(ByVal New_x As Variant, ByVal known_y As Variant, ByVal known_xs As Variant) As Variant
@@ -211,41 +211,41 @@ Public Function TLLog(ByVal New_x As Variant, ByVal known_y As Variant, ByVal kn
     For Each v In New_x
         arrx.addval Application.WorksheetFunction.Forecast(Log(v), known_y, LogN(known_xs))
     Next v
-    
+
     TLLog = arrx.ToArray
-    
+
 End Function
 
 Public Function TLLogU(ByVal New_x As Variant, ByVal known_y As Variant, ByVal known_xs As Variant)
-    
+
     If IsArray(New_x) Then
         If IsJagArr(New_x) And UBound(New_x) = 0 Then New_x = ArrFlatten(New_x)
     End If
     If IsJagArr(known_y) And UBound(known_y) = 0 Then known_y = ArrFlatten(known_y)
     If IsJagArr(known_xs) And UBound(known_xs) = 0 Then known_xs = ArrFlatten(known_xs)
-    
+
     If ArrEquals(IIf(IsArray(New_x), New_x, Array(New_x)), known_xs) Then
         TLLogU = ArrPlus(TLLog(New_x, known_y, known_xs), SEP(New_x, known_y, known_xs))
     Else
         TLLogU = ArrPlus(TLLog(New_x, known_y, known_xs), SEP(TLLog(known_xs, known_y, known_xs), known_y, known_xs, New_x))
     End If
-    
+
 End Function
 
 Public Function TLLogL(ByVal New_x As Variant, ByVal known_y As Variant, ByVal known_xs As Variant)
-    
+
     If IsArray(New_x) Then
         If IsJagArr(New_x) And UBound(New_x) = 0 Then New_x = ArrFlatten(New_x)
     End If
     If IsJagArr(known_y) And UBound(known_y) = 0 Then known_y = ArrFlatten(known_y)
     If IsJagArr(known_xs) And UBound(known_xs) = 0 Then known_xs = ArrFlatten(known_xs)
-    
+
     If ArrEquals(IIf(IsArray(New_x), New_x, Array(New_x)), known_xs) Then
         TLLogL = ArrMinus(TLLog(New_x, known_y, known_xs), SEP(New_x, known_y, known_xs))
     Else
         TLLogL = ArrMinus(TLLog(New_x, known_y, known_xs), SEP(TLLog(known_xs, known_y, known_xs), known_y, known_xs, New_x))
     End If
-    
+
 End Function
 
 Public Function TLPwr(ByVal New_x As Variant, ByVal known_y As Variant, ByVal known_xs As Variant) As Variant
@@ -257,41 +257,41 @@ Public Function TLPwr(ByVal New_x As Variant, ByVal known_y As Variant, ByVal kn
     For Each v In New_x
         arrx.addval Exp(Application.WorksheetFunction.Forecast(Log(v), LogN(known_y), LogN(known_xs)))
     Next v
-    
+
     TLPwr = arrx.ToArray
-    
+
 End Function
 
 Public Function TLPwrU(ByVal New_x As Variant, ByVal known_y As Variant, ByVal known_xs As Variant)
-    
+
     If IsArray(New_x) Then
         If IsJagArr(New_x) And UBound(New_x) = 0 Then New_x = ArrFlatten(New_x)
     End If
     If IsJagArr(known_y) And UBound(known_y) = 0 Then known_y = ArrFlatten(known_y)
     If IsJagArr(known_xs) And UBound(known_xs) = 0 Then known_xs = ArrFlatten(known_xs)
-    
+
     If ArrEquals(IIf(IsArray(New_x), New_x, Array(New_x)), known_xs) Then
         TLPwrU = ArrPlus(TLPwr(New_x, known_y, known_xs), SEP(New_x, known_y, known_xs))
     Else
         TLPwrU = ArrPlus(TLPwr(New_x, known_y, known_xs), SEP(TLPwr(known_xs, known_y, known_xs), known_y, known_xs, New_x))
     End If
-    
+
 End Function
 
 Public Function TLPwrL(ByVal New_x As Variant, ByVal known_y As Variant, ByVal known_xs As Variant)
-    
+
     If IsArray(New_x) Then
         If IsJagArr(New_x) And UBound(New_x) = 0 Then New_x = ArrFlatten(New_x)
     End If
     If IsJagArr(known_y) And UBound(known_y) = 0 Then known_y = ArrFlatten(known_y)
     If IsJagArr(known_xs) And UBound(known_xs) = 0 Then known_xs = ArrFlatten(known_xs)
-    
+
     If ArrEquals(IIf(IsArray(New_x), New_x, Array(New_x)), known_xs) Then
         TLPwrL = ArrMinus(TLPwr(New_x, known_y, known_xs), SEP(New_x, known_y, known_xs))
     Else
         TLPwrL = ArrMinus(TLPwr(New_x, known_y, known_xs), SEP(TLPwr(known_xs, known_y, known_xs), known_y, known_xs, New_x))
     End If
-    
+
 End Function
 
 
@@ -304,47 +304,47 @@ Public Function TLPly(ByVal New_x As Variant, ByVal known_y As Variant, ByVal kn
     For Each v In New_x
         arrx.addval Application.WorksheetFunction.Trend(known_y, PowerScan(known_xs, n), PowerScan(Array(v), n))
     Next v
-    
+
     TLPly = ArrFlatten(arrx.ToArray)
-    
+
 End Function
 
 Public Function TLPlyU(ByVal New_x As Variant, ByVal known_y As Variant, ByVal known_xs As Variant, Optional ByVal n As Long = 2)
-    
+
     If IsArray(New_x) Then
         If IsJagArr(New_x) And UBound(New_x) = 0 Then New_x = ArrFlatten(New_x)
     End If
     If IsJagArr(known_y) And UBound(known_y) = 0 Then known_y = ArrFlatten(known_y)
     If IsJagArr(known_xs) And UBound(known_xs) = 0 Then known_xs = ArrFlatten(known_xs)
-    
+
     If ArrEquals(IIf(IsArray(New_x), New_x, Array(New_x)), known_xs) Then
         TLPlyU = ArrPlus(TLPly(New_x, known_y, known_xs), SEP(New_x, known_y, known_xs))
     Else
         TLPlyU = ArrPlus(TLPly(New_x, known_y, known_xs), SEP(TLPly(known_xs, known_y, known_xs, n), known_y, known_xs, New_x))
     End If
-    
+
 End Function
 
 Public Function TLPlyL(ByVal New_x As Variant, ByVal known_y As Variant, ByVal known_xs As Variant, Optional ByVal n As Long = 2)
-    
+
     If IsArray(New_x) Then
         If IsJagArr(New_x) And UBound(New_x) = 0 Then New_x = ArrFlatten(New_x)
     End If
     If IsJagArr(known_y) And UBound(known_y) = 0 Then known_y = ArrFlatten(known_y)
     If IsJagArr(known_xs) And UBound(known_xs) = 0 Then known_xs = ArrFlatten(known_xs)
-    
+
     If ArrEquals(IIf(IsArray(New_x), New_x, Array(New_x)), known_xs) Then
         TLPlyL = ArrMinus(TLPly(New_x, known_y, known_xs), SEP(New_x, known_y, known_xs))
     Else
         TLPlyL = ArrMinus(TLPly(New_x, known_y, known_xs), SEP(TLPly(known_xs, known_y, known_xs, n), known_y, known_xs, New_x))
     End If
-    
+
 End Function
 
 Public Function R2Values(ByVal known_y As Variant, ByVal known_x As Variant) As Variant
 
     Dim wf As WorksheetFunction: Set wf = Application.WorksheetFunction
-    
+
     If IsJagArr(known_x) Then
         R2Values = LinEst2(known_y, known_x)(2)(0)
     Else
@@ -356,8 +356,8 @@ Public Function R2Values(ByVal known_y As Variant, ByVal known_x As Variant) As 
         Dim ply3 As Variant: ply3 = LinEst2(known_y, PowerScan(known_x, 3))(2)(0)
         R2Values = Array(Lin, Exp, Log, Pwr, ply2, ply3)
     End If
-    
-    
+
+
 
 End Function
 
@@ -365,7 +365,7 @@ End Function
 'Standard Error of Predicts
 
 Public Function SEP(ByVal Pred_y, ByVal known_y, ByVal known_xs, Optional ByVal Setter_xs, Optional ByVal SampleCnt As Long, Optional ByVal Known_xsCnt As Long) As Variant
-    
+
     Dim flg As Boolean
     If IsMissing(Setter_xs) Then
         Setter_xs = known_xs
@@ -379,7 +379,7 @@ Public Function SEP(ByVal Pred_y, ByVal known_y, ByVal known_xs, Optional ByVal 
             SampleCnt = ArrLen(known_y)
         End If
     End If
-    
+
     If Known_xsCnt = 0 Then
         If IsJagArr(known_xs) Then
             Known_xsCnt = ArrLen(known_xs)
@@ -403,7 +403,7 @@ End Function
 Public Function Residual(ByVal Pred_y, ByVal xs) As Variant
 
     Dim wf As WorksheetFunction: Set wf = Application.WorksheetFunction
-    
+
     If IsArray(Pred_y) Then
         Dim i As Long, arrx As New ArrayEx
         For i = 0 To UBound(xs)
@@ -438,11 +438,11 @@ Public Function MahalanobisDist(ByVal PredVals As Variant, ByVal xs As Variant) 
 End Function
 
 Public Function CovarMatrix(ByVal JagArr As Variant) As Variant
-    
+
     If Not IsJagArr(JagArr) Then JagArr = Array(JagArr)
-    
+
     Dim wf As WorksheetFunction: Set wf = Application.WorksheetFunction
-    
+
     Dim v, v1, arrx As New ArrayEx, tmp As New ArrayEx
     For Each v In JagArr
         For Each v1 In JagArr
@@ -451,9 +451,9 @@ Public Function CovarMatrix(ByVal JagArr As Variant) As Variant
         arrx.addval tmp.ToArray
         Set tmp = Nothing
     Next v
-    
+
     CovarMatrix = arrx.ToArray
-    
+
 End Function
 
 Public Function TDist(ByVal arr, ByVal DegreeOfFreedom, ByVal Tails) As Variant
@@ -465,9 +465,9 @@ Public Function TDist(ByVal arr, ByVal DegreeOfFreedom, ByVal Tails) As Variant
 End Function
 
 Public Function Correl(ByVal arr As Variant) As Variant
-    
+
     Dim v, v2, tmp As New ArrayEx, arrx As New ArrayEx
-    
+
     For Each v In arr
         For Each v2 In arr
             tmp.addval Application.WorksheetFunction.Correl(v, v2)
@@ -475,7 +475,7 @@ Public Function Correl(ByVal arr As Variant) As Variant
         arrx.addval tmp.ToArray
         Set tmp = Nothing
     Next v
-    
+
     Correl = arrx.ToArray
 
 End Function
@@ -483,7 +483,7 @@ End Function
 
 'About ABC chart data
 Public Function TplABC(ByVal ArrName As Variant, ByVal ArrVal As Variant) As Tuple
-    
+
     Dim Order:       Order = ArrRange(1, ArrLen(ArrName))
     Dim Rate:        Rate = DivideByTotal(ArrVal, Total(ArrVal))
     Dim StackRate:   StackRate = StepTotal(Rate)(0)
@@ -522,11 +522,11 @@ End Function
 
 'About Regression_Overview
 Public Sub Regression_Overview(ByVal known_y, ByVal known_x_headerIncluded)
-    
+
     RegressionStatistics known_y, known_x_headerIncluded
-    
+
     Debug.Print vbNewLine
-    
+
     ANOVA known_y, known_x_headerIncluded
 
     Debug.Print vbNewLine
@@ -539,13 +539,13 @@ Private Sub RegressionStatistics(ByVal known_y, ByVal known_x_headerIncluded)
 
     Dim SampleCnt As Long: SampleCnt = ArrLen(known_y(0))
     Dim xCnt As Long:      xCnt = ArrLen(known_x_headerIncluded(0))
-    
+
     Dim MultipleR:       MultipleR = (WorksheetFunction.Correl(TLTrd(known_x_headerIncluded(0), known_y(0), known_x_headerIncluded(0)), known_y(0)))
     Dim RSquare:         RSquare = LinEst2(known_y, known_x_headerIncluded(0))(2)(0)
     Dim AdjustedRSquare: AdjustedRSquare = 1 - (SampleCnt - 1) / (SampleCnt - xCnt - 1) * (1 - LinEst2(known_y, known_x_headerIncluded(0))(2)(0))
     Dim StandardError:   StandardError = LinEst2(known_y, known_x_headerIncluded(0))(2)(1)
     Dim Observations:    Observations = SampleCnt
-    
+
     DP Array(MultipleR, RSquare, AdjustedRSquare, StandardError, Observations) _
         , Array("MultR2", "R2", "adjR2", "StdErr", "Obs") _
         , , "(Regression Statistics)" & vbNewLine & "----------------------"
@@ -553,29 +553,29 @@ Private Sub RegressionStatistics(ByVal known_y, ByVal known_x_headerIncluded)
 End Sub
 
 Private Sub ANOVA(ByVal known_y, ByVal known_x_headerIncluded)
-    
+
     Dim lEst: lEst = LinEst2(known_y, known_x_headerIncluded(0))
-    
+
     Dim Regdf:   Regdf = ArrLen(known_x_headerIncluded(0))
     Dim Resdf:   Resdf = lEst(3)(1)
     Dim totaldf: totaldf = Regdf + Resdf
-    
+
     Dim RegSS:   RegSS = lEst(4)(0)
     Dim ResSS:   ResSS = lEst(4)(1)
     Dim TotalSS: TotalSS = RegSS + ResSS
-    
+
     Dim RegMS:   RegMS = ""
     Dim ResMS:   ResMS = Residualv(TLTrd(known_x_headerIncluded(0), known_y, known_x_headerIncluded(0)), known_y, ArrLen(known_y(0)), ArrLen(known_x_headerIncluded(0)))
-    
+
     Dim RegF:    RegF = lEst(3)(0)
     Dim SigF:    SigF = WorksheetFunction.FDist(RegF, Regdf, Resdf)
-    
+
     DP Array(Array(Regdf, Resdf, totaldf), Array(RegSS, ResSS, TotalSS), _
              Array(RegMS, ResMS, "Error"), Array(RegF, "Error", "Error"), Array(SigF, "Error", "Error")) _
              , Array("Regression", "Residual", "Total") _
              , Array("df", "SS", "MS", "F", "SigF") _
              , "(ANOVA)", 7
-             
+
 End Sub
 
 Private Sub LinEstChart(ByVal known_y, ByVal known_x_headerIncluded)
@@ -583,15 +583,15 @@ Private Sub LinEstChart(ByVal known_y, ByVal known_x_headerIncluded)
     Dim lEst: lEst = LinEst2(known_y, known_x_headerIncluded(0))
     Dim tStat: tStat = ArrDivide(ArrExplode(lEst(0)), ArrExplode(lEst(1)))
     Dim Pvalue: Pvalue = TDist(tStat, lEst(3)(1), 2)
-        
+
     DP Array(lEst(0), lEst(1), tStat, Pvalue) _
     , ArrExplode(Array(known_x_headerIncluded(1), "Intercept")) _
     , Array("Coef", "StdErr", "t Stat", "P-value") _
     , , 8
-    
+
     Debug.Print vbNewLine
-    
-    
+
+
     Dim i As Long, Lower95 As New ArrayEx, Upper95 As New ArrayEx, Lower99 As New ArrayEx, Upper99 As New ArrayEx
     For i = 0 To UBound(lEst(0))
         Lower95.addval lEst(0)(i) - (lEst(1)(i) * WorksheetFunction.TInv(1 - 0.95, lEst(3)(1)))
@@ -599,10 +599,10 @@ Private Sub LinEstChart(ByVal known_y, ByVal known_x_headerIncluded)
         Lower99.addval lEst(0)(i) - (lEst(1)(i) * WorksheetFunction.TInv(1 - 0.99, lEst(3)(1)))
         Upper99.addval lEst(0)(i) + (lEst(1)(i) * WorksheetFunction.TInv(1 - 0.99, lEst(3)(1)))
     Next i
-    
+
     DP Array(Lower95.ToArray, Upper95.ToArray, Lower99.ToArray, Upper99.ToArray) _
     , ArrExplode(Array(known_x_headerIncluded(1), "Intercept")) _
     , Array("Lower95", "Upper95", "Lower99", "Upper99") _
     , , 8
-    
+
 End Sub

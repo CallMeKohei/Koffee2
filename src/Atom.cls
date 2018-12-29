@@ -80,12 +80,12 @@ Public Sub FastApply(ByRef returnVal As Variant, ParamArray args() As Variant)
             End If
         Case Else:  tmp = args
     End Select
-    
+
     fun_.CallByPtr returnVal, ApplyPrep(tmp)
 End Sub
 
 Public Function Apply(ParamArray args() As Variant) As Variant
-    
+
     Dim tmp As Variant
     Select Case UBound(args)
         Case Is = -1: tmp = Missing
@@ -97,55 +97,55 @@ Public Function Apply(ParamArray args() As Variant) As Variant
             End If
         Case Else:  tmp = args
     End Select
-    
+
     fun_.CallByPtr Apply, ApplyPrep(tmp)
-    
+
 End Function
 
 Private Function ApplyPrep(ByVal args As Variant)
-    
+
     Dim ps As Variant
-    
+
     Select Case addr_
-        
+
         Case Is = VBA.CLng(AddressOf PartialMark)
-            
+
             Dim arrx As New ArrayEx
             PartialBindPrep arrx
             MergeArgs2 arrx, args
             ps = arrx.ToArray
-            
+
             Dim RestPs: RestPs = Rest(ps)
             If Not IsArray(RestPs(0)) And UBound(RestPs) = 0 Then
                 ApplyPrep = Array(ps(0), RestPs(0))
             Else
                 ApplyPrep = Array(ps(0), RestPs)
             End If
-    
+
         Case Is = VBA.CLng(AddressOf FoldMark), VBA.CLng(AddressOf ScanMark), VBA.CLng(AddressOf FoldRMark), VBA.CLng(AddressOf ScanRMark)
-        
+
             ps = MergeArgs(args)
-            
+
             If UBound(ps) = 1 Then
                 ReDim Preserve ps(2)
                 ps(2) = Missing
             End If
-            
+
             ApplyPrep = ps
-            
+
         Case Else
-        
+
             ApplyPrep = MergeArgs(args)
-    
+
     End Select
-    
+
 Escape:
 End Function
 
 Private Function MergeArgs(ByVal args As Variant) As Variant
-    
+
     If IsMissing(args) Then args = Array()
-    
+
     Dim v As Variant
     If Not IsArray(args) Then
         If IsObject(args) Then arrx_.AddObj args Else arrx_.addval args
@@ -164,13 +164,13 @@ Private Function MergeArgs(ByVal args As Variant) As Variant
             End If
         Next v
     End If
-    
+
     MergeArgs = arrx_.ToArray
-    
+
     If addr_ = 0 Then
         arrx_.popval
     End If
-    
+
 End Function
 
 Private Sub PartialBindPrep(ByRef arrx As Variant)
@@ -207,13 +207,13 @@ Private Sub PartialBindPrep(ByRef arrx As Variant)
             End If
         End If
     Next v
-    
+
 End Sub
 
 Private Sub MergeArgs2(ByRef arrx As Variant, ByVal args As Variant)
-    
+
     If IsMissing(args) Then args = Array()
-    
+
     Dim v As Variant
     If Not IsArray(args) Then
         If IsObject(args) Then arrx.AddObj args Else arrx.addval args
@@ -232,5 +232,5 @@ Private Sub MergeArgs2(ByRef arrx As Variant, ByVal args As Variant)
             End If
         Next v
     End If
-    
+
 End Sub

@@ -90,7 +90,7 @@ Public Function isGreenBlack(ByVal rcd As Object) As Boolean
     If rcd("Color") = "black" Or rcd("Color") = "green" Then
         isGreenBlack = True
     End If
-        
+
 End Function
 #End If
 
@@ -118,7 +118,7 @@ Public Sub KoffeeCore_Test()
     Application.DisplayAlerts = False
     sh.Delete
     Application.DisplayAlerts = True
-    
+
 
 
     Dim jagArr1 As Variant: jagArr1 = Array(Array(1, 2, 3), Array(4, 5, 6))
@@ -146,7 +146,7 @@ Public Sub KoffeeCore_Test()
     Dim arr3DClct() As Variant: arr3DClct = JagArrToArr2D(Array(Array(ArrToClct(Array(0))), Array(ArrToClct(Array(0))), Array(ArrToClct(Array(0)))))
     Assert.AreEqual False, IsJagArr(arr3DInt), "arr3DInt"
     Assert.AreEqual False, IsJagArr(arr3DClct), "arr3DClct"
-    
+
 
     Assert.AreEqualArr Array(1, 2, 3), Truncate(Array(1, 2, 3, Empty, Empty, Empty))
     Assert.AreEqualArr Array(Empty, 1, 2, 3), Truncate(Array(Empty, 1, 2, 3, Empty, Empty, Empty))
@@ -155,21 +155,21 @@ Public Sub KoffeeCore_Test()
     Assert.AreEqual 1&, LBound(Base01(Array(0, 1), True))
 
     Assert.AreEqualArr Array(1, 2, 3, 4, 5), ArrExplode(Array(1, Array(2, Array(3, Array(4))), 5))
-    
+
     Assert.AreEqualArr Array(1&, 2&, 3&, 0, 0), ArrFill(Array(1&, 2&, 3&), 4)
-    
+
     Dim arr As Variant: arr = Array("a", "b", "c", "d")
-    
+
     Assert.AreEqual "a", nth(0, arr)
     Assert.AreEqual "b", nth(1, arr)
     Assert.AreEqual "c", nth(2, arr)
     Assert.AreEqual "d", nth(3, arr)
-    
+
     Assert.AreEqualArr Array("b", "c", "d"), Rest(arr)
     Assert.AreEqualArr Array("c", "d"), Rest(Rest(arr))
     Assert.AreEqualArr Array("d"), Rest(Rest(Rest(arr)))
-    
-    
+
+
     Dim arrA As Variant: arrA = Array(5, 4, 3, 2, 1)
     Assert.AreEqualArr Array(1, 2, 3, 4, 5), ArrSortAsc(arrA)
     Assert.AreEqualArr Array(5, 4, 3, 2, 1), ArrSortDec(arrA)
@@ -189,22 +189,22 @@ Public Sub KoffeeCore_Test()
     Assert.AreEqualArr Array(4, 5, "b", 1, 2), ArrDiff2(arr2, arr1)
     Assert.AreEqualArr Array(3, "a"), ArrIntersect(arr1, arr2)
     Assert.AreEqualArr Array(3, "a"), ArrIntersect(arr2, arr1)
-    
+
     Assert.AreEqualArr Array(9, 1, 2, 3), ArrShift(9, Array(1, 2, 3))
     Assert.AreEqualArr Array(2, 3), ArrUnshift(Array(1, 2, 3))
     Assert.AreEqualArr Array(1, 2, 3, 9), ArrPush(9, Array(1, 2, 3))
     Assert.AreEqualArr Array(1, 2), ArrPop(Array(1, 2, 3))
-    
-    
+
+
     Assert.AreEqualArr Array(1&, 2&, 3&), ArrCLng(Array(1, 2, 3))
     Assert.AreEqualArr Array(1@, 2@, 3@), ArrCCur(Array(1, 2, 3))
-    
+
     Assert.AreEqualArr Array(1@, 3@, 6@), StepTotal(Array(1, 2, 3))(0)
     Assert.AreEqualArr Array(4@, 9@, 15@), StepTotal(Array(Array(1, 2, 3), Array(4, 5, 6)))(1)
-    
+
     Assert.AreEqualArr Array(1, 0, 3), Nz2(Array(1, Null, 3))
     Assert.AreEqualArr Array(1, "", 3, "a"), Nz2(Array(1, Null, 3, "a"))
-    
+
 End Sub
 
 Public Sub KoffeeTable_Test()
@@ -321,9 +321,9 @@ Public Sub KoffeeExcel_Test()
     Application.DisplayAlerts = False
     sh.Delete
     Application.DisplayAlerts = True
-    
-    
-    
+
+
+
         '    |  A   B   C   D   E   F   G
     '----+---------------------------
     '  1 |
@@ -382,7 +382,7 @@ Public Sub KoffeeExcel_Test()
     Application.DisplayAlerts = False
     sh.Delete
     Application.DisplayAlerts = True
-    
+
 
 
 
@@ -436,17 +436,17 @@ Public Sub KoffeeExcel_Test()
     Application.DisplayAlerts = False
     sh.Delete
     Application.DisplayAlerts = True
-    
-    
-    
+
+
+
     Dim v1 As Worksheet, arrx1 As New ArrayEx
     For Each v1 In ThisWorkbook.Worksheets
         arrx1.addval v1.Name
     Next v1
 
     Assert.AreEqualArr arrx1.ToArray, ArrSheetsName(ThisWorkbook)
-    
-    
+
+
 
     Dim v2 As Worksheet, arrx2 As New ArrayEx
     For Each v2 In ThisWorkbook.Worksheets
@@ -455,8 +455,8 @@ Public Sub KoffeeExcel_Test()
 
     Assert.AreEqual True, ExistsSheet(arrx2.ToArray(0))
     Assert.AreEqual False, ExistsSheet("abcdefghijklmnopqrstuvwxyz")
-    
-    
+
+
     Set sh = AddSheet("myTestTemporarySheet")
 
     Dim v3 As Worksheet, arrx3 As New ArrayEx
@@ -469,7 +469,7 @@ Public Sub KoffeeExcel_Test()
     Application.DisplayAlerts = False
     sh.Delete
     Application.DisplayAlerts = True
-    
+
 
 
     Set sh = AddSheet("myTestTemporarySheet")
@@ -481,7 +481,7 @@ Public Sub KoffeeExcel_Test()
     sh.Delete
     shCopied.Delete
     Application.DisplayAlerts = True
-    
+
 End Sub
 
 Public Sub ArrToNumericType_Test()

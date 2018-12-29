@@ -21,16 +21,16 @@ Public Function PowerSet(ByVal arr As Variant, Optional ByVal R As Long = 0) As 
                 T = ArrPush(arr(j), T)
             End If
         Next j
-        
+
         If ub = i Then
             ub = ub + 1
             ub = -1 + ub + ub
             ReDim Preserve a(ub - 1)
         End If
-    
+
         a(i) = T
         i = i + 1
-        
+
     Next v
 
     PowerSet = Truncate(a)
@@ -38,30 +38,30 @@ Public Function PowerSet(ByVal arr As Variant, Optional ByVal R As Long = 0) As 
 End Function
 
 Public Function PowerSetImpl(ByVal n As Variant, Optional R As Long = 0) As Variant
-    
+
     Dim arr(): ReDim arr(32)
     Dim ub As Long:  ub = 32
     Dim i As Long: i = 0
-    
+
     Dim v, bitflg
     For Each v In ArrRange(0, (2 ^ n) - 1)
         bitflg = Dec2bin(v, n, R)
         If UBound(bitflg) <> -1 Then
-            
+
             If ub = i Then
                 ub = ub + 1
                 ub = -1 + ub + ub
                 ReDim Preserve arr(ub - 1)
             End If
-        
+
             arr(i) = bitflg
             i = i + 1
-            
+
         End If
     Next v
-    
+
     PowerSetImpl = Truncate(arr)
-    
+
 End Function
 
 Public Function Combin(ByVal arr As Variant, Optional ByVal R As Long = 0) As Variant
@@ -77,7 +77,7 @@ Public Function Permut(ByVal arr As Variant, ByVal R As Long) As collection
 End Function
 
 Private Sub PermutImpl(ByVal a As Variant, ByVal R As Long, ByRef clct As collection)
-    
+
     Dim ub           As Byte: ub = UBound(a)
     Dim leafLevel    As Byte: If R = 0 Then leafLevel = ub Else leafLevel = R - 1
     Dim arr()        As Variant: ReDim arr(leafLevel)
@@ -87,7 +87,7 @@ Private Sub PermutImpl(ByVal a As Variant, ByVal R As Long, ByRef clct As collec
     Dim level(99)    As Byte
     Dim used         As Object: Set used = CreateObject("Scripting.Dictionary")
     Dim i            As Byte
-    
+
     Dim v
     For Each v In a
         stackPointer = stackPointer + 1
@@ -95,13 +95,13 @@ Private Sub PermutImpl(ByVal a As Variant, ByVal R As Long, ByRef clct As collec
         level(stackPointer) = 0
         used.Add key:=v, Item:=False
     Next v
-    
+
     Do While stackPointer > 0
-        
+
         currentLevel = level(stackPointer): level(stackPointer) = 0
         arr(currentLevel) = stack(stackPointer): stack(stackPointer) = 0
         stackPointer = stackPointer - 1
-        
+
         If used(arr(currentLevel)) = True Then
             currentLevel = currentLevel - 1
         Else
@@ -124,11 +124,11 @@ Private Sub PermutImpl(ByVal a As Variant, ByVal R As Long, ByRef clct As collec
             End If
         End If
     Loop
-    
+
 End Sub
 
 Public Sub PermutLimited(ByVal fst As Byte, ByVal lst As Byte, ByVal R As Byte, Optional ByRef clct As collection)
-    
+
     Dim ub           As Byte: ub = lst - fst
     Dim leafLevel    As Byte: If R = 0 Then leafLevel = ub Else leafLevel = R - 1
     Dim arr()        As Byte: ReDim arr(leafLevel)
@@ -138,19 +138,19 @@ Public Sub PermutLimited(ByVal fst As Byte, ByVal lst As Byte, ByVal R As Byte, 
     Dim level(99)    As Byte
     Dim used()       As Byte: ReDim used(lst)
     Dim i            As Byte
-    
+
     For i = fst To lst
         stackPointer = stackPointer + 1
         stack(stackPointer) = i
         level(stackPointer) = 0
     Next i
-    
+
     Do While stackPointer > 0
-        
+
         currentLevel = level(stackPointer): level(stackPointer) = 0
         arr(currentLevel) = stack(stackPointer): stack(stackPointer) = 0
         stackPointer = stackPointer - 1
-        
+
         If used(arr(currentLevel)) = True Then
             currentLevel = currentLevel - 1
         Else
@@ -173,7 +173,7 @@ Public Sub PermutLimited(ByVal fst As Byte, ByVal lst As Byte, ByVal R As Byte, 
             End If
         End If
     Loop
-    
+
 End Sub
 
 'Repeated Permutations
@@ -193,7 +193,7 @@ Public Function ReptPermut(ByVal arr As Variant, Optional ByVal R As Long = 0) A
 End Function
 
 Public Function ReptPermutImpl(ByVal n As Variant, Optional R As Long = 0) As Variant
-    
+
     Dim v, bitflg, arrx As New ArrayEx
     For Each v In ArrRange(0, (n ^ R - 1))
         bitflg = SplitStr(Dec2N(v, n))
@@ -201,9 +201,9 @@ Public Function ReptPermutImpl(ByVal n As Variant, Optional R As Long = 0) As Va
             arrx.addval ArrCLng(ArrFill(bitflg, R - 1, , True))
         End If
     Next v
-    
+
     ReptPermutImpl = arrx.ToArray
-    
+
 End Function
 
 Public Function Dec2N(ByVal val As Long, ByVal n As Long) As String
@@ -212,27 +212,27 @@ Public Function Dec2N(ByVal val As Long, ByVal n As Long) As String
         Dec2N = "0"
         GoTo Escape
     End If
-    
+
     Dim i As Long:      i = 1
     Dim tmp As String:  tmp = ""
-    
+
     Do While (val >= i)
         tmp = Dec2NImpl((val Mod (i * n)) \ i) & tmp
         i = i * n
     Loop
     Dec2N = tmp
-    
+
 Escape:
 End Function
 
 Private Function Dec2NImpl(ByVal val As Long) As String
-    
+
     If val < 10 Then
         Dec2NImpl = CStr(val)
     Else
         Dec2NImpl = Chr(65 + val - 10)
     End If
-    
+
 End Function
 
 'bit Operations
@@ -249,7 +249,7 @@ Public Function Dec2BinImpl(ByVal val As Long, Optional ByVal n As Long = 0, Opt
     Dim bit As Long
     Dim tmp As String
     Dim cnt As Long
-    
+
     Do Until (val < 2 ^ bit)
         If (val And 2 ^ bit) <> 0 Then
             tmp = "1" & tmp
@@ -261,9 +261,9 @@ Public Function Dec2BinImpl(ByVal val As Long, Optional ByVal n As Long = 0, Opt
 
         bit = bit + 1
     Loop
-    
+
     If tmp = "" Then tmp = 0
-    
+
     If R = 0 Then
         If n = 0 Then
             Dec2BinImpl = tmp
@@ -277,12 +277,12 @@ Public Function Dec2BinImpl(ByVal val As Long, Optional ByVal n As Long = 0, Opt
             Dec2BinImpl = Empty
         End If
     End If
-    
+
 Escape:
 End Function
 
 Public Function SplitStr(ByVal str As String) As Variant
-    
+
     If str = "" Then
         SplitStr = Array()
         GoTo Escape
@@ -302,14 +302,14 @@ Public Function SplitStr(ByVal str As String) As Variant
 
         a(i - 1) = Mid(str, i, 1)
     Next i
-    
+
     SplitStr = Truncate(a)
-    
+
 Escape:
 End Function
 
 Public Function BitAnd(ByVal flg1 As Variant, ByVal flg2 As Variant) As Variant
-    
+
     Dim ub As Long: ub = UBound(flg1)
     If UBound(flg1) > UBound(flg2) Then
         ub = UBound(flg1)
@@ -318,17 +318,17 @@ Public Function BitAnd(ByVal flg1 As Variant, ByVal flg2 As Variant) As Variant
         ub = UBound(flg2)
         flg1 = ArrFill(flg1, ub, , True)
     End If
-    
+
     Dim i As Long, arrx As New ArrayEx
     For i = 0 To ub
         arrx.addval IIf(CLng(flg1(i)) = CLng(flg2(i)) And CLng(flg1(i)) = 1, 1, 0)
     Next i
     BitAnd = arrx.ToArray
-    
+
 End Function
 
 Public Function BitOr(ByVal flg1 As Variant, ByVal flg2 As Variant) As Variant
-    
+
     Dim ub As Long: ub = UBound(flg1)
     If UBound(flg1) > UBound(flg2) Then
         ub = UBound(flg1)
@@ -337,17 +337,17 @@ Public Function BitOr(ByVal flg1 As Variant, ByVal flg2 As Variant) As Variant
         ub = UBound(flg2)
         flg1 = ArrFill(flg1, ub, , True)
     End If
-    
+
     Dim i As Long, arrx As New ArrayEx
     For i = 0 To UBound(flg1)
         arrx.addval IIf(CLng(flg1(i)) = CLng(flg2(i)) And CLng(flg1(i)) = 0, 0, 1)
     Next i
     BitOr = arrx.ToArray
-    
+
 End Function
 
 Public Function BitXor(ByVal flg1 As Variant, ByVal flg2 As Variant) As Variant
-    
+
     Dim ub As Long: ub = UBound(flg1)
     If UBound(flg1) > UBound(flg2) Then
         ub = UBound(flg1)
@@ -356,29 +356,29 @@ Public Function BitXor(ByVal flg1 As Variant, ByVal flg2 As Variant) As Variant
         ub = UBound(flg2)
         flg1 = ArrFill(flg1, ub, , True)
     End If
-    
+
     Dim i As Long, arrx As New ArrayEx
     For i = 0 To UBound(flg1)
         arrx.addval IIf(CLng(flg1(i)) = CLng(flg2(i)), 0, 1)
     Next i
     BitXor = arrx.ToArray
-    
+
 End Function
 
 Public Function BitNOT(ByVal flg As Variant) As Variant
-    
+
     Dim i As Long, arrx As New ArrayEx
     For i = 0 To UBound(flg)
         arrx.addval IIf(CLng(flg(i)) = 1, 0, 1)
     Next i
     BitNOT = arrx.ToArray
-    
+
 End Function
 
 Public Function BitFlag2(ByVal flgs As Variant) As Long
     BitFlag2 = 0
     Dim ub As Long: ub = UBound(flgs)
-    
+
     Dim i As Long
     For i = 0 To ub
         BitFlag2 = BitFlag2 + Abs(flgs(i)) * 2 ^ (ub - i)
@@ -408,13 +408,13 @@ Public Function BitComplement(ByVal flg As Variant) As Variant
 End Function
 
 Public Function BitPlus(ByVal flg1 As Variant, flg2 As Variant) As Variant
-    
+
     If UBound(flg1) > UBound(flg2) Then
         flg2 = ArrFill(flg2, UBound(flg1), , True)
     ElseIf UBound(flg1) < UBound(flg2) Then
         flg1 = ArrFill(flg1, UBound(flg2), , True)
     End If
-    
+
     BitPlus = Dec2bin(BitFlag2(flg1) + BitFlag2(flg2))
 End Function
 
@@ -436,7 +436,7 @@ Public Function BitMult(ByVal flg1 As Variant, flg2 As Variant) As Variant
     ElseIf UBound(flg1) < UBound(flg2) Then
         flg1 = ArrFill(flg1, UBound(flg2), , True)
     End If
-    
+
     BitMult = Dec2bin(BitFlag2(flg1) * BitFlag2(flg2))
 End Function
 
