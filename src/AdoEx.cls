@@ -7,11 +7,11 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'  +--------------                                         --------------+
-'  |||||||||    Koffee2 0.1.0                                            |
-'  |: ^_^ :|    Koffee2 is free Library based on Ariawase.               |
-'  |||||||||    The Project Page: https://github.com/CallMeKohei/Koffee2 |
-'  +--------------                                         --------------+
+''' --------------------------------------------------------
+'''  FILE    : AdoEx.cls
+'''  AUTHOR  : callmekohei <callmekohei at gmail.com>
+'''  License : MIT license
+''' --------------------------------------------------------
 Option Explicit
 
 Public Enum CursorTypeEnum

@@ -1,9 +1,9 @@
 Attribute VB_Name = "KoffeeStat"
-'  +--------------                                         --------------+
-'  |||||||||    Koffee2 0.1.0                                            |
-'  |: ^_^ :|    Koffee2 is free Library based on Ariawase.               |
-'  |||||||||    The Project Page: https://github.com/CallMeKohei/Koffee2 |
-'  +--------------                                         --------------+
+''' --------------------------------------------------------
+'''  FILE    : KoffeeStat.bas
+'''  AUTHOR  : callmekohei <callmekohei at gmail.com>
+'''  License : MIT license
+''' --------------------------------------------------------
 Option Explicit
 
 'Basic Function

@@ -1,9 +1,9 @@
 Attribute VB_Name = "KoffeeCore"
-'  +--------------                                         --------------+
-'  |||||||||    Koffee2 0.1.0                                            |
-'  |: ^_^ :|    Koffee2 is free Library based on Ariawase.               |
-'  |||||||||    The Project Page: https://github.com/CallMeKohei/Koffee2 |
-'  +--------------                                         --------------+                                dddddddd+
+''' --------------------------------------------------------
+'''  FILE    : KoffeeCore.bas
+'''  AUTHOR  : callmekohei <callmekohei at gmail.com>
+'''  License : MIT license
+''' --------------------------------------------------------
 Option Explicit
 
 Public Function RandomBetween(Optional ByVal UpperBound As Variant = 0, Optional ByVal LowerBound As Variant = 9) As Variant

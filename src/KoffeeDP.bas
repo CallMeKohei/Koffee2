@@ -1,9 +1,9 @@
 Attribute VB_Name = "KoffeeDP"
-'  +--------------                                         --------------+
-'  |||||||||    Koffee2 0.1.0                                            |
-'  |: ^_^ :|    Koffee2 is free Library based on Ariawase.               |
-'  |||||||||    The Project Page: https://github.com/CallMeKohei/Koffee2 |
-'  +--------------                                         --------------+
+''' --------------------------------------------------------
+'''  FILE    : KoffeeDP.bas
+'''  AUTHOR  : callmekohei <callmekohei at gmail.com>
+'''  License : MIT license
+''' --------------------------------------------------------
 Option Explicit
 
 Sub DP(ByVal arr As Variant, Optional Lheader As Variant, Optional ByVal header As Variant, Optional ByVal Title As String, Optional ByVal n As Long = 10)

@@ -1,9 +1,9 @@
 Attribute VB_Name = "KoffeeTable"
-'  +--------------                                         --------------+
-'  |||||||||    Koffee2 0.1.0                                            |
-'  |: ^_^ :|    Koffee2 is free Library based on Ariawase.               |
-'  |||||||||    The Project Page: https://github.com/CallMeKohei/Koffee2 |
-'  +--------------                                         --------------+
+''' --------------------------------------------------------
+'''  FILE    : KoffeeTable.bas
+'''  AUTHOR  : callmekohei <callmekohei at gmail.com>
+'''  License : MIT license
+''' --------------------------------------------------------
 Option Explicit
 
 Public Function CreateTable(ByVal ArrKeys As Variant, ArrValues As Variant) As Variant
