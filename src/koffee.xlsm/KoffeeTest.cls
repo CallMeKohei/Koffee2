@@ -106,15 +106,18 @@ Public Sub KoffeeCore_Test()
     PutVal Array("F3", "C1", "C2", "C3"), sh.Range("C1"), True
 
     Dim sql As String:   sql = "SELECT * FROM [myTestTemporarySheet$]"
-
-    Dim arrq As Variant:  arrq = FetchSh(sql)
+    
+    Dim adox1 As AdoEx: Set adox1 = New AdoEx
+    adox1.Init srcExcel
+    Dim arrq As Variant:  arrq = adox1.Select_(sql)
 
     Assert.AreEqualArr Array("A1", "A2", "A3"), arrq(0)
     Assert.AreEqualArr Array("B1", "B2", "B3"), arrq(1)
     Assert.AreEqualArr Array("C1", "C2", "C3"), arrq(2)
-
-
-    Dim arrr As Variant: arrr = FetchSh(sql, , True)
+    
+    Dim adox2 As AdoEx: Set adox2 = New AdoEx
+    adox2.Init srcExcel
+    Dim arrr As Variant: arrr = adox2.Select_(sql, True)
 
     Assert.AreEqualArr Array("F1", "F2", "F3"), arrr(1)
 
@@ -280,7 +283,7 @@ Sub KoffeePuzzle_Test()
     Assert.AreEqualArr Array("A", "C", "B"), ClctToArr(Permut(Array("A", "B", "C"), 3))(4)
     Assert.AreEqualArr Array("A", "B", "C"), ClctToArr(Permut(Array("A", "B", "C"), 3))(5)
 
-    Dim clct As collection: Set clct = New collection
+    Dim clct As Collection: Set clct = New Collection
     PermutLimited 1, 3, 3, clct
     Assert.AreEqualArr Array(CByte(3), CByte(2), CByte(1)), ClctToArr(clct)(0)
     Assert.AreEqualArr Array(CByte(3), CByte(1), CByte(2)), ClctToArr(clct)(1)
@@ -445,7 +448,7 @@ Public Sub KoffeeExcel_Test()
 
     Dim v1 As Worksheet, arrx1 As ArrayEx: Set arrx1 = New ArrayEx
     For Each v1 In ThisWorkbook.Worksheets
-        arrx1.addval v1.Name
+        arrx1.AddVal v1.Name
     Next v1
 
     Assert.AreEqualArr arrx1.ToArray, ArrSheetsName(ThisWorkbook)
@@ -454,7 +457,7 @@ Public Sub KoffeeExcel_Test()
 
     Dim v2 As Worksheet, arrx2 As ArrayEx: Set arrx2 = New ArrayEx
     For Each v2 In ThisWorkbook.Worksheets
-        arrx2.addval v2.Name
+        arrx2.AddVal v2.Name
     Next v2
 
     Assert.AreEqual True, ExistsSheet(arrx2.ToArray(0))
@@ -465,7 +468,7 @@ Public Sub KoffeeExcel_Test()
 
     Dim v3 As Worksheet, arrx3 As ArrayEx: Set arrx3 = New ArrayEx
     For Each v3 In ThisWorkbook.Worksheets
-        arrx3.addval v3.Name
+        arrx3.AddVal v3.Name
     Next v3
 
     Assert.AreEqual True, ExistsSheet("myTestTemporarySheet")
@@ -735,7 +738,7 @@ Public Sub Always_Test()
     Assert.AreEqual 1, Always(1).Apply
     Assert.AreEqual 0, Always(0).Apply
     Assert.AreEqual -1, Always(-1).Apply
-    Assert.IsNullVal Always(Null).Apply
+    Assert.AreEqual Null, Always(Null).Apply
     Assert.AreEqual Empty, Always(Empty).Apply
 End Sub
 
@@ -889,15 +892,15 @@ Public Sub AllAnyFind_Test()
     Assert.AreEqual True, Any_(AddressOf IsNumber).Bind(Array("a", "b", 3, "d")).Apply
     Assert.AreEqual 3, Find(AddressOf IsNumber).Bind(Array("a", "b", 3, "d")).Apply
 
-    Dim T As Func: Set T = Init(New Func, vbBoolean, AddressOf Tr)
+    Dim t As Func: Set t = Init(New Func, vbBoolean, AddressOf Tr)
     Dim f As Func: Set f = Init(New Func, vbBoolean, AddressOf Fa)
 
     Assert.AreEqual True, AllOf()
-    Assert.AreEqual True, AllOf(T, T)
-    Assert.AreEqual False, AllOf(T, T, T, T, f)
+    Assert.AreEqual True, AllOf(t, t)
+    Assert.AreEqual False, AllOf(t, t, t, t, f)
 
     Assert.AreEqual False, AnyOf()
-    Assert.AreEqual True, AnyOf(T, T, f)
+    Assert.AreEqual True, AnyOf(t, t, f)
     Assert.AreEqual False, AnyOf(f, f, f, f)
 
 End Sub
