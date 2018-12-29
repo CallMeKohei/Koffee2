@@ -23,7 +23,7 @@ End Function
 Public Function LastCol(ByVal R As Range, Optional toRight As Boolean = False) As Long
     Select Case toRight
         Case True:  LastCol = R.End(xlToRight).Column
-        Case False: LastCol = R.Worksheet.Cells(R.row, R.Worksheet.Columns.Count).End(xlToLeft).Column
+        Case False: LastCol = R.Worksheet.Cells(R.row, R.Worksheet.columns.Count).End(xlToLeft).Column
     End Select
 End Function
 
@@ -37,13 +37,13 @@ Public Function GetVal(ByVal R As Range, ByVal GetValOption As GetValOption, Opt
         Case Is = 0
             arr = R.Resize(lRow + 1, lCol + 1)
             arr = Arr2DToJagArr(arr)
-            For v = 1 To UBound(arr, 1): arrx.addval arr(v): Next v
+            For v = 1 To UBound(arr, 1): arrx.AddVal arr(v): Next v
         Case Is = 1
             For v = 0 To lCol
-                arrx.addval ArrFlatten(Arr2DToJagArr(R.Offset(0, v).Resize(lRow + 1, 1).Value))
+                arrx.AddVal ArrFlatten(Arr2DToJagArr(R.Offset(0, v).Resize(lRow + 1, 1).Value))
             Next v
-        Case Is = 2: For v = 0 To lCol: arrx.addval R.Cells(1, v + 1).Value: Next v
-        Case Is = 3: For v = 0 To lRow: arrx.addval R.Cells(v + 1, 1).Value: Next v
+        Case Is = 2: For v = 0 To lCol: arrx.AddVal R.Cells(1, v + 1).Value: Next v
+        Case Is = 3: For v = 0 To lRow: arrx.AddVal R.Cells(v + 1, 1).Value: Next v
     End Select
 
     GetVal = arrx.ToArray
@@ -94,7 +94,7 @@ Public Function ArrSheetsName(Optional ByVal bk As Workbook = Nothing) As Varian
 
     Dim sh As Worksheet, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each sh In bk.Worksheets
-        arrx.addval ToStr(sh.Name)
+        arrx.AddVal ToStr(sh.Name)
     Next sh
 
     ArrSheetsName = arrx.ToArray

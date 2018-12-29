@@ -33,7 +33,7 @@ Public Function DictToAssocArr(ByVal dict As Object) As Variant
     If TypeName(dict) <> "Dictionary" Then Err.Raise 13
     Dim arr As Variant: arr = Array()
     
-    Dim ks As Variant: ks = dict.Keys
+    Dim ks As Variant: ks = dict.keys
     Dim dlen As Long: dlen = UBound(ks)
     If dlen < 0 Then GoTo Ending
     

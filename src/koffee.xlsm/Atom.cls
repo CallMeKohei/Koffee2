@@ -34,7 +34,7 @@ Public Function AddFunc(ByVal fun As Func) As Atom
 End Function
 
 Public Function Bind(ByVal x As Variant) As Atom
-    If IsObject(x) Then arrx_.AddObj x Else arrx_.addval x
+    If IsObject(x) Then arrx_.AddObj x Else arrx_.AddVal x
     Set Bind = Me
 End Function
 
@@ -58,7 +58,7 @@ Public Function PopPop() As Atom
     Set arrx_ = New ArrayEx
     Dim v As Variant
     For Each v In arr
-        If IsObject(v) Then arrx_.AddObj v Else arrx_.addval v
+        If IsObject(v) Then arrx_.AddObj v Else arrx_.AddVal v
     Next v
     Set PopPop = Me
 End Function
@@ -110,7 +110,7 @@ Private Function ApplyPrep(ByVal args As Variant)
 
         Case Is = VBA.CLng(AddressOf PartialMark)
 
-            Dim arrx As ArrayEx : Set arrx = New ArrayEx
+            Dim arrx As ArrayEx: Set arrx = New ArrayEx
             PartialBindPrep arrx
             MergeArgs2 arrx, args
             ps = arrx.ToArray
@@ -148,18 +148,18 @@ Private Function MergeArgs(ByVal args As Variant) As Variant
 
     Dim v As Variant
     If Not IsArray(args) Then
-        If IsObject(args) Then arrx_.AddObj args Else arrx_.addval args
+        If IsObject(args) Then arrx_.AddObj args Else arrx_.AddVal args
     ElseIf Not UBound(args) = -1 Then
         For Each v In args
             If IsObject(v) Then
                 arrx_.AddObj v
             ElseIf Not IsArray(v) Then
-                arrx_.addval v
+                arrx_.AddVal v
             Else
                 If UBound(v) = 0 Then
-                    arrx_.addval v
+                    arrx_.AddVal v
                 Else
-                    arrx_.addval v
+                    arrx_.AddVal v
                 End If
             End If
         Next v
@@ -187,23 +187,23 @@ Private Sub PartialBindPrep(ByRef arrx As Variant)
                         If UBound(tmp) <> 0 Then
                             Dim v2
                             For Each v2 In tmp
-                                arrx.addval v2
+                                arrx.AddVal v2
                             Next v2
                         Else
                             If TypeName(tmp(0)) = "Atom" Then
                                 arrx.AddObj tmp(0)
                             Else
-                                arrx.addval tmp(0)
+                                arrx.AddVal tmp(0)
                             End If
                         End If
                     Else
-                        arrx.addval tmp
+                        arrx.AddVal tmp
                     End If
                 End If
             ElseIf IsObject(v) Then
                 arrx.AddObj v
             Else
-                arrx.addval v
+                arrx.AddVal v
             End If
         End If
     Next v
@@ -216,18 +216,18 @@ Private Sub MergeArgs2(ByRef arrx As Variant, ByVal args As Variant)
 
     Dim v As Variant
     If Not IsArray(args) Then
-        If IsObject(args) Then arrx.AddObj args Else arrx.addval args
+        If IsObject(args) Then arrx.AddObj args Else arrx.AddVal args
     ElseIf Not UBound(args) = -1 Then
         For Each v In args
             If IsObject(v) Then
                 arrx.AddObj v
             ElseIf Not IsArray(v) Then
-                arrx.addval v
+                arrx.AddVal v
             Else
                 If UBound(v) = 0 Then
-                    arrx.addval v
+                    arrx.AddVal v
                 Else
-                    arrx.addval v
+                    arrx.AddVal v
                 End If
             End If
         Next v

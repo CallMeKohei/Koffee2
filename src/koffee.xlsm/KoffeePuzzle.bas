@@ -13,12 +13,12 @@ Public Function PowerSet(ByVal arr As Variant, Optional ByVal R As Long = 0) As 
     Dim ub As Long:  ub = 32
     Dim i As Long: i = 0
 
-    Dim v, T, j As Long
+    Dim v, t, j As Long
     For Each v In PowerSetImpl(UBound(arr) + 1, R)
-        T = Array()
+        t = Array()
         For j = 0 To UBound(arr)
             If v(j) <> 0 Then
-                T = ArrPush(arr(j), T)
+                t = ArrPush(arr(j), t)
             End If
         Next j
 
@@ -28,7 +28,7 @@ Public Function PowerSet(ByVal arr As Variant, Optional ByVal R As Long = 0) As 
             ReDim Preserve a(ub - 1)
         End If
 
-        a(i) = T
+        a(i) = t
         i = i + 1
 
     Next v
@@ -70,13 +70,13 @@ Public Function Combin(ByVal arr As Variant, Optional ByVal R As Long = 0) As Va
 End Function
 
 'Permutations
-Public Function Permut(ByVal arr As Variant, ByVal R As Long) As collection
-    Dim clct As collection: Set clct = New collection
+Public Function Permut(ByVal arr As Variant, ByVal R As Long) As Collection
+    Dim clct As Collection: Set clct = New Collection
     PermutImpl arr, R, clct
     Set Permut = clct
 End Function
 
-Private Sub PermutImpl(ByVal a As Variant, ByVal R As Long, ByRef clct As collection)
+Private Sub PermutImpl(ByVal a As Variant, ByVal R As Long, ByRef clct As Collection)
 
     Dim ub           As Byte: ub = UBound(a)
     Dim leafLevel    As Byte: If R = 0 Then leafLevel = ub Else leafLevel = R - 1
@@ -127,7 +127,7 @@ Private Sub PermutImpl(ByVal a As Variant, ByVal R As Long, ByRef clct As collec
 
 End Sub
 
-Public Sub PermutLimited(ByVal fst As Byte, ByVal lst As Byte, ByVal R As Byte, Optional ByRef clct As collection)
+Public Sub PermutLimited(ByVal fst As Byte, ByVal lst As Byte, ByVal R As Byte, Optional ByRef clct As Collection)
 
     Dim ub           As Byte: ub = lst - fst
     Dim leafLevel    As Byte: If R = 0 Then leafLevel = ub Else leafLevel = R - 1
@@ -185,7 +185,7 @@ Public Function ReptPermut(ByVal arr As Variant, Optional ByVal R As Long = 0) A
         For Each v2 In v
             tmp = ArrPush(arr(v2), tmp)
         Next v2
-        arrx.addval tmp
+        arrx.AddVal tmp
     Next v
 
     ReptPermut = arrx.ToArray
@@ -198,7 +198,7 @@ Public Function ReptPermutImpl(ByVal n As Variant, Optional R As Long = 0) As Va
     For Each v In ArrRange(0, (n ^ R - 1))
         bitflg = SplitStr(Dec2N(v, n))
         If UBound(bitflg) <> -1 Then
-            arrx.addval ArrCLng(ArrFill(bitflg, R - 1, , True))
+            arrx.AddVal ArrCLng(ArrFill(bitflg, R - 1, , True))
         End If
     Next v
 
@@ -321,7 +321,7 @@ Public Function BitAnd(ByVal flg1 As Variant, ByVal flg2 As Variant) As Variant
 
     Dim i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
     For i = 0 To ub
-        arrx.addval IIf(CLng(flg1(i)) = CLng(flg2(i)) And CLng(flg1(i)) = 1, 1, 0)
+        arrx.AddVal IIf(CLng(flg1(i)) = CLng(flg2(i)) And CLng(flg1(i)) = 1, 1, 0)
     Next i
     BitAnd = arrx.ToArray
 
@@ -340,7 +340,7 @@ Public Function BitOr(ByVal flg1 As Variant, ByVal flg2 As Variant) As Variant
 
     Dim i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
     For i = 0 To UBound(flg1)
-        arrx.addval IIf(CLng(flg1(i)) = CLng(flg2(i)) And CLng(flg1(i)) = 0, 0, 1)
+        arrx.AddVal IIf(CLng(flg1(i)) = CLng(flg2(i)) And CLng(flg1(i)) = 0, 0, 1)
     Next i
     BitOr = arrx.ToArray
 
@@ -359,7 +359,7 @@ Public Function BitXor(ByVal flg1 As Variant, ByVal flg2 As Variant) As Variant
 
     Dim i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
     For i = 0 To UBound(flg1)
-        arrx.addval IIf(CLng(flg1(i)) = CLng(flg2(i)), 0, 1)
+        arrx.AddVal IIf(CLng(flg1(i)) = CLng(flg2(i)), 0, 1)
     Next i
     BitXor = arrx.ToArray
 
@@ -369,7 +369,7 @@ Public Function BitNOT(ByVal flg As Variant) As Variant
 
     Dim i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
     For i = 0 To UBound(flg)
-        arrx.addval IIf(CLng(flg(i)) = 1, 0, 1)
+        arrx.AddVal IIf(CLng(flg(i)) = 1, 0, 1)
     Next i
     BitNOT = arrx.ToArray
 

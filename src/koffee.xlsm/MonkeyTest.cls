@@ -326,7 +326,7 @@ Public Sub Ext_Test()
     
     Assert.IsInstanceOfTypeName _
         "Decimal", _
-        CDec(EnumeratorToArr(Wmi.ConnectServer().ExecQuery("SELECT * FROM Win32_ComputerSystem"))(0).TotalPhysicalMemory)
+        CDec(EnumeratorToArr(Wmi.connectServer().execQuery("SELECT * FROM Win32_ComputerSystem"))(0).TotalPhysicalMemory)
     
     Assert.AreEqualArr Array(1, 2, 3, 4, 5, 6, 7, 8, 9), ArrRange(1, 9)
     

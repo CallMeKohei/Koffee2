@@ -14,7 +14,7 @@ Public Function LogN(ByVal xs As Variant) As Variant
     Else
         Dim v As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
         For Each v In xs
-            arrx.addval Log(v)
+            arrx.AddVal Log(v)
         Next v
         LogN = arrx.ToArray
     End If
@@ -28,7 +28,7 @@ Public Function Sqr2(ByVal xs As Variant) As Variant
     Else
         Dim v As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
         For Each v In xs
-            arrx.addval Sqr(v)
+            arrx.AddVal Sqr(v)
         Next v
         Sqr2 = arrx.ToArray
     End If
@@ -44,7 +44,7 @@ Public Function PowerN(ByVal xs As Variant, ByVal nth As Variant) As Variant
     Else
         Dim v As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
         For Each v In xs
-            arrx.addval wf.Power(v, nth)
+            arrx.AddVal wf.Power(v, nth)
         Next v
         PowerN = arrx.ToArray
     End If
@@ -74,9 +74,9 @@ Public Function TLTrd(ByVal New_xs As Variant, ByVal known_y, ByVal known_xs) As
         End If
 
         Dim i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
-        dim rcd as variant:  rcd = ToRecord(New_xs, False)
+        Dim rcd As Variant:  rcd = ToRecord(New_xs, False)
         For i = 0 To ub
-            arrx.addval WorksheetFunction.Trend(known_y, known_xs, PartialPackage(rcd(i)))(1)
+            arrx.AddVal WorksheetFunction.Trend(known_y, known_xs, PartialPackage(rcd(i)))(1)
         Next i
 
         TLTrd = arrx.ToArray
@@ -90,7 +90,7 @@ End Function
 Private Function PartialPackage(ByVal arr As Variant) As Variant
     Dim v, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In arr
-        arrx.addval Array(v)
+        arrx.AddVal Array(v)
     Next v
     PartialPackage = arrx.ToArray
 End Function
@@ -126,7 +126,7 @@ Public Function TLLin(ByVal New_x As Variant, ByVal known_y As Variant, ByVal kn
 
     Dim v As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In New_x
-        arrx.addval Application.WorksheetFunction.Forecast(v, known_y, known_xs)
+        arrx.AddVal Application.WorksheetFunction.Forecast(v, known_y, known_xs)
     Next v
 
     TLLin = arrx.ToArray
@@ -210,7 +210,7 @@ Public Function TLLog(ByVal New_x As Variant, ByVal known_y As Variant, ByVal kn
 
     Dim v As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In New_x
-        arrx.addval Application.WorksheetFunction.Forecast(Log(v), known_y, LogN(known_xs))
+        arrx.AddVal Application.WorksheetFunction.Forecast(Log(v), known_y, LogN(known_xs))
     Next v
 
     TLLog = arrx.ToArray
@@ -256,7 +256,7 @@ Public Function TLPwr(ByVal New_x As Variant, ByVal known_y As Variant, ByVal kn
 
     Dim v As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In New_x
-        arrx.addval Exp(Application.WorksheetFunction.Forecast(Log(v), LogN(known_y), LogN(known_xs)))
+        arrx.AddVal Exp(Application.WorksheetFunction.Forecast(Log(v), LogN(known_y), LogN(known_xs)))
     Next v
 
     TLPwr = arrx.ToArray
@@ -303,7 +303,7 @@ Public Function TLPly(ByVal New_x As Variant, ByVal known_y As Variant, ByVal kn
 
     Dim v As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In New_x
-        arrx.addval Application.WorksheetFunction.Trend(known_y, PowerScan(known_xs, n), PowerScan(Array(v), n))
+        arrx.AddVal Application.WorksheetFunction.Trend(known_y, PowerScan(known_xs, n), PowerScan(Array(v), n))
     Next v
 
     TLPly = ArrFlatten(arrx.ToArray)
@@ -392,7 +392,7 @@ Public Function SEP(ByVal Pred_y, ByVal known_y, ByVal known_xs, Optional ByVal 
     Dim v, v2, arrx As ArrayEx: Set arrx = New ArrayEx
     If flg Or IsJagArr(Setter_xs) Then
         For Each v In Setter_xs
-            arrx.addval Sqr(Residualv(Pred_y, known_y, SampleCnt, Known_xsCnt) * (1 + 1 / SampleCnt + MahalanobisDist(v, known_xs)(1) / (SampleCnt - 1)))
+            arrx.AddVal Sqr(Residualv(Pred_y, known_y, SampleCnt, Known_xsCnt) * (1 + 1 / SampleCnt + MahalanobisDist(v, known_xs)(1) / (SampleCnt - 1)))
         Next v
         SEP = arrx.ToArray
     Else
@@ -408,7 +408,7 @@ Public Function Residual(ByVal Pred_y, ByVal xs) As Variant
     If IsArray(Pred_y) Then
         Dim i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
         For i = 0 To UBound(xs)
-            arrx.addval Pred_y(i) - wf.Average(xs(i))
+            arrx.AddVal Pred_y(i) - wf.Average(xs(i))
         Next i
         Residual = arrx.ToArray
     Else
@@ -438,20 +438,20 @@ Public Function MahalanobisDist(ByVal PredVals As Variant, ByVal xs As Variant) 
     MahalanobisDist = wf.MMult(wf.MMult(Residual(PredVals, xs), wf.MInverse(CovarMatrix(xs))), wf.Transpose(Residual(PredVals, xs)))
 End Function
 
-Public Function CovarMatrix(ByVal JagArr As Variant) As Variant
+Public Function CovarMatrix(ByVal jagArr As Variant) As Variant
 
-    If Not IsJagArr(JagArr) Then JagArr = Array(JagArr)
+    If Not IsJagArr(jagArr) Then jagArr = Array(jagArr)
 
     Dim wf As WorksheetFunction: Set wf = Application.WorksheetFunction
 
     Dim v, v1
-    dim arrx As ArrayEx: Set arrx = New ArrayEx
+    Dim arrx As ArrayEx: Set arrx = New ArrayEx
     Dim tmp As ArrayEx: Set tmp = New ArrayEx
-    For Each v In JagArr
-        For Each v1 In JagArr
-            tmp.addval wf.Covar(v, v1) * wf.Count(v) / (wf.Count(v) - 1)
+    For Each v In jagArr
+        For Each v1 In jagArr
+            tmp.AddVal wf.Covar(v, v1) * wf.Count(v) / (wf.Count(v) - 1)
         Next v1
-        arrx.addval tmp.ToArray
+        arrx.AddVal tmp.ToArray
         Set tmp = Nothing
     Next v
 
@@ -462,7 +462,7 @@ End Function
 Public Function TDist(ByVal arr, ByVal DegreeOfFreedom, ByVal Tails) As Variant
     Dim v, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In arr
-        arrx.addval WorksheetFunction.TDist(Abs(v), DegreeOfFreedom, 2)
+        arrx.AddVal WorksheetFunction.TDist(Abs(v), DegreeOfFreedom, 2)
     Next v
     TDist = arrx.ToArray
 End Function
@@ -475,9 +475,9 @@ Public Function Correl(ByVal arr As Variant) As Variant
 
     For Each v In arr
         For Each v2 In arr
-            tmp.addval Application.WorksheetFunction.Correl(v, v2)
+            tmp.AddVal Application.WorksheetFunction.Correl(v, v2)
         Next v2
-        arrx.addval tmp.ToArray
+        arrx.AddVal tmp.ToArray
         Set tmp = Nothing
     Next v
 
@@ -508,7 +508,7 @@ End Function
 Private Function DivideByTotal(ByVal arr As Variant, ByVal Total As Variant) As Variant
     Dim v, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In arr
-        arrx.addval ARound((v / Total) * 100, 2)
+        arrx.AddVal ARound((v / Total) * 100, 2)
     Next v
     DivideByTotal = arrx.ToArray
 End Function
@@ -517,9 +517,9 @@ Private Function ABCMark(ByVal arr As Variant) As Variant
     Dim v, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In arr
         Select Case v
-            Case Is < 70: arrx.addval "A"
-            Case Is < 90: arrx.addval "B"
-            Case Else:    arrx.addval "C"
+            Case Is < 70: arrx.AddVal "A"
+            Case Is < 90: arrx.AddVal "B"
+            Case Else:    arrx.AddVal "C"
         End Select
     Next v
     ABCMark = arrx.ToArray
@@ -603,10 +603,10 @@ Private Sub LinEstChart(ByVal known_y, ByVal known_x_headerIncluded)
     Dim Lower99 As ArrayEx: Set Lower99 = New ArrayEx
     Dim Upper99 As ArrayEx: Set Upper99 = New ArrayEx
     For i = 0 To UBound(lEst(0))
-        Lower95.addval lEst(0)(i) - (lEst(1)(i) * WorksheetFunction.TInv(1 - 0.95, lEst(3)(1)))
-        Upper95.addval lEst(0)(i) + (lEst(1)(i) * WorksheetFunction.TInv(1 - 0.95, lEst(3)(1)))
-        Lower99.addval lEst(0)(i) - (lEst(1)(i) * WorksheetFunction.TInv(1 - 0.99, lEst(3)(1)))
-        Upper99.addval lEst(0)(i) + (lEst(1)(i) * WorksheetFunction.TInv(1 - 0.99, lEst(3)(1)))
+        Lower95.AddVal lEst(0)(i) - (lEst(1)(i) * WorksheetFunction.TInv(1 - 0.95, lEst(3)(1)))
+        Upper95.AddVal lEst(0)(i) + (lEst(1)(i) * WorksheetFunction.TInv(1 - 0.95, lEst(3)(1)))
+        Lower99.AddVal lEst(0)(i) - (lEst(1)(i) * WorksheetFunction.TInv(1 - 0.99, lEst(3)(1)))
+        Upper99.AddVal lEst(0)(i) + (lEst(1)(i) * WorksheetFunction.TInv(1 - 0.99, lEst(3)(1)))
     Next i
 
     DP Array(Lower95.ToArray, Upper95.ToArray, Lower99.ToArray, Upper99.ToArray) _

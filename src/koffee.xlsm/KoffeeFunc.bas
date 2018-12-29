@@ -360,7 +360,7 @@ Public Function ScanImpl( _
             stats.AddObj stat
         Next
     Else
-        stats.addval stat
+        stats.AddVal stat
         For i = i To UBound(arr)
             If TypeName(f) = "Atom" Then
                 If f.GetAddr = VBA.CLng(AddressOf fnullMark) Then
@@ -373,7 +373,7 @@ Public Function ScanImpl( _
             Else
                 f.FastApply stat, stat, arr(i)
             End If
-            stats.addval stat
+            stats.AddVal stat
         Next
     End If
 
@@ -566,7 +566,7 @@ Private Function ScanRImpl( _
             stats.AddObj stat
         Next
     Else
-        stats.addval stat
+        stats.AddVal stat
         For i = i To 0 Step -1
             If TypeName(f) = "Atom" Then
                 If f.GetAddr = VBA.CLng(AddressOf fnullMark) Then
@@ -579,7 +579,7 @@ Private Function ScanRImpl( _
             Else
                 f.FastApply stat, stat, arr(i)
             End If
-            stats.addval stat
+            stats.AddVal stat
         Next
     End If
 
@@ -702,7 +702,7 @@ Public Function AllOf(ParamArray funs() As Variant) As Boolean
         Dim v
         For Each v In funs: arrx.AddObj v: Next v
     End If
-    arrx.addval True
+    arrx.AddVal True
 
     AllOf = Flow(arrx.ToArray, FoldR(Init(New Func, vbBoolean, AddressOf AllOfImpl, vbBoolean, vbVariant)))
 
@@ -714,12 +714,12 @@ End Function
 
 Public Function AnyOf(ParamArray funs() As Variant) As Boolean
 
-    Dim arrx As ArrayEx : Set arrx = New ArrayEx
+    Dim arrx As ArrayEx: Set arrx = New ArrayEx
     If UBound(funs) <> -1 Then
         Dim v
         For Each v In funs: arrx.AddObj v: Next v
     End If
-    arrx.addval False
+    arrx.AddVal False
 
     AnyOf = Flow(arrx.ToArray, FoldR(Init(New Func, vbBoolean, AddressOf AnyOfImpl, vbBoolean, vbVariant)))
 
@@ -797,7 +797,7 @@ Public Function ShiftA() As Func
 End Function
 
 Private Function ArrShift2(ByVal val As Variant, ByVal arr As Variant) As Variant
-    Dim clct As collection: Set clct = New collection
+    Dim clct As Collection: Set clct = New Collection
     Set clct = ArrToClct(arr)
     Shift clct, val
     ArrShift2 = ClctToArr(clct)
@@ -867,13 +867,13 @@ Public Function AlwaysImpl(ByVal x As Variant) As Variant
 End Function
 
 Public Function Repeat(ByVal n As Variant, ByVal f As Variant) As Variant
-    Dim v As Variant, arrx As ArrayEx : Set arrx = New ArrayEx
+    Dim v As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In ArrRange(1, n)
         Select Case TypeName(f)
             Case "Func", "Atom"
-                arrx.addval f.Apply
+                arrx.AddVal f.Apply
             Case Else
-                arrx.addval f
+                arrx.AddVal f
         End Select
     Next v
     Repeat = arrx.ToArray
@@ -1016,13 +1016,13 @@ End Function
 
 Private Function ActionsImpl(ByVal fArgs As Variant, ByVal seed As Variant) As Variant
 
-    Dim tpl As Tuple : Set tpl = New Tuple
+    Dim tpl As Tuple: Set tpl = New Tuple
     If TypeName(seed) <> "Tuple" Then
         Set tpl = Init(New Tuple, seed, seed)
     End If
 
     Dim Status As Variant
-    Dim Values As ArrayEx : Set Values = New ArrayEx
+    Dim Values As ArrayEx: Set Values = New ArrayEx
 
     Dim v As Variant, v2 As Variant
     For Each v In fArgs
@@ -1031,17 +1031,17 @@ Private Function ActionsImpl(ByVal fArgs As Variant, ByVal seed As Variant) As V
             If Err.Number = 0 Then
                 Status = tpl.Item1
                 If IsArray(tpl.Item2) Then
-                    Dim tmpEx As ArrayEx : Set tmpEx = New ArrayEx
+                    Dim tmpEx As ArrayEx: Set tmpEx = New ArrayEx
                     For Each v2 In tpl.Item2
-                        tmpEx.addval v2
+                        tmpEx.AddVal v2
                     Next v2
-                    Values.addval tmpEx.ToArray
+                    Values.AddVal tmpEx.ToArray
                     Set tmpEx = Nothing
                 Else
-                    Values.addval tpl.Item2
+                    Values.AddVal tpl.Item2
                 End If
             ElseIf Err.Number = 5 Then
-                Values.addval Missing
+                Values.AddVal Missing
             Else
                 Err.Raise 13
             End If
@@ -1077,7 +1077,7 @@ Public Function EliminateMissing(ByVal arr As Variant) As Variant
     Dim v As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In arr
         If Not IsMissing(v) Then
-            If IsObject(v) Then arrx.AddObj v Else arrx.addval v
+            If IsObject(v) Then arrx.AddObj v Else arrx.AddVal v
         End If
     Next v
     EliminateMissing = arrx.ToArray
@@ -1092,7 +1092,7 @@ Private Function CheckerImpl(ByVal prds As Variant, ByVal x As Variant) As Varia
     Dim f, tmp As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each f In prds
             tmp = f.Apply(x)
-            If tmp <> True Then arrx.addval tmp
+            If tmp <> True Then arrx.AddVal tmp
     Next f
     CheckerImpl = arrx.ToArray
 End Function

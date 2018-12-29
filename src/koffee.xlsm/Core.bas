@@ -1104,6 +1104,6 @@ End Function
 
 ''' @return As Object Is StdRegProv
 Public Function CreateStdRegProv() As Object
-    Dim wmiSrv As Object: Set wmiSrv = Wmi.ConnectServer(, "root\default")
+    Dim wmiSrv As Object: Set wmiSrv = Wmi.connectServer(, "root\default")
     Set CreateStdRegProv = wmiSrv.Get("StdRegProv")
 End Function

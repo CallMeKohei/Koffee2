@@ -38,7 +38,7 @@ Function rtcCallByName Lib "VBE7.DLL" ( _
     ByVal Object As Object, _
     ByVal ProcName As LongPtr, _
     ByVal CallType As VbCallType, _
-    ByRef Args() As Any, _
+    ByRef args() As Any, _
     Optional ByVal lcid As Long _
     ) As Variant
 #Else
@@ -47,7 +47,7 @@ Function rtcCallByName Lib "VBE6.DLL" ( _
     ByVal Object As Object, _
     ByVal ProcName As Long, _
     ByVal CallType As VbCallType, _
-    ByRef Args() As Any, _
+    ByRef args() As Any, _
     Optional ByVal lcid As Long _
     ) As Variant
 #End If
@@ -203,12 +203,12 @@ Public Sub TestRunnerGenerate()
 End Sub
 
 Private Sub AssertDone( _
-    ByVal isa As Boolean, ByVal cond As Boolean, ByVal exp As Variant, ByVal act As Variant _
+    ByVal isa As Boolean, ByVal cond As Boolean, ByVal Exp As Variant, ByVal act As Variant _
     )
     
     If isa <> cond Then
         Push xFailMsgs, "[" & xAssertIx & "] " & xAssertMsg & ":"
-        Push xFailMsgs, "  Expected: " & IIf(isa, "", "Not ") & "<" & Dump(exp) & ">"
+        Push xFailMsgs, "  Expected: " & IIf(isa, "", "Not ") & "<" & Dump(Exp) & ">"
         Push xFailMsgs, "  But was:  <" & Dump(act) & ">"
     End If
     IncrPre xAssertIx
@@ -242,51 +242,51 @@ Public Sub IsNotInstanceOfTypeName( _
 End Sub
 
 Public Sub AreEq( _
-    ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
+    ByVal Exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
     xAssertMsg = msg
-    AssertDone True, Eq(exp, act), exp, act
+    AssertDone True, Eq(Exp, act), Exp, act
 End Sub
 
 Public Sub AreNotEq( _
-    ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
+    ByVal Exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
     xAssertMsg = msg
-    AssertDone False, Eq(exp, act), exp, act
+    AssertDone False, Eq(Exp, act), Exp, act
 End Sub
 
 Public Sub AreEqual( _
-    ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
+    ByVal Exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
     xAssertMsg = msg
-    AssertDone True, Equals(exp, act, True), exp, act
+    AssertDone True, Equals(Exp, act, True), Exp, act
 End Sub
 
 Public Sub AreNotEqual( _
-    ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
+    ByVal Exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
     xAssertMsg = msg
-    AssertDone False, Equals(exp, act, True), exp, act
+    AssertDone False, Equals(Exp, act, True), Exp, act
 End Sub
 
 Public Sub AreEqualArr( _
-    ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
+    ByVal Exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
     xAssertMsg = msg
-    AssertDone True, ArrEquals(exp, act, True), exp, act
+    AssertDone True, ArrEquals(Exp, act, True), Exp, act
 End Sub
 
 Public Sub AreNotEqualArr( _
-    ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
+    ByVal Exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
     xAssertMsg = msg
-    AssertDone False, ArrEquals(exp, act, True), exp, act
+    AssertDone False, ArrEquals(Exp, act, True), Exp, act
 End Sub
 
 Public Sub Fail(Optional ByVal msg As String = "")

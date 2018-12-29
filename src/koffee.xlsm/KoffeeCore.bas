@@ -22,15 +22,15 @@ Public Function ArrShuffle(ByVal arr As Variant) As Variant
     ArrShuffle = arr
 End Function
 
-Public Function FetchSh(ByVal sql As String, Optional ByVal fPath As String = "", Optional ByVal isHeader As Boolean = False) As Variant
+Public Function FetchSh(ByVal sql As String, Optional ByVal fpath As String = "", Optional ByVal isHeader As Boolean = False) As Variant
 
-    Select Case fPath
-        Case Is = "": fPath = ThisWorkbook.Path & "\" & ThisWorkbook.Name
-        Case Else:    fPath = fPath
+    Select Case fpath
+        Case Is = "": fpath = ThisWorkbook.Path & "\" & ThisWorkbook.Name
+        Case Else:    fpath = fpath
     End Select
 
     Dim ado As AdoEx: Set ado = New AdoEx
-    ado.Init adExcel, fPath
+    ado.Init adExcel, fpath
     Select Case isHeader
         Case False: FetchSh = ado.JagArrAdoRS(sql)
         Case True:  FetchSh = Array(ado.JagArrAdoRS(sql), ado.JagArrAdoRsHeader(sql))
@@ -39,9 +39,9 @@ Public Function FetchSh(ByVal sql As String, Optional ByVal fPath As String = ""
     Set ado = Nothing
 End Function
 
-Public Function FetchCSV(ByVal sql As String, ByVal fPath As String, Optional ByVal isHeader As Boolean = False) As Variant
+Public Function FetchCSV(ByVal sql As String, ByVal fpath As String, Optional ByVal isHeader As Boolean = False) As Variant
     Dim ado As AdoEx: Set ado = New AdoEx
-    ado.Init adCsv, fPath
+    ado.Init adCsv, fpath
     FetchCSV = ado.JagArrAdoRS(sql)
 
     Select Case isHeader
@@ -195,7 +195,7 @@ Private Function ArrExplodeImpl(ByVal arr As Variant, Optional ByRef acc As Arra
                 If IsObject(v) Then
                     acc.AddObj v
                 Else
-                    acc.addval v
+                    acc.AddVal v
                 End If
             End If
             Set ArrExplodeImpl = ArrExplodeImpl(v, acc)
@@ -417,7 +417,7 @@ Public Function ArrDiff(ByVal s1 As Variant, s2 As Variant) As Variant
 
         Dim v As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In s1
-        If ArrIndexOf(s2, v) = -1 Then arrx.addval v
+        If ArrIndexOf(s2, v) = -1 Then arrx.AddVal v
     Next v
     ArrDiff = arrx.ToArray
 End Function
@@ -437,7 +437,7 @@ Public Function ArrIntersect(ByVal s1 As Variant, s2 As Variant) As Variant
 
     Dim v As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In s1
-        If ArrIndexOf(s2, v) > -1 Then arrx.addval v
+        If ArrIndexOf(s2, v) > -1 Then arrx.AddVal v
     Next v
     ArrIntersect = arrx.ToArray
 End Function
@@ -578,16 +578,16 @@ End Function
 
 Public Function Nz2(ByVal arr As Variant, Optional ByVal ValueIfNull As Variant, Optional ByVal EnableSpeedUp As Boolean = False) As Variant
 
-    Dim alt
+    Dim Alt
     If IsMissing(ValueIfNull) Then
-        alt = IIf(IsNumericArray(arr, EnableSpeedUp), 0, "")
+        Alt = IIf(IsNumericArray(arr, EnableSpeedUp), 0, "")
     Else
-        alt = ValueIfNull
+        Alt = ValueIfNull
     End If
 
     Dim v, arrx As ArrayEx: Set arrx = New ArrayEx
     For Each v In arr
-        arrx.addval IIf(IsNull(v), alt, v)
+        arrx.AddVal IIf(IsNull(v), Alt, v)
     Next v
 
     Nz2 = arrx.ToArray
