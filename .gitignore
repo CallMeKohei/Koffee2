@@ -1,6 +1,1 @@
-*.cls
-*.bas
-!AdoEx.cls
-!ArrayEx.cls
-!Atom.cls
-!Koffee*
+bin
