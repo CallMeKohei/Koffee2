@@ -189,13 +189,16 @@ End Function
 
 Public Sub pos(ByVal sql As String, Optional ByRef rng As Range = Nothing)
 
-    If CreateAdoRS(sql).EOF Then Debug.Print "No Date!: " & Now(): Exit Sub
+    Set rs_ = CreateObject("ADODB.Recordset")
+    rs_.Open Source:=sql, ActiveConnection:=cn_, CursorType:=adOpenStatic, LockType:=adLockReadOnly, Options:=adCmdText
+
+    If rs_.EOF Then Debug.Print "No Date!: " & Now(): Exit Sub
 
     If TypeName(rng) = "Nothing" Then
         AddSheet "test"
         Set rng = ThisWorkbook.Worksheets("test").Range("C5")
     End If
 
-    rng.CopyFromRecordset CreateAdoRS(sql)
+    rng.CopyFromRecordset rs_
 
 End Sub
