@@ -42,17 +42,17 @@ Public Enum CommandTypeEnum
     adCmdTableDirect = 512
 End Enum
 
-Public Enum SourceTypeEnum
-    srcText = 0
-    srcDBF = 1
-    srcAccess = 2
-    srcExcel = 3
+Public Enum dbTypeEnum
+    dbText = 0
+    dbDBF = 1
+    dbAccess = 2
+    dbExcel = 3
 End Enum
 
 Private cn_ As Object
 Private rs_ As Object
-Private dbEngine As String
-Private filePath As String
+Private dbEngine_ As String
+Private filePath_ As String
 
 Private Sub Class_Initialize()
 
@@ -61,12 +61,12 @@ Private Sub Class_Initialize()
     ''' Microsoft Access Database Engine 2016 Redistributable
     ''' https://www.microsoft.com/en-us/download/details.aspx?id=54920
     If is64bitOS() Then
-        dbEngine = "Microsoft.ACE.OLEDB.12.0"
+        dbEngine_ = "Microsoft.ACE.OLEDB.12.0"
     Else
-        dbEngine = "Microsoft.Jet.OLEDB.4.0"
+        dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
     End If
 
-    filePath = ThisWorkbook.Path & "\" & ThisWorkbook.Name
+    filePath_ = ThisWorkbook.Path & "\" & ThisWorkbook.Name
 
 End Sub
 
@@ -81,51 +81,63 @@ Private Sub Class_Terminate()
 
 End Sub
 
-Public Sub Init(ByVal srcType As SourceTypeEnum, Optional ByVal fpath As String = "")
+Public Sub Init(ByVal dbType As dbTypeEnum, Optional ByVal fpath As String = "", Optional isHeader As Boolean = True)
 
     If fpath = "" Then
-        If srcType = srcAccess Then Err.Raise 76 ''' Path not found
-        fpath = filePath
+        If dbType = dbAccess Then Err.Raise 76 ''' Path not found
+        fpath = filePath_
     Else
         fpath = fpath
     End If
 
-    Select Case srcType
+    Dim strHDR As String: strHDR = IIf(isHeader, "HDR=YES", "HDR=NO")
+
+    Select Case dbType
 
         Case 0: ''' Text
 
-            With cn_
-                .Provider = dbEngine
-                .Properties("Data Source") = Fso.GetParentFolderName(fpath)
-                .Properties("Extended Properties") = Join(Array("text", "HDR=yes"), ";")
-                .Open
-            End With
+            cn_.Provider = dbEngine_
+            cn_.Properties("Data Source") = Fso.GetParentFolderName(fpath)
+            cn_.Properties("Extended Properties") = Join(Array("TEXT", strHDR), ";")
+            cn_.Open
 
         Case 1: ''' DBF
 
-            With cn_
-                .Provider = dbEngine
-                .Properties("Data Source") = Fso.GetParentFolderName(fpath)
-                .Properties("Extended Properties") = Join(Array("dBASE IV", "User ID=Admin"), ";")
-                .Open
-            End With
+            cn_.Provider = dbEngine_
+            cn_.Properties("Data Source") = Fso.GetParentFolderName(fpath)
+            cn_.Properties("Extended Properties") = Join(Array("dBASE IV", "User ID=Admin"), ";")
+            cn_.Open
 
         Case 2: ''' Access
 
-            With cn_
-                .Provider = dbEngine
-                .Properties("Data Source") = fpath
-                .Open
-            End With
+            cn_.Provider = dbEngine_
+            cn_.Properties("Data Source") = fpath
+            cn_.Open
 
         Case 3: ''' Excel
 
-            With cn_
-                .Provider = dbEngine
-                .Properties("Data Source") = fpath
-                .Properties("Extended Properties") = Join(Array("Excel 12.0", "HDR=YES"), ";")
-                .Open
-            End With
+            Dim dbTypeExcel As String
+            Select Case Fso.GetExtensionName(fpath)
+                Case "xls" ''' Excel5.0/95 Workbook(*.xls) or Excel97-2003 WorkBook(*.xls)
+                    If InStr(Fso.getfile(fpath).Type, 95) Then
+                        dbTypeExcel = "Excel 5.0"
+                    Else
+                        dbTypeExcel = "Excel 8.0"
+                    End If
+                Case "xlsb" ''' Excel binary Workbook(*.xlsb)
+                    dbTypeExcel = "Excel 12.0"
+                Case "xlsm" ''' Excel Macro-Enabled Wrokbook(*.xlsm)
+                    dbTypeExcel = "Excel 12.0 Macro"
+                Case "xlsx" ''' Excel Workbook(*.xlsx)
+                    dbTypeExcel = "Excel 12.0 Xml"
+                Case Else
+                    dbTypeExcel = ""
+            End Select
+
+            cn_.Provider = dbEngine_
+            cn_.Properties("Data Source") = fpath
+            cn_.Properties("Extended Properties") = Join(Array(dbTypeExcel, strHDR), ";")
+            cn_.Open
 
     End Select
 
