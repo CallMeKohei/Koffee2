@@ -74,15 +74,12 @@ Private Function foo(ByVal n As Long, ByRef xxx As Variant) As Variant
         Set arrx = Nothing
 
     Next i
-    
+
     foo = Truncate(arr)
 
 End Function
 
 Public Function ToRecord(ByVal tbl As Variant, Optional ByVal ExistsKeys As Boolean = True) As Variant
-
-'    Dim a(): ReDim a(32)
-'    Dim ub As Long:  ub = 32
 '
     Dim vals, ub2 As Long
     If ExistsKeys Then
@@ -90,51 +87,12 @@ Public Function ToRecord(ByVal tbl As Variant, Optional ByVal ExistsKeys As Bool
     Else
         vals = IIf(IsJagArr(tbl), tbl, Array(tbl))
     End If
-'
-'    Dim v, i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
-'    For i = 0 To UBound(vals(0))
-'
-'        For Each v In vals
-'            arrx.AddVal v(i)
-'        Next v
-'
-'        If ub = i Then
-'            ub = ub + 1
-'            ub = -1 + ub + ub
-'            ReDim Preserve a(ub - 1)
-'        End If
-'
-'        a(i) = arrx.ToArray
-'
-'        Set arrx = Nothing
-'    Next i
-    
+
     ToRecord = foo(UBound(vals(0)), vals)
 
 End Function
 
 Public Function ToTable(ByVal ArrKey As Variant, ByVal Records As Variant) As Variant
-
-'    Dim a(): ReDim a(32)
-'    Dim ub As Long:  ub = 32
-'
-'    Dim v, i As Long, arrx As ArrayEx: Set arrx = New ArrayEx
-'    For i = 0 To UBound(ArrKey)
-'
-'        For Each v In Records
-'            arrx.AddVal v(i)
-'        Next v
-'
-'        If ub = i Then
-'            ub = ub + 1
-'            ub = -1 + ub + ub
-'            ReDim Preserve a(ub - 1)
-'        End If
-'
-'        a(i) = arrx.ToArray
-'        Set arrx = Nothing
-'
-'    Next i
 
     ToTable = CreateTable(ArrKey, foo(UBound(ArrKey), Records))
 
