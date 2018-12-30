@@ -22,35 +22,6 @@ Public Function ArrShuffle(ByVal arr As Variant) As Variant
     ArrShuffle = arr
 End Function
 
-Public Function FetchSh(ByVal sql As String, Optional ByVal fpath As String = "", Optional ByVal isHeader As Boolean = False) As Variant
-
-    Select Case fpath
-        Case Is = "": fpath = ThisWorkbook.Path & "\" & ThisWorkbook.Name
-        Case Else:    fpath = fpath
-    End Select
-
-    Dim ado As AdoEx: Set ado = New AdoEx
-    ado.Init adExcel, fpath
-    Select Case isHeader
-        Case False: FetchSh = ado.JagArrAdoRS(sql)
-        Case True:  FetchSh = Array(ado.JagArrAdoRS(sql), ado.JagArrAdoRsHeader(sql))
-    End Select
-
-    Set ado = Nothing
-End Function
-
-Public Function FetchCSV(ByVal sql As String, ByVal fpath As String, Optional ByVal isHeader As Boolean = False) As Variant
-    Dim ado As AdoEx: Set ado = New AdoEx
-    ado.Init adCsv, fpath
-    FetchCSV = ado.JagArrAdoRS(sql)
-
-    Select Case isHeader
-        Case False: FetchCSV = ado.JagArrAdoRS(sql)
-        Case True:  FetchCSV = Array(ado.JagArrAdoRS(sql), ado.JagArrAdoRsHeader(sql))
-    End Select
-    Set ado = Nothing
-End Function
-
 Public Function IsJagArr(ByVal arr As Variant) As Boolean
 
     If Not IsArray(arr) Then GoTo Escape
