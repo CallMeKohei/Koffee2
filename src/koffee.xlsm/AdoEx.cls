@@ -159,11 +159,31 @@ Public Function Select_(ByVal sql As String, _
         arrx.AddVal v.Name
     Next v
 
+    Dim arr As Variant: arr = Arr2DToJagArr(ArrTranspose(rs_.GetRows()))
+
     If isHeader Then
-        Select_ = Array(Arr2DToJagArr(rs_.GetRows()), arrx.ToArray)
+        Select_ = Array(arr, arrx.ToArray)
     Else
-        Select_ = Arr2DToJagArr(rs_.GetRows())
+        Select_ = arr
     End If
+
+End Function
+
+Private Function ArrTranspose(ByVal arr As Variant) As Variant
+
+    Dim ub1 As Long: ub1 = UBound(arr, 2)
+    Dim ub2 As Long: ub2 = UBound(arr, 1)
+
+    Dim tmp() As Variant: ReDim tmp(ub1, ub2)
+
+    Dim ix1 As Long, ix2 As Long
+    For ix1 = 0 To ub1
+        For ix2 = 0 To ub2
+            tmp(ix1, ix2) = arr(ix2, ix1)
+        Next ix2
+    Next ix1
+
+    ArrTranspose = tmp
 
 End Function
 
