@@ -167,6 +167,10 @@ Public Function Select_(ByVal sql As String, _
         Select_ = arr
     End If
 
+    On Error Resume Next
+    If Not rs_ Is Nothing Then rs_.Close
+    Set rs_ = Nothing
+
 End Function
 
 Private Function ArrTranspose(ByVal arr As Variant) As Variant

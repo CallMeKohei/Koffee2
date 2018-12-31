@@ -165,7 +165,7 @@ End Function
 
 Public Function ArrShift(ByVal val As Variant, ByVal arr As Variant, Optional ByVal BaseOne As Boolean = False) As Variant
 
-    Dim a() as Variant: If BaseOne Then ReDim a(1 To 32) Else ReDim a(32)
+    Dim a() As Variant: If BaseOne Then ReDim a(1 To 32) Else ReDim a(32)
     Dim ub As Long:  ub = 32
     Dim i As Long:  If BaseOne Then i = 2 Else i = 1
 
@@ -175,7 +175,7 @@ Public Function ArrShift(ByVal val As Variant, ByVal arr As Variant, Optional By
         If BaseOne Then Let a(1) = val Else Let a(0) = val
     End If
 
-    Dim v as Variant
+    Dim v As Variant
     For Each v In arr
 
         If ub = i Then

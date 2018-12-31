@@ -14,23 +14,7 @@ Attribute VB_Exposed = False
 ''' --------------------------------------------------------
 Option Explicit
 
-''' ( Usage )
-''' Copy the following code and paste onto a standard module and Run.
-'''
-'''   Sub foo()
-'''       Assert.RunTestOf New ClassTest
-'''   End Sub
-
-Public Sub Prepare_Test()
-
-    Debug.Print vbNewLine & "<< Prepare Test >>"
-    Debug.Print "please ignore following text"
-    DeleteSheet "myTestTemporarySheet"
-    DeleteSheet "myTestTemporarySheet2"
-    DeleteSheet "abcdefghijklmnopqrstuvwxyz"
-    Debug.Print ""
-
-End Sub
+'Assert.RunTestOf New KoffeeTest
 
 ''' --------------------------------------------------------
 '''                     KoffeeCore Test
@@ -717,51 +701,84 @@ Public Sub AdoEx_Test()
     ws.Cells.Clear
 
     PutVal Array( _
-        Array("Number", 1, 2, 3, Empty, Empty), _
-        Array("Name", "Apple", "Banana", "Cherry", Empty, "a"), _
-        Array("Price", 200, 300, 400, Empty, "b"), _
-        Array(Empty, Empty, Empty, Empty, Empty, "c"), _
-        Array("d", "e", "f", Empty, Empty, Empty) _
+        Array("Number", 1, 2, 3, 4, 5), _
+        Array("Name", "Apple", "Banana", "Cherry", Empty, Empty), _
+        Array("Price", 200, 300, 400, Empty, 600), _
+        Array("Memo1", Empty, Empty, Empty, Empty, Empty), _
+        Array("Memo2", "d", "e", "f", Empty, Empty) _
     ), ws.Range("B2"), True
 
     '''     |   A        B         C         D        E        F
     ''' ----+------- --------- --------- --------- ------- ---------
     '''   1 |
-    '''   2 |          Number    Name      Price
+    '''   2 |          Number    Name      Price    Memo1    Memo2
     '''   3 |            1       Apple      200                d
     '''   4 |            2       Banana     300                e
     '''   5 |            3       Cherry     400                f
-    '''   6 |
-    '''   7 |            a         b         c
+    '''   6 |            4
+    '''   7 |            5                  600
 
     Dim adox As AdoEx: Set adox = New AdoEx
     adox.Init dbExcel
 
-    Dim arr As Variant: arr = adox.Select_("select * from [adoado$B2:D5]")
-    Assert.AreEqualArr Array(1#, "Apple", 200#), arr(0)
-    Assert.AreEqualArr Array(2#, "Banana", 300#), arr(1)
-    Assert.AreEqualArr Array(3#, "Cherry", 400#), arr(2)
+    Dim arr As Variant: arr = adox.Select_("select * from [myTestTemporarySheet$B2:F7]")
+    Assert.AreEqualArr Array(1#, "Apple", 200#, Null, "d"), arr(0)
+    Assert.AreEqualArr Array(2#, "Banana", 300#, Null, "e"), arr(1)
+    Assert.AreEqualArr Array(3#, "Cherry", 400#, Null, "f"), arr(2)
+    Assert.AreEqualArr Array(4#, Null, Null, Null, Null), arr(3)
+    Assert.AreEqualArr Array(5#, Null, 600#, Null, Null), arr(4)
 
-    Dim arrHeader As Variant: arrHeader = adox.Select_("select * from [adoado$B2:D5]", True)
-    Assert.AreEqualArr Array("Number", "Name", "Price"), arrHeader(1)
-
-    ''' TODO: can not read head record :-(
-    ''' Table as Headerless
-'    Dim adox2 As AdoEx: Set adox2 = New AdoEx
-'    adox2.Init dbExcel, , False
-
-'    Dim arr2 As Variant: arr2 = adox2.Select_("select * from [adoado$B2:D5]")
-'    Assert.AreEqualArr Array("Number", "Name", "Price"), arr2(0)
-'    Assert.AreEqualArr Array(1#, "Apple", 200#), arr2(1)
-'    Assert.AreEqualArr Array(2#, "Banana", 300#), arr2(2)
-'    Assert.AreEqualArr Array(3#, "Cherry", 400#), arr2(3)
-
-'    Dim arrHeader2 As Variant: arrHeader2 = adox2.Select_("select * from [adoado$B2:D5]", True)
-'    Assert.AreEqualArr Array("Number", "Name", "Price"), arrHeader2(1)
+    Dim arrHeader As Variant: arrHeader = adox.Select_("select * from [myTestTemporarySheet$B2:F7]", True)
+    Assert.AreEqualArr Array("Number", "Name", "Price", "Memo1", "Memo2"), arrHeader(1)
 
     DeleteSheet "myTestTemporarySheet"
 
 End Sub
 
+Public Sub AdoExHeadless_Test()
 
+    ''' Header as data
+
+    Dim ws As Worksheet: Set ws = AddSheet("myTestTemporarySheet")
+    ws.Cells.Clear
+
+    PutVal Array( _
+        Array("Number", 1, 2, 3, 4, 5), _
+        Array("Name", "Apple", "Banana", "Cherry", Empty, Empty), _
+        Array("Price", 200, 300, 400, Empty, 600), _
+        Array("Memo1", Empty, Empty, Empty, Empty, Empty), _
+        Array("Memo2", "d", "e", "f", Empty, Empty) _
+    ), ws.Range("B2"), True
+
+    '''     |   A        B         C         D        E        F
+    ''' ----+------- --------- --------- --------- ------- ---------
+    '''   1 |
+    '''   2 |          Number    Name      Price    Memo1    Memo2
+    '''   3 |            1       Apple      200                d
+    '''   4 |            2       Banana     300                e
+    '''   5 |            3       Cherry     400                f
+    '''   6 |            4
+    '''   7 |            5                  600
+
+    Dim adox2 As AdoEx: Set adox2 = New AdoEx
+    adox2.Init dbExcel, , False
+
+    Dim arr2 As Variant: arr2 = adox2.Select_("select * from [myTestTemporarySheet$B2:F7]")
+
+    ''' B column type is Double. ---> "Number" strings shows Null.
+    ''' D column type is Double. ---> "Price" strings shows Null.
+    Assert.AreEqualArr Array(Null, "Name", Null, "Memo1", "Memo2"), arr2(0)
+
+    Assert.AreEqualArr Array(1#, "Apple", 200#, Null, "d"), arr2(1)
+    Assert.AreEqualArr Array(2#, "Banana", 300#, Null, "e"), arr2(2)
+    Assert.AreEqualArr Array(3#, "Cherry", 400#, Null, "f"), arr2(3)
+    Assert.AreEqualArr Array(4#, Null, Null, Null, Null), arr2(4)
+    Assert.AreEqualArr Array(5#, Null, 600#, Null, Null), arr2(5)
+
+    Dim arrHeader2 As Variant: arrHeader2 = adox2.Select_("select * from [myTestTemporarySheet$B2:F7]", True)
+    Assert.AreEqualArr Array("F1", "F2", "F3", "F4", "F5"), arrHeader2(1)
+
+    DeleteSheet "myTestTemporarySheet"
+
+End Sub
 
