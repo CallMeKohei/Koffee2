@@ -316,13 +316,11 @@ Public Sub PutVal(ByVal arr As Variant, ByVal rng As Range, Optional isVertical 
 
     If isVertical Then
 
-        Dim wf As WorksheetFunction: Set wf = Application.WorksheetFunction
-
         ''' Minimum index Excel's Array is 1
         If LBound(arr, 1) = 1 Then
-            rng.Resize(UBound(arr, 2), UBound(arr, 1)).Value = wf.Transpose(arr)
+            rng.Resize(UBound(arr, 2), UBound(arr, 1)).Value = ArrTranspose(arr)
         Else
-            rng.Resize(UBound(arr, 2) + 1, UBound(arr, 1) + 1).Value = wf.Transpose(arr)
+            rng.Resize(UBound(arr, 2) + 1, UBound(arr, 1) + 1).Value = ArrTranspose(arr)
         End If
 
     Else
