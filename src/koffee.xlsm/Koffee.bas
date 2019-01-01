@@ -17,7 +17,6 @@ Option Private Module
 '''     PutVal
 '''         Arr2DToJagArr(Ariawase)
 '''         ArrRank(Ariawase)
-'''         IsJagArr(Koffee.core)
 
 ''' --------------------------------------------------------
 '''                      Util Functions
