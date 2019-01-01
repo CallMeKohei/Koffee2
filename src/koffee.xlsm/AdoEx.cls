@@ -154,7 +154,6 @@ Public Sub Init(ByVal dbType As dbTypeEnum, Optional ByVal fpath As String = "",
 End Sub
 
 Public Function Select_(ByVal sql As String, _
-    Optional ByVal isHeader As Boolean = False, _
     Optional ByVal propCursorType As CursorTypeEnum = adOpenStatic, _
     Optional ByVal propLockType As LockTypeEnum = adLockReadOnly, _
     Optional ByVal propCommandType As CommandTypeEnum = adCmdText _
@@ -163,9 +162,8 @@ Public Function Select_(ByVal sql As String, _
     Set Rcds_ = CreateObject("ADODB.Recordset")
     Rcds_.Open Source:=sql, ActiveConnection:=Con_, CursorType:=propCursorType, LockType:=propLockType, Options:=propCommandType
 
-    ''' Should be defaulte date with header?
     Dim v As Variant, arrx As New ArrayEx
-    For Each v In rs_.Fields
+    For Each v In Rcds_.Fields
         arrx.AddVal v.Name
     Next v
 

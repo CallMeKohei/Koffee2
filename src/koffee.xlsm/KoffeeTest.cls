@@ -711,14 +711,14 @@ Public Sub AdoEx_Test()
     adox.Init dbExcel
 
     Dim arr As Variant: arr = adox.Select_("select * from [myTestTemporarySheet$B2:F7]")
-    Assert.AreEqualArr Array(1#, "Apple", 200#, Null, "d"), arr(0)
-    Assert.AreEqualArr Array(2#, "Banana", 300#, Null, "e"), arr(1)
-    Assert.AreEqualArr Array(3#, "Cherry", 400#, Null, "f"), arr(2)
-    Assert.AreEqualArr Array(4#, Null, Null, Null, Null), arr(3)
-    Assert.AreEqualArr Array(5#, Null, 600#, Null, Null), arr(4)
 
-    Dim arrHeader As Variant: arrHeader = adox.Select_("select * from [myTestTemporarySheet$B2:F7]", True)
-    Assert.AreEqualArr Array("Number", "Name", "Price", "Memo1", "Memo2"), arrHeader(1)
+    Assert.AreEqualArr Array("Number", "Name", "Price", "Memo1", "Memo2"), arr(0)
+
+    Assert.AreEqualArr Array(1#, "Apple", 200#, Null, "d"), arr(1)(0)
+    Assert.AreEqualArr Array(2#, "Banana", 300#, Null, "e"), arr(1)(1)
+    Assert.AreEqualArr Array(3#, "Cherry", 400#, Null, "f"), arr(1)(2)
+    Assert.AreEqualArr Array(4#, Null, Null, Null, Null), arr(1)(3)
+    Assert.AreEqualArr Array(5#, Null, 600#, Null, Null), arr(1)(4)
 
     DeleteSheet "myTestTemporarySheet"
 
@@ -749,23 +749,21 @@ Public Sub AdoExHeadless_Test()
     '''   6 |            4
     '''   7 |            5                  600
 
-    Dim adox2 As AdoEx: Set adox2 = New AdoEx
-    adox2.Init dbExcel, , False
+    Dim adox As AdoEx: Set adox = New AdoEx
+    adox.Init dbExcel, , False
 
-    Dim arr2 As Variant: arr2 = adox2.Select_("select * from [myTestTemporarySheet$B2:F7]")
+    Dim arr As Variant: arr = adox.Select_("select * from [myTestTemporarySheet$B2:F7]")
+
+    Assert.AreEqualArr Array("F1", "F2", "F3", "F4", "F5"), arr(0)
 
     ''' B column type is Double. ---> "Number" strings shows Null.
     ''' D column type is Double. ---> "Price" strings shows Null.
-    Assert.AreEqualArr Array(Null, "Name", Null, "Memo1", "Memo2"), arr2(0)
-
-    Assert.AreEqualArr Array(1#, "Apple", 200#, Null, "d"), arr2(1)
-    Assert.AreEqualArr Array(2#, "Banana", 300#, Null, "e"), arr2(2)
-    Assert.AreEqualArr Array(3#, "Cherry", 400#, Null, "f"), arr2(3)
-    Assert.AreEqualArr Array(4#, Null, Null, Null, Null), arr2(4)
-    Assert.AreEqualArr Array(5#, Null, 600#, Null, Null), arr2(5)
-
-    Dim arrHeader2 As Variant: arrHeader2 = adox2.Select_("select * from [myTestTemporarySheet$B2:F7]", True)
-    Assert.AreEqualArr Array("F1", "F2", "F3", "F4", "F5"), arrHeader2(1)
+    Assert.AreEqualArr Array(Null, "Name", Null, "Memo1", "Memo2"), arr(1)(0)
+    Assert.AreEqualArr Array(1#, "Apple", 200#, Null, "d"), arr(1)(1)
+    Assert.AreEqualArr Array(2#, "Banana", 300#, Null, "e"), arr(1)(2)
+    Assert.AreEqualArr Array(3#, "Cherry", 400#, Null, "f"), arr(1)(3)
+    Assert.AreEqualArr Array(4#, Null, Null, Null, Null), arr(1)(4)
+    Assert.AreEqualArr Array(5#, Null, 600#, Null, Null), arr(1)(5)
 
     DeleteSheet "myTestTemporarySheet"
 
