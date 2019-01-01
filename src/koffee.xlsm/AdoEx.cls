@@ -57,14 +57,14 @@ Public Enum dbTypeEnum
     dbExcel = 3
 End Enum
 
-Private cn_ As Object
-Private rs_ As Object
+Private Con_  As Object
+Private Rcds_ As Object
 Private dbEngine_ As String
 Private filePath_ As String
 
 Private Sub Class_Initialize()
 
-    Set cn_ = CreateObject("ADODB.Connection")
+    Set Con_ = CreateObject("ADODB.Connection")
 
     ''' Microsoft Access Database Engine 2016 Redistributable
     ''' https://www.microsoft.com/en-us/download/details.aspx?id=54920
@@ -81,11 +81,11 @@ End Sub
 Private Sub Class_Terminate()
 
     On Error Resume Next
-    If Not rs_ Is Nothing Then rs_.Close
-    Set rs_ = Nothing
+    If Not Rcds_ Is Nothing Then Rcds_.Close
+    Set Rcds_ = Nothing
 
-    cn_.Close
-    Set cn_ = Nothing
+    Con_.Close
+    Set Con_ = Nothing
 
 End Sub
 
@@ -98,29 +98,29 @@ Public Sub Init(ByVal dbType As dbTypeEnum, Optional ByVal fpath As String = "",
         fpath = fpath
     End If
 
-    Dim strHDR As String: strHDR = IIf(isHeader, "HDR=YES", "HDR=NO")
+    Dim tableHeader As String: tableHeader = IIf(isTableHeader, "HDR=YES", "HDR=NO")
 
     Select Case dbType
 
         Case 0: ''' Text
 
-            cn_.Provider = dbEngine_
-            cn_.Properties("Data Source") = Fso.GetParentFolderName(fpath)
-            cn_.Properties("Extended Properties") = Join(Array("TEXT", strHDR), ";")
-            cn_.Open
+            Con_.Provider = dbEngine_
+            Con_.Properties("Data Source") = Fso.GetParentFolderName(fpath)
+            Con_.Properties("Extended Properties") = Join(Array("TEXT", tableHeader), ";")
+            Con_.Open
 
         Case 1: ''' DBF
 
-            cn_.Provider = dbEngine_
-            cn_.Properties("Data Source") = Fso.GetParentFolderName(fpath)
-            cn_.Properties("Extended Properties") = Join(Array("dBASE IV", "User ID=Admin"), ";")
-            cn_.Open
+            Con_.Provider = dbEngine_
+            Con_.Properties("Data Source") = Fso.GetParentFolderName(fpath)
+            Con_.Properties("Extended Properties") = Join(Array("dBASE IV", "User ID=Admin"), ";")
+            Con_.Open
 
         Case 2: ''' Access
 
-            cn_.Provider = dbEngine_
-            cn_.Properties("Data Source") = fpath
-            cn_.Open
+            Con_.Provider = dbEngine_
+            Con_.Properties("Data Source") = fpath
+            Con_.Open
 
         Case 3: ''' Excel
 
@@ -142,10 +142,10 @@ Public Sub Init(ByVal dbType As dbTypeEnum, Optional ByVal fpath As String = "",
                     dbTypeExcel = ""
             End Select
 
-            cn_.Provider = dbEngine_
-            cn_.Properties("Data Source") = fpath
-            cn_.Properties("Extended Properties") = Join(Array(dbTypeExcel, strHDR), ";")
-            cn_.Open
+            Con_.Provider = dbEngine_
+            Con_.Properties("Data Source") = fpath
+            Con_.Properties("Extended Properties") = Join(Array(dbTypeExcel, tableHeader), ";")
+            Con_.Open
 
     End Select
 
@@ -158,8 +158,8 @@ Public Function Select_(ByVal sql As String, _
     Optional ByVal propCommandType As CommandTypeEnum = adCmdText _
     )
 
-    Set rs_ = CreateObject("ADODB.Recordset")
-    rs_.Open Source:=sql, ActiveConnection:=cn_, CursorType:=propCursorType, LockType:=propLockType, Options:=propCommandType
+    Set Rcds_ = CreateObject("ADODB.Recordset")
+    Rcds_.Open Source:=sql, ActiveConnection:=Con_, CursorType:=propCursorType, LockType:=propLockType, Options:=propCommandType
 
     ''' Should be defaulte date with header?
     Dim v As Variant, arrx As New ArrayEx
@@ -167,17 +167,14 @@ Public Function Select_(ByVal sql As String, _
         arrx.AddVal v.Name
     Next v
 
-    Dim arr As Variant: arr = Arr2DToJagArr(ArrTranspose(rs_.GetRows()))
-
-    If isHeader Then
-        Select_ = Array(arr, arrx.ToArray)
-    Else
-        Select_ = arr
-    End If
+    Select_ = Array( _
+        arrx.ToArray, _
+        Arr2DToJagArr(ArrTranspose(Rcds_.GetRows())) _
+    )
 
     On Error Resume Next
-    If Not rs_ Is Nothing Then rs_.Close
-    Set rs_ = Nothing
+    If Not Rcds_ Is Nothing Then Rcds_.Close
+    Set Rcds_ = Nothing
 
 End Function
 
@@ -201,7 +198,7 @@ End Function
 
 Public Function Execute(ByVal sql As String) As Long
     Dim rcdNumbers As Long
-    cn_.Execute sql, ARecNum
+    Con_.Execute sql, ARecNum
     Execute = rcdNumbers
 End Function
 
@@ -210,7 +207,7 @@ Public Sub BeginTrans()
 End Sub
 
 Public Sub CommitTrans()
-    cn_.CommitTrans
+    Con_.CommitTrans
 End Sub
 
 Public Sub RollbackTrans()
@@ -233,16 +230,16 @@ End Function
 
 Public Sub pos(ByVal sql As String, Optional ByRef rng As Range = Nothing)
 
-    Set rs_ = CreateObject("ADODB.Recordset")
-    rs_.Open Source:=sql, ActiveConnection:=cn_, CursorType:=adOpenStatic, LockType:=adLockReadOnly, Options:=adCmdText
+    Set Rcds_ = CreateObject("ADODB.Recordset")
+    Rcds_.Open Source:=sql, ActiveConnection:=Con_, CursorType:=adOpenStatic, LockType:=adLockReadOnly, Options:=adCmdText
 
-    If rs_.EOF Then Debug.Print "No Date!: " & Now(): Exit Sub
+    If Rcds_.EOF Then Debug.Print "No Date!: " & Now(): Exit Sub
 
     If TypeName(rng) = "Nothing" Then
         AddSheet "test"
         Set rng = ThisWorkbook.Worksheets("test").Range("C5")
     End If
 
-    rng.CopyFromRecordset rs_
+    rng.CopyFromRecordset Rcds_
 
 End Sub
