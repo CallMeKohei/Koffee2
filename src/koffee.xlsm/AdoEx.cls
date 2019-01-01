@@ -91,7 +91,7 @@ Private Sub Class_Terminate()
 
 End Sub
 
-Public Sub Init(ByVal dbType As dbTypeEnum, Optional ByVal fpath As String = "", Optional isHeader As Boolean = True)
+Public Sub Init(ByVal dbType As dbTypeEnum, Optional ByVal fpath As String = "", Optional isTableHeader As Boolean = True)
 
     If fpath = "" Then
         If dbType = dbAccess Then Err.Raise 76 ''' Path not found
