@@ -63,8 +63,8 @@ Public Sub ArrTranspose_Test()
 
     '''  Before             After
     '''
-    '''  1  3  5     --->   1  2  3
-    '''  2  4  6            4  5  6
+    '''  1  2  3     --->   1  2  5
+    '''  4  5  6            2  4  6
 
     ''' validation
     ''' not array
