@@ -11,6 +11,7 @@ Option Private Module
 '''
 '''     IsJagArr
 '''         ArrRank(Ariawase)
+'''         ArrLen(Ariawse)
 '''     GetVal
 '''         Arr2DToJagArr(Ariawase)
 '''     PutVal
