@@ -19,7 +19,7 @@ Option Explicit
 '''     Select_
 '''         ArrayEx(Ariawase)
 '''         Arr2DToJagArr(Ariawase)
-'''     pos
+'''     Pos
 '''         AddSheet(KoffeeExcel)
 
 Public Enum CursorTypeEnum
@@ -228,7 +228,7 @@ Private Function is64bitOS() As Boolean
 
 End Function
 
-Public Sub pos(ByVal sql As String, Optional ByRef rng As Range = Nothing)
+Public Sub Pos(ByVal sql As String, Optional ByRef rng As Range = Nothing)
 
     Set Rcds_ = CreateObject("ADODB.Recordset")
     Rcds_.Open Source:=sql, ActiveConnection:=Con_, CursorType:=adOpenStatic, LockType:=adLockReadOnly, Options:=adCmdText
@@ -241,5 +241,9 @@ Public Sub pos(ByVal sql As String, Optional ByRef rng As Range = Nothing)
     End If
 
     rng.CopyFromRecordset Rcds_
+
+    On Error Resume Next
+    If Not Rcds_ Is Nothing Then Rcds_.Close
+    Set Rcds_ = Nothing
 
 End Sub
