@@ -19,8 +19,9 @@ Option Explicit
 '''     Select_
 '''         ArrayEx(Ariawase)
 '''         Arr2DToJagArr(Ariawase)
+'''         ArrTranspose(KoffeeVBA)
 '''     Pos
-'''         AddSheet(KoffeeExcel)
+'''         AddSheet(KoffeeVBA)
 
 Public Enum CursorTypeEnum
     adOpenUnspecified = -1
@@ -210,16 +211,19 @@ Private Function is64bitOS() As Boolean
 
 End Function
 
-Public Sub Pos(ByVal sql As String, Optional ByRef rng As Range = Nothing)
+Public Sub Pos(ByVal sql As String, Optional ByVal rng As Range = Nothing)
 
     Set Rcds_ = CreateObject("ADODB.Recordset")
     Rcds_.Open Source:=sql, ActiveConnection:=Con_, CursorType:=adOpenStatic, LockType:=adLockReadOnly, Options:=adCmdText
 
-    If Rcds_.EOF Then Debug.Print "No Date!: " & Now(): Exit Sub
+    If Rcds_.EOF Then
+        Debug.Print "No Date!: " & Now()
+        GoTo Escape
+    End If
 
     If TypeName(rng) = "Nothing" Then
-        AddSheet "test"
-        Set rng = ThisWorkbook.Worksheets("test").Range("C5")
+        AddSheet "TestTestTestTestTest"
+        Set rng = ThisWorkbook.Worksheets("TestTestTestTestTest").Range("C5")
     End If
 
     rng.CopyFromRecordset Rcds_
@@ -228,4 +232,5 @@ Public Sub Pos(ByVal sql As String, Optional ByRef rng As Range = Nothing)
     If Not Rcds_ Is Nothing Then Rcds_.Close
     Set Rcds_ = Nothing
 
+Escape:
 End Sub
