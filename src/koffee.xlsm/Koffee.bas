@@ -46,6 +46,10 @@ End Function
 
 Public Function ArrTranspose(ByVal arr As Variant) As Variant
 
+    If Not IsArray(arr) Then Err.Raise 13
+    If IsJagArr(arr) Then arr = JagArrToArr2D(arr)
+    If Not ArrRank(arr) = 2 Then Err.Raise 13
+
     Dim ub1 As Long: ub1 = UBound(arr, 2)
     Dim ub2 As Long: ub2 = UBound(arr, 1)
 

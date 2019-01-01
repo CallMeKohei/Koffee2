@@ -59,6 +59,43 @@ Public Sub IsJagArr_Test()
 
 End Sub
 
+Public Sub ArrTranspose_Test()
+
+    ''' Before
+    Dim arr As Variant: arr = JagArrToArr2D(Array(Array(1, 2, 3), Array(4, 5, 6)))
+
+    Assert.AreEqual 1, arr(0, 0)
+    Assert.AreEqual 2, arr(0, 1)
+    Assert.AreEqual 3, arr(0, 2)
+
+    Assert.AreEqual 4, arr(1, 0)
+    Assert.AreEqual 5, arr(1, 1)
+    Assert.AreEqual 6, arr(1, 2)
+
+    ''' After
+    Dim arr2 As Variant: arr2 = ArrTranspose(arr)
+
+    Assert.AreEqual 1, arr2(0, 0)
+    Assert.AreEqual 4, arr2(0, 1)
+
+    Assert.AreEqual 2, arr2(1, 0)
+    Assert.AreEqual 5, arr2(1, 1)
+
+    Assert.AreEqual 3, arr2(2, 0)
+    Assert.AreEqual 6, arr2(2, 1)
+
+    ''' validation
+    ''' not array
+    Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf ArrTranspose, vbVariant), Array(0)
+    ''' not two dimensions
+    Dim arr1D(0) As Variant
+    Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf ArrTranspose, vbVariant), Array(arr1D)
+    ''' not two dimensions
+    Dim arr3D(0, 0, 0) As Variant
+    Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf ArrTranspose, vbVariant), Array(arr3D)
+
+End Sub
+
 ''' --------------------------------------------------------
 '''                     KoffeeExcel Test
 ''' --------------------------------------------------------
