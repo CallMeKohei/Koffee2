@@ -46,18 +46,24 @@ End Function
 
 Public Function ArrTranspose(ByVal arr As Variant) As Variant
 
+    ''' base0 and base1 is available
+    ''' see test script
+
     If Not IsArray(arr) Then Err.Raise 13
     If IsJagArr(arr) Then arr = JagArrToArr2D(arr)
     If Not ArrRank(arr) = 2 Then Err.Raise 13
 
+    Dim lb1 As Long: lb1 = LBound(arr, 2)
+    Dim lb2 As Long: lb2 = LBound(arr, 1)
+
     Dim ub1 As Long: ub1 = UBound(arr, 2)
     Dim ub2 As Long: ub2 = UBound(arr, 1)
 
-    Dim tmp() As Variant: ReDim tmp(ub1, ub2)
+    Dim tmp() As Variant: ReDim tmp(lb1 To ub1, lb2 To ub2)
 
     Dim ix1 As Long, ix2 As Long
-    For ix1 = 0 To ub1
-        For ix2 = 0 To ub2
+    For ix1 = lb1 To ub1
+        For ix2 = lb2 To ub2
             tmp(ix1, ix2) = arr(ix2, ix1)
         Next ix2
     Next ix1

@@ -61,7 +61,22 @@ End Sub
 
 Public Sub ArrTranspose_Test()
 
-    ''' Before
+    '''  Before             After
+    '''
+    '''  1  3  5     --->   1  2  3
+    '''  2  4  6            4  5  6
+
+    ''' validation
+    ''' not array
+    Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf ArrTranspose, vbVariant), Array(0)
+    ''' not two dimensions
+    Dim arr1D(0) As Variant
+    Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf ArrTranspose, vbVariant), Array(arr1D)
+    ''' not two dimensions
+    Dim arr3D(0, 0, 0) As Variant
+    Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf ArrTranspose, vbVariant), Array(arr3D)
+
+    ''' Before ( Base 0 )
     Dim arr As Variant: arr = JagArrToArr2D(Array(Array(1, 2, 3), Array(4, 5, 6)))
 
     Assert.AreEqual 1, arr(0, 0)
@@ -72,7 +87,7 @@ Public Sub ArrTranspose_Test()
     Assert.AreEqual 5, arr(1, 1)
     Assert.AreEqual 6, arr(1, 2)
 
-    ''' After
+    ''' After ( Base 0 )
     Dim arr2 As Variant: arr2 = ArrTranspose(arr)
 
     Assert.AreEqual 1, arr2(0, 0)
@@ -84,15 +99,28 @@ Public Sub ArrTranspose_Test()
     Assert.AreEqual 3, arr2(2, 0)
     Assert.AreEqual 6, arr2(2, 1)
 
-    ''' validation
-    ''' not array
-    Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf ArrTranspose, vbVariant), Array(0)
-    ''' not two dimensions
-    Dim arr1D(0) As Variant
-    Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf ArrTranspose, vbVariant), Array(arr1D)
-    ''' not two dimensions
-    Dim arr3D(0, 0, 0) As Variant
-    Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf ArrTranspose, vbVariant), Array(arr3D)
+    ''' Before ( Base 1 )
+    Dim arr3 As Variant: arr3 = [{1,2,3;4,5,6}]
+
+    Assert.AreEqual 1#, arr3(1, 1)
+    Assert.AreEqual 2#, arr3(1, 2)
+    Assert.AreEqual 3#, arr3(1, 3)
+
+    Assert.AreEqual 4#, arr3(2, 1)
+    Assert.AreEqual 5#, arr3(2, 2)
+    Assert.AreEqual 6#, arr3(2, 3)
+
+    ''' After ( Base 1 )
+    Dim arr4 As Variant: arr4 = ArrTranspose(arr3)
+
+    Assert.AreEqual 1#, arr4(1, 1)
+    Assert.AreEqual 4#, arr4(1, 2)
+
+    Assert.AreEqual 2#, arr4(2, 1)
+    Assert.AreEqual 5#, arr4(2, 2)
+
+    Assert.AreEqual 3#, arr4(3, 1)
+    Assert.AreEqual 6#, arr4(3, 2)
 
 End Sub
 
