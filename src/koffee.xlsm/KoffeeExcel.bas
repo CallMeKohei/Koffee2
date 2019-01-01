@@ -87,22 +87,41 @@ End Sub
 '''                   WorkSheet Operation
 ''' --------------------------------------------------------
 
-Public Function AddSheet(ByVal SheetName As String, Optional ByVal wb As Workbook = Nothing) As Worksheet
+Public Function ArrSheetsName(Optional ByVal wb As Workbook = Nothing) As Variant
 
     ''' ( Usage )
-    ''' Dim ws As Worksheet: Set ws = AddSheet("abc")
+    ''' Dim wb As Workbook: Set wb = Application.ThisWorkbook
+    ''' Debug.Print ArrSheetsName(wb)(0)
 
     If TypeName(wb) = "Nothing" Then Set wb = Application.ThisWorkbook
 
-    If ExistsSheet(SheetName, wb) Then GoTo Catch
+    Dim arr() As String
+    ReDim arr(0 To wb.Sheets.Count - 1)
 
-    wb.Worksheets.Add().Name = SheetName
-    Set AddSheet = wb.Worksheets(SheetName)
-    GoTo Escape
+    Dim ws As Variant, i As Long
+    For Each ws In wb.Worksheets
+        arr(i) = ws.Name
+        i = i + 1
+    Next ws
 
-Catch:
-    Debug.Print "(AddSheet): The SheetName is already exists!"
-    Exit Function
+    ArrSheetsName = arr
+
+End Function
+
+Public Function ExistsSheet(ByVal SheetName As String, Optional ByVal wb As Workbook = Nothing) As Boolean
+
+    ''' ( Usage )
+    ''' Debug.Print ExistsSheet("abc")
+
+    If TypeName(wb) = "Nothing" Then Set wb = Application.ThisWorkbook
+
+    Dim v As Variant
+    For Each v In ArrSheetsName(wb)
+        If SheetName = v Then
+            ExistsSheet = True
+            GoTo Escape
+        End If
+    Next v
 
 Escape:
 End Function
@@ -127,6 +146,26 @@ Catch:
 
 Escape:
 End Sub
+
+Public Function AddSheet(ByVal SheetName As String, Optional ByVal wb As Workbook = Nothing) As Worksheet
+
+    ''' ( Usage )
+    ''' Dim ws As Worksheet: Set ws = AddSheet("abc")
+
+    If TypeName(wb) = "Nothing" Then Set wb = Application.ThisWorkbook
+
+    If ExistsSheet(SheetName, wb) Then GoTo Catch
+
+    wb.Worksheets.Add().Name = SheetName
+    Set AddSheet = wb.Worksheets(SheetName)
+    GoTo Escape
+
+Catch:
+    Debug.Print "(AddSheet): The SheetName is already exists!"
+    Exit Function
+
+Escape:
+End Function
 
 Public Function CopySheet(ByVal SourceSheetName As String, ByVal SheetName As String, Optional ByVal wb As Workbook = Nothing) As Worksheet
 
@@ -154,44 +193,7 @@ Catch2:
 Escape:
 End Function
 
-Public Function ExistsSheet(ByVal SheetName As String, Optional ByVal wb As Workbook = Nothing) As Boolean
 
-    ''' ( Usage )
-    ''' Debug.Print ExistsSheet("abc")
-
-    If TypeName(wb) = "Nothing" Then Set wb = Application.ThisWorkbook
-
-    Dim v As Variant
-    For Each v In ArrSheetsName(wb)
-        If SheetName = v Then
-            ExistsSheet = True
-            GoTo Escape
-        End If
-    Next v
-
-Escape:
-End Function
-
-Public Function ArrSheetsName(Optional ByVal wb As Workbook = Nothing) As Variant
-
-    ''' ( Usage )
-    ''' Dim wb As Workbook: Set wb = Application.ThisWorkbook
-    ''' Debug.Print ArrSheetsName(wb)(0)
-
-    If TypeName(wb) = "Nothing" Then Set wb = Application.ThisWorkbook
-
-    Dim arr() As String
-    ReDim arr(0 To wb.Sheets.Count - 1)
-
-    Dim ws As Variant, i As Long
-    For Each ws In wb.Worksheets
-        arr(i) = ws.Name
-        i = i + 1
-    Next ws
-
-    ArrSheetsName = arr
-
-End Function
 
 ''' --------------------------------------------------------
 '''                     Cells Operation

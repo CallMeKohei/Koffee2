@@ -101,18 +101,30 @@ End Sub
 '''                     KoffeeExcel Test
 ''' --------------------------------------------------------
 
-Public Sub AddSheet_Test()
+Public Sub ArrSheetsName_Test()
 
-    Assert.AreEqual False, ExistsSheet("myTestTemporarySheet")
+    Dim arr As Variant: arr = ArrSheetsName()
 
-    Dim ws As Worksheet: Set ws = AddSheet("myTestTemporarySheet")
-    Assert.AreEqual True, ExistsSheet("myTestTemporarySheet")
+    Dim wb As Workbook: Set wb = Application.ThisWorkbook
 
-    Application.DisplayAlerts = False
-    ws.Delete
-    Application.DisplayAlerts = True
+    Assert.AreEqual wb.Worksheets.Count, ArrLen(arr)
 
-    Assert.AreEqual False, ExistsSheet("myTestTemporarySheet")
+    Dim ws As Worksheet, i As Long
+    For Each ws In wb.Worksheets
+        Assert.AreEqual ws.Name, arr(i)
+        i = i + 1
+    Next ws
+
+End Sub
+
+Public Sub ExistsSheet_Test()
+
+    Assert.AreEqual False, ExistsSheet("abcdefghijklmnopqrstuvwxyz")
+
+    Dim worksheet_name As Variant
+    For Each worksheet_name In ArrSheetsName()
+        Assert.AreEqual True, ExistsSheet(worksheet_name)
+    Next worksheet_name
 
 End Sub
 
@@ -120,6 +132,16 @@ Public Sub DeleteSheet_Test()
 
     Assert.AreEqual False, ExistsSheet("myTestTemporarySheet")
     Application.ThisWorkbook.Worksheets.Add().Name = "myTestTemporarySheet"
+    Assert.AreEqual True, ExistsSheet("myTestTemporarySheet")
+    DeleteSheet "myTestTemporarySheet"
+    Assert.AreEqual False, ExistsSheet("myTestTemporarySheet")
+
+End Sub
+
+Public Sub AddSheet_Test()
+
+    Assert.AreEqual False, ExistsSheet("myTestTemporarySheet")
+    Dim ws As Worksheet: Set ws = AddSheet("myTestTemporarySheet")
     Assert.AreEqual True, ExistsSheet("myTestTemporarySheet")
     DeleteSheet "myTestTemporarySheet"
     Assert.AreEqual False, ExistsSheet("myTestTemporarySheet")
@@ -145,31 +167,6 @@ Public Sub CopySheet_Test()
 
 End Sub
 
-Public Sub ExistSheet_Test()
-
-    Assert.AreEqual False, ExistsSheet("abcdefghijklmnopqrstuvwxyz")
-
-    Dim worksheet_name As Variant
-    For Each worksheet_name In ArrSheetsName()
-        Assert.AreEqual True, ExistsSheet(worksheet_name)
-    Next worksheet_name
-
-End Sub
-
-Public Sub ArrSheetsName_Test()
-
-    Dim arr As Variant: arr = ArrSheetsName()
-    Dim wb As Workbook: Set wb = Application.ThisWorkbook
-
-    Assert.AreEqual wb.Worksheets.Count, ArrLen(arr)
-
-    Dim ws As Worksheet, i As Long
-    For Each ws In wb.Worksheets
-        Assert.AreEqual ws.Name, arr(i)
-        i = i + 1
-    Next ws
-
-End Sub
 
 Public Sub GetVal_Test()
 
@@ -218,9 +215,7 @@ Public Sub GetVal_Test()
     Assert.AreEqualArr Array(Empty, Empty, Empty, Empty), GetVal(ws.Range("B2:E5"))(3)
     Assert.AreEqualArr Array("c", "d", Empty, Empty), GetVal(ws.Range("B2:E5"))(4)
 
-    Application.DisplayAlerts = False
-    ws.Delete
-    Application.DisplayAlerts = True
+    DeleteSheet "myTestTemporarySheet"
 
 End Sub
 
@@ -405,9 +400,7 @@ Public Sub PutVal_Test()
     Assert.AreEqual Empty, ws.Range("F5").Value
     Assert.AreEqual Empty, ws.Range("F6").Value
 
-    Application.DisplayAlerts = False
-    ws.Delete
-    Application.DisplayAlerts = True
+    DeleteSheet "myTestTemporarySheet"
 
 End Sub
 
@@ -638,9 +631,7 @@ Public Sub LastRow_Test()
     Assert.AreEqual 7&, LastRow(ws.Range("B2"))
     Assert.AreEqual 4&, LastRow(ws.Range("B2"), True)
 
-    Application.DisplayAlerts = False
-    ws.Delete
-    Application.DisplayAlerts = True
+    DeleteSheet "myTestTemporarySheet"
 
 End Sub
 
@@ -668,9 +659,7 @@ Public Sub LastCol_Test()
     Assert.AreEqual 7&, LastCol(ws.Range("B2"))
     Assert.AreEqual 4&, LastCol(ws.Range("B2"), True)
 
-    Application.DisplayAlerts = False
-    ws.Delete
-    Application.DisplayAlerts = True
+    DeleteSheet "myTestTemporarySheet"
 
 End Sub
 
@@ -781,4 +770,3 @@ Public Sub AdoExHeadless_Test()
     DeleteSheet "myTestTemporarySheet"
 
 End Sub
-
