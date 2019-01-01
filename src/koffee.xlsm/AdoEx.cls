@@ -14,6 +14,14 @@ Attribute VB_Exposed = False
 ''' --------------------------------------------------------
 Option Explicit
 
+''' Dependencies
+'''
+'''     Select_
+'''         ArrayEx(Ariawase)
+'''         Arr2DToJagArr(Ariawase)
+'''     pos
+'''         AddSheet(KoffeeExcel)
+
 Public Enum CursorTypeEnum
     adOpenUnspecified = -1
     adOpenForwardOnly = 0
