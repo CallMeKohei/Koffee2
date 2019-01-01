@@ -58,7 +58,7 @@ Public Function Base01(ByVal arr As Variant, _
         End If
     End If
 
-    Dim v
+    Dim v As Variant
     If IsJagArr(arr) Then
         For Each v In arr
             Base01 = Base01(v, BaseOne, acc, acc_i, acc_ub, level + 1, leaf)
@@ -204,7 +204,7 @@ End Function
 Private Function ArrExplodeImpl(ByVal arr As Variant, Optional ByRef acc As ArrayEx) As ArrayEx
     If acc Is Nothing Then Set acc = New ArrayEx
     If IsArray(arr) Then
-        Dim v
+        Dim v As Variant
         For Each v In arr
             If Not IsArray(v) Then
                 If IsObject(v) Then

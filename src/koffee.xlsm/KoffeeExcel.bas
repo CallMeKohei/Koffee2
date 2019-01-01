@@ -98,7 +98,7 @@ Public Function ArrSheetsName(Optional ByVal wb As Workbook = Nothing) As Varian
     Dim arr() As String
     ReDim arr(0 To wb.Sheets.Count - 1)
 
-    Dim ws As Variant, i As Long
+    Dim ws As Worksheet, i As Long
     For Each ws In wb.Worksheets
         arr(i) = ws.Name
         i = i + 1
@@ -355,7 +355,7 @@ Public Sub Hankaku(ByVal ws As Worksheet)
     ''' "‚`‚a‚b‚c‚d" -> "ABCDE"
     ''' "‚P‚Q‚R‚S‚T" -> 12345
 
-    Dim v As Variant
+    Dim v As Range
     For Each v In ws.UsedRange
         v.Value = StrConv(v.Value, vbNarrow)
     Next
