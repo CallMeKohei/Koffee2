@@ -19,7 +19,7 @@ Option Private Module
 '''         IsJagArr(Koffee.core)
 
 ''' --------------------------------------------------------
-'''                      Core Functions
+'''                      Util Functions
 ''' --------------------------------------------------------
 
 Public Function IsJagArr(ByVal arr As Variant) As Boolean
@@ -239,8 +239,6 @@ Catch2:
 
 Escape:
 End Function
-
-
 
 ''' --------------------------------------------------------
 '''                     Cells Operation
