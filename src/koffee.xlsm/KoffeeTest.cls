@@ -51,52 +51,6 @@ Public Sub IsJagArr_Test()
 
 End Sub
 
-Public Sub Base01_Test()
-
-    ''' base0 to base1
-    Assert.AreEqual 1&, LBound(Base01(Array(0, 1), True))
-
-    ''' base1 to base0
-    Dim ws As Worksheet: Set ws = AddSheet("myTestTemporarySheet")
-    PutVal 1, ws.Range("B2")
-
-    '    |  A   B   C   D
-    '----+----------------
-    '  1 |
-    '  2 |      1
-    '  3 |
-
-    Assert.AreEqual 0&, LBound(Base01(GetVal(ws.Range("B2"))))
-
-    DeleteSheet "myTestTemporarySheet"
-
-End Sub
-
-Public Sub Truncate_Test()
-
-    Assert.AreEqualArr Array(1, 2, 3), Truncate(Array(1, 2, 3, Empty, Empty, Empty))
-    Assert.AreEqualArr Array(Empty, 1, 2, 3), Truncate(Array(Empty, 1, 2, 3, Empty, Empty, Empty))
-
-End Sub
-
-Public Sub ArrUnflatten_Test()
-
-    ' TODO
-
-End Sub
-
-Public Sub ArrShift_Test()
-
-    Assert.AreEqualArr Array(9, 1, 2, 3), ArrShift(9, Array(1, 2, 3))
-
-End Sub
-
-Public Sub ArrExplode_Test()
-
-    Assert.AreEqualArr Array(1, 2, 3, 4, 5), ArrExplode(Array(1, Array(2, Array(3, Array(4))), 5))
-
-End Sub
-
 ''' --------------------------------------------------------
 '''                     KoffeeExcel Test
 ''' --------------------------------------------------------

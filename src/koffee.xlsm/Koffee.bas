@@ -1,6 +1,6 @@
-Attribute VB_Name = "KoffeeExcel"
+Attribute VB_Name = "Koffee"
 ''' --------------------------------------------------------
-'''  FILE    : KoffeeExcel.bas
+'''  FILE    : Koffee.bas
 '''  AUTHOR  : callmekohei <callmekohei at gmail.com>
 '''  License : MIT license
 ''' --------------------------------------------------------
@@ -9,12 +9,59 @@ Option Private Module
 
 ''' Dependencies
 '''
+'''     IsJagArr
+'''         ArrRank(Ariawase)
 '''     GetVal
 '''         Arr2DToJagArr(Ariawase)
 '''     PutVal
 '''         Arr2DToJagArr(Ariawase)
 '''         ArrRank(Ariawase)
 '''         IsJagArr(Koffee.core)
+
+''' --------------------------------------------------------
+'''                      Core Functions
+''' --------------------------------------------------------
+
+Public Function IsJagArr(ByVal arr As Variant) As Boolean
+
+    If Not IsArray(arr) Then GoTo Escape
+    On Error GoTo Escape
+
+    If ArrRank(arr) > 1 Then GoTo Escape
+
+    Dim v1 As Variant, v2 As Variant
+
+    For Each v1 In arr
+        If Not IsObject(v1) Then
+            For Each v2 In v1
+                If Not IsObject(v2) Then
+                    IsJagArr = True
+                    GoTo Escape
+                End If
+            Next v2
+        End If
+    Next v1
+
+Escape:
+End Function
+
+Public Function ArrTranspose(ByVal arr As Variant) As Variant
+
+    Dim ub1 As Long: ub1 = UBound(arr, 2)
+    Dim ub2 As Long: ub2 = UBound(arr, 1)
+
+    Dim tmp() As Variant: ReDim tmp(ub1, ub2)
+
+    Dim ix1 As Long, ix2 As Long
+    For ix1 = 0 To ub1
+        For ix2 = 0 To ub2
+            tmp(ix1, ix2) = arr(ix2, ix1)
+        Next ix2
+    Next ix1
+
+    ArrTranspose = tmp
+
+End Function
 
 ''' --------------------------------------------------------
 '''                    General Operation
