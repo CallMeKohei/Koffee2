@@ -59,12 +59,14 @@ End Enum
 
 Private Con_  As Object
 Private Rcds_ As Object
+Private Wmi_  As Object
 Private dbEngine_ As String
 Private filePath_ As String
 
 Private Sub Class_Initialize()
 
     Set Con_ = CreateObject("ADODB.Connection")
+    Set Wmi_ = CreateObject("WbemScripting.SWbemLocator")
 
     ''' Microsoft Access Database Engine 2016 Redistributable
     ''' https://www.microsoft.com/en-us/download/details.aspx?id=54920
@@ -217,7 +219,7 @@ End Sub
 Private Function is64bitOS() As Boolean
 
   Dim v As Variant
-  For Each v In Core.Wmi.connectServer.execQuery("Select * From Win32_OperatingSystem")
+  For Each v In Wmi_.connectServer.execQuery("Select * From Win32_OperatingSystem")
 
     If InStr(v.OSArchitecture, "64") Then
         is64bitOS = True
