@@ -22,32 +22,40 @@ Option Explicit
 
 Public Sub IsJagArr_Test()
 
-    Assert.AreEqual False, IsJagArr(Array(Array()))
+    ''' "Array of arrays" is Jagged arrays
+    Assert.AreEqual True, IsJagArr(Array(Array(0)))
 
-    Dim jagArr1 As Variant: jagArr1 = Array(Array(1, 2, 3), Array(4, 5, 6))
-    Dim jagArr2 As Variant: jagArr2 = Array(Array(1, 2, 3), Array(4, 5, 6), Array(7, 8, 9))
+    ''' Not initalized array is as array.
+    Assert.AreEqual True, IsJagArr(Array(Array()))
+    Assert.AreEqual True, IsJagArr(Array(Array(), Array(0)))
 
-    Dim jagArr3 As Variant: jagArr3 = Array(Array(1), Array(2, 3, 4), Array(5, 6))
-    Dim jagArr4 As Variant: jagArr4 = Array(Array(), Array(1, 2, 3), Array(4, 5))
-    Dim jagArr5 As Variant: jagArr5 = Array(ArrToClct(Array()), ArrToClct(Array(0)), ArrToClct(Array(0, 0)))
+    ''' All inner elements must be array.
+    Assert.AreEqual False, IsJagArr(0)
+    Assert.AreEqual False, IsJagArr(New Collection)
+    Assert.AreEqual False, IsJagArr(Array())
+    Assert.AreEqual False, IsJagArr(Array(Array(0), 0))
+    Assert.AreEqual False, IsJagArr(Array(Array(0), New Collection))
 
-    Assert.AreEqual True, IsJagArr(jagArr1)
-    Assert.AreEqual True, IsJagArr(jagArr2)
-    Assert.AreEqual True, IsJagArr(jagArr3)
-    Assert.AreEqual True, IsJagArr(jagArr4)
-    Assert.AreEqual False, IsJagArr(jagArr5)
-
-    Dim arr1D() As Variant
-    Dim arr1DInt(0) As Integer
-    Dim arr1DClct() As Variant: arr1DClct = Array(ArrToClct(Array(0)))
+    ''' One Dimension
+    Dim arr1D(0)
     Assert.AreEqual False, IsJagArr(arr1D)
-    Assert.AreEqual False, IsJagArr(arr1DInt)
-    Assert.AreEqual False, IsJagArr(arr1DClct)
 
-    Dim arr3DInt(0, 0, 0) As Integer
-    Dim arr3DClct() As Variant: arr3DClct = JagArrToArr2D(Array(Array(ArrToClct(Array(0))), Array(ArrToClct(Array(0))), Array(ArrToClct(Array(0)))))
-    Assert.AreEqual False, IsJagArr(arr3DInt)
-    Assert.AreEqual False, IsJagArr(arr3DClct)
+    Dim nArr1D(-1 To -1)
+    Assert.AreEqual False, IsJagArr(nArr1D)
+
+    ''' Two Dimensions
+    Dim arr2D(0, 0)
+    Assert.AreEqual False, IsJagArr(arr2D)
+
+    Dim nArr2D(-1 To -1, -1 To -1)
+    Assert.AreEqual False, IsJagArr(nArr2D)
+
+    ''' More Dimensions
+    Dim arr3D(0, 0, 0)
+    Assert.AreEqual False, IsJagArr(arr3D)
+
+    Dim nArr3D(-1 To -1, -1 To -1, -1 To -1)
+    Assert.AreEqual False, IsJagArr(nArr3D)
 
 End Sub
 

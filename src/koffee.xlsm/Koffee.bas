@@ -22,25 +22,23 @@ Option Private Module
 '''                      Util Functions
 ''' --------------------------------------------------------
 
-Public Function IsJagArr(ByVal arr As Variant) As Boolean
+''' @seealso Jagged Arrays https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/arrays/jagged-arrays
+Public Function IsJagArr(ByVal jagArr As Variant) As Boolean
 
-    If Not IsArray(arr) Then GoTo Escape
+    ''' check outer array
+    If Not IsArray(jagArr) Then GoTo Escape
     On Error GoTo Escape
+    If ArrRank(jagArr) > 1 Then GoTo Escape
+    If ArrLen(jagArr) = 0 Then GoTo Escape
 
-    If ArrRank(arr) > 1 Then GoTo Escape
+    '' check inner array
+    Dim arr As Variant
+    For Each arr In jagArr
+        If Not IsArray(arr) Then GoTo Escape
+        If IsObject(arr) Then GoTo Escape
+    Next arr
 
-    Dim v1 As Variant, v2 As Variant
-
-    For Each v1 In arr
-        If Not IsObject(v1) Then
-            For Each v2 In v1
-                If Not IsObject(v2) Then
-                    IsJagArr = True
-                    GoTo Escape
-                End If
-            Next v2
-        End If
-    Next v1
+    IsJagArr = True
 
 Escape:
 End Function
