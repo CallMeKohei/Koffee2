@@ -175,6 +175,7 @@ Public Function Select_(ByVal sql As String, _
 
 End Function
 
+''' @param sql As String
 Public Function Execute(ByVal sql As String) As Long
     Dim rcdNumbers As Long
     Con_.Execute sql, ARecNum
