@@ -14,14 +14,8 @@ Attribute VB_Exposed = False
 ''' --------------------------------------------------------
 Option Explicit
 
-''' Dependencies
-'''
-'''     Select_
-'''         ArrayEx(Ariawase)
-'''         Arr2DToJagArr(Ariawase)
-'''         ArrTranspose(KoffeeVBA)
-'''     Pos
-'''         AddSheet(KoffeeVBA)
+
+
 
 Public Enum CursorTypeEnum
     adOpenUnspecified = -1
@@ -69,8 +63,6 @@ Private Sub Class_Initialize()
     Set Con_ = CreateObject("ADODB.Connection")
     Set Wmi_ = CreateObject("WbemScripting.SWbemLocator")
 
-    ''' Microsoft Access Database Engine 2016 Redistributable
-    ''' https://www.microsoft.com/en-us/download/details.aspx?id=54920
     If is64bitOS() Then
         dbEngine_ = "Microsoft.ACE.OLEDB.12.0"
     Else
@@ -154,6 +146,8 @@ Public Sub Init(ByVal dbType As dbTypeEnum, Optional ByVal fpath As String = "",
 
 End Sub
 
+''' @param sql As String
+''' @return As Variant(Of Array(Of T, T))
 Public Function Select_(ByVal sql As String, _
     Optional ByVal propCursorType As CursorTypeEnum = adOpenStatic, _
     Optional ByVal propLockType As LockTypeEnum = adLockReadOnly, _
@@ -163,15 +157,17 @@ Public Function Select_(ByVal sql As String, _
     Set Rcds_ = CreateObject("ADODB.Recordset")
     Rcds_.Open Source:=sql, ActiveConnection:=Con_, CursorType:=propCursorType, LockType:=propLockType, Options:=propCommandType
 
-    Dim v As Variant, arrx As New ArrayEx
-    For Each v In Rcds_.Fields
-        arrx.AddVal v.Name
-    Next v
+    ''' Table header names
+    Dim fieldsCnt As Long: fieldsCnt = Rcds_.Fields.Count
+    Dim tableHeaderNamesArray() As String: ReDim tableHeaderNamesArray(fieldsCnt - 1)
 
-    Select_ = Array( _
-        arrx.ToArray, _
-        Arr2DToJagArr(ArrTranspose(Rcds_.GetRows())) _
-    )
+    Dim idx As Long
+    For idx = 0 To (fieldsCnt - 1)
+        tableHeaderNamesArray(idx) = Rcds_.Fields.Item(idx).Name
+    Next idx
+
+    ''' array( array( Table Names ),  array( Table Values ) )
+    Select_ = Array(tableHeaderNamesArray, ArrTranspose(Rcds_.GetRows()))
 
     On Error Resume Next
     If Not Rcds_ Is Nothing Then Rcds_.Close
@@ -197,21 +193,54 @@ Public Sub RollbackTrans()
     cn.RollbackTrans
 End Sub
 
+''' --------------------------------------------------------
+'''                      Util Functions
+''' --------------------------------------------------------
+
 Private Function is64bitOS() As Boolean
+
+''' @param arr2D As Variant(Of Array(Of T, T))
+''' @return As Variant(Of Array(Of T, T))
+Private Function ArrTranspose(ByVal arr2D As Variant) As Variant
+
+    ''' This original function is from KoffeeVBA
+
+    If Not IsArray(arr2D) Then Err.Raise 13
+    If Not ArrRank(arr2D) = 2 Then Err.Raise 13
+
+    Dim lb1 As Long: lb1 = LBound(arr2D, 2)
+    Dim ub1 As Long: ub1 = UBound(arr2D, 2)
+    Dim lb2 As Long: lb2 = LBound(arr2D, 1)
+    Dim ub2 As Long: ub2 = UBound(arr2D, 1)
 
   Dim v As Variant
   For Each v In Wmi_.connectServer.execQuery("Select * From Win32_OperatingSystem")
+    Dim tmpArr2D() As Variant
+    ReDim tmpArr2D(lb1 To ub1, lb2 To ub2)
 
     If InStr(v.OSArchitecture, "64") Then
         is64bitOS = True
         Exit Function
     End If
+    Dim ix1 As Long, ix2 As Long
+    For ix1 = lb1 To ub1
+        For ix2 = lb2 To ub2
+            If IsObject(arr2D(ix2, ix1)) Then
+                Set tmpArr2D(ix1, ix2) = arr2D(ix2, ix1)
+            Else
+                Let tmpArr2D(ix1, ix2) = arr2D(ix2, ix1)
+            End If
+        Next ix2
+    Next ix1
 
   Next
+    ArrTranspose = tmpArr2D
 
 End Function
 
-Public Sub Pos(ByVal sql As String, Optional ByVal rng As Range = Nothing)
+''' @param sql As String
+''' @param rng As Range
+Public Sub CopyFromRecordset(ByVal sql As String, ByVal rng As Range)
 
     Set Rcds_ = CreateObject("ADODB.Recordset")
     Rcds_.Open Source:=sql, ActiveConnection:=Con_, CursorType:=adOpenStatic, LockType:=adLockReadOnly, Options:=adCmdText
@@ -219,11 +248,6 @@ Public Sub Pos(ByVal sql As String, Optional ByVal rng As Range = Nothing)
     If Rcds_.EOF Then
         Debug.Print "No Date!: " & Now()
         GoTo Escape
-    End If
-
-    If TypeName(rng) = "Nothing" Then
-        AddSheet "TestTestTestTestTest"
-        Set rng = ThisWorkbook.Worksheets("TestTestTestTestTest").Range("C5")
     End If
 
     rng.CopyFromRecordset Rcds_
