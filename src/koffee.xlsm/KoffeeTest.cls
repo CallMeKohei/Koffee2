@@ -40,22 +40,22 @@ Public Sub IsJagArr_Test()
     Dim arr1D(0)
     Assert.AreEqual False, IsJagArr(arr1D)
 
-    Dim nArr1D(-1 To -1)
-    Assert.AreEqual False, IsJagArr(nArr1D)
+    Dim negativeArr1D(-1 To -1)
+    Assert.AreEqual False, IsJagArr(negativeArr1D)
 
     ''' Two Dimensions
     Dim arr2D(0, 0)
     Assert.AreEqual False, IsJagArr(arr2D)
 
-    Dim nArr2D(-1 To -1, -1 To -1)
-    Assert.AreEqual False, IsJagArr(nArr2D)
+    Dim negativeArr2D(-1 To -1, -1 To -1)
+    Assert.AreEqual False, IsJagArr(negativeArr2D)
 
     ''' More Dimensions
     Dim arr3D(0, 0, 0)
     Assert.AreEqual False, IsJagArr(arr3D)
 
-    Dim nArr3D(-1 To -1, -1 To -1, -1 To -1)
-    Assert.AreEqual False, IsJagArr(nArr3D)
+    Dim negativeArr3D(-1 To -1, -1 To -1, -1 To -1)
+    Assert.AreEqual False, IsJagArr(negativeArr3D)
 
 End Sub
 
@@ -63,8 +63,9 @@ Public Sub ArrTranspose_Test()
 
     '''  Before             After
     '''
-    '''  1  2  3     --->   1  2  5
-    '''  4  5  6            2  4  6
+    '''  A  B  C            A  1
+    '''  1  2  3     --->   B  2
+    '''                     C  3
 
     ''' validation
     ''' not array
@@ -77,50 +78,57 @@ Public Sub ArrTranspose_Test()
     Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf ArrTranspose, vbVariant), Array(arr3D)
 
     ''' Before ( Base 0 )
-    Dim arr As Variant: arr = JagArrToArr2D(Array(Array(1, 2, 3), Array(4, 5, 6)))
+    Dim arr2D(1, 2) As Variant
+    arr2D(0, 0) = "A"
+    arr2D(0, 1) = "B"
+    arr2D(0, 2) = "C"
 
-    Assert.AreEqual 1, arr(0, 0)
-    Assert.AreEqual 2, arr(0, 1)
-    Assert.AreEqual 3, arr(0, 2)
+    arr2D(1, 0) = 1
+    arr2D(1, 1) = 2
+    arr2D(1, 2) = 3
 
-    Assert.AreEqual 4, arr(1, 0)
-    Assert.AreEqual 5, arr(1, 1)
-    Assert.AreEqual 6, arr(1, 2)
+    Assert.AreEqual "A", arr2D(0, 0)
+    Assert.AreEqual "B", arr2D(0, 1)
+    Assert.AreEqual "C", arr2D(0, 2)
+
+    Assert.AreEqual 1, arr2D(1, 0)
+    Assert.AreEqual 2, arr2D(1, 1)
+    Assert.AreEqual 3, arr2D(1, 2)
 
     ''' After ( Base 0 )
-    Dim arr2 As Variant: arr2 = ArrTranspose(arr)
+    Dim arr2DTrans As Variant: arr2DTrans = ArrTranspose(arr2D)
 
-    Assert.AreEqual 1, arr2(0, 0)
-    Assert.AreEqual 4, arr2(0, 1)
+    Assert.AreEqual "A", arr2DTrans(0, 0)
+    Assert.AreEqual 1, arr2DTrans(0, 1)
 
-    Assert.AreEqual 2, arr2(1, 0)
-    Assert.AreEqual 5, arr2(1, 1)
+    Assert.AreEqual "B", arr2DTrans(1, 0)
+    Assert.AreEqual 2, arr2DTrans(1, 1)
 
-    Assert.AreEqual 3, arr2(2, 0)
-    Assert.AreEqual 6, arr2(2, 1)
+    Assert.AreEqual "C", arr2DTrans(2, 0)
+    Assert.AreEqual 3, arr2DTrans(2, 1)
 
     ''' Before ( Base 1 )
-    Dim arr3 As Variant: arr3 = [{1,2,3;4,5,6}]
+    Dim arr2DBase1 As Variant: arr2DBase1 = [{"A","B","C";1,2,3}]
 
-    Assert.AreEqual 1#, arr3(1, 1)
-    Assert.AreEqual 2#, arr3(1, 2)
-    Assert.AreEqual 3#, arr3(1, 3)
+    Assert.AreEqual "A", arr2DBase1(1, 1)
+    Assert.AreEqual "B", arr2DBase1(1, 2)
+    Assert.AreEqual "C", arr2DBase1(1, 3)
 
-    Assert.AreEqual 4#, arr3(2, 1)
-    Assert.AreEqual 5#, arr3(2, 2)
-    Assert.AreEqual 6#, arr3(2, 3)
+    Assert.AreEqual 1#, arr2DBase1(2, 1)
+    Assert.AreEqual 2#, arr2DBase1(2, 2)
+    Assert.AreEqual 3#, arr2DBase1(2, 3)
 
     ''' After ( Base 1 )
-    Dim arr4 As Variant: arr4 = ArrTranspose(arr3)
+    Dim arr2DBase1Trans As Variant: arr2DBase1Trans = ArrTranspose(arr2DBase1)
 
-    Assert.AreEqual 1#, arr4(1, 1)
-    Assert.AreEqual 4#, arr4(1, 2)
+    Assert.AreEqual "A", arr2DBase1Trans(1, 1)
+    Assert.AreEqual 1#, arr2DBase1Trans(1, 2)
 
-    Assert.AreEqual 2#, arr4(2, 1)
-    Assert.AreEqual 5#, arr4(2, 2)
+    Assert.AreEqual "B", arr2DBase1Trans(2, 1)
+    Assert.AreEqual 2#, arr2DBase1Trans(2, 2)
 
-    Assert.AreEqual 3#, arr4(3, 1)
-    Assert.AreEqual 6#, arr4(3, 2)
+    Assert.AreEqual "C", arr2DBase1Trans(3, 1)
+    Assert.AreEqual 3#, arr2DBase1Trans(3, 2)
 
 End Sub
 
@@ -227,7 +235,7 @@ Public Sub GetVal_Test()
     ws.Range("D5").Value = Empty
     ws.Range("E5").Value = Empty
 
-    Assert.AreEqualArr Array(1#), GetVal(ws.Range("B2"))
+    Assert.AreEqualArr Array(1#), GetVal(ws.Range("B2"))(0)
 
     Assert.AreEqualArr Array(1#, 2#, Empty, "a"), GetVal(ws.Range("B2:E2"))(1)
 
@@ -733,10 +741,7 @@ Public Sub AdoEx_Test()
     '''   6 |            4
     '''   7 |            5                  600
 
-    Dim adox As AdoEx: Set adox = New AdoEx
-    adox.Init dbExcel
-
-    Dim arr As Variant: arr = adox.Select_("select * from [myTestTemporarySheet$B2:F7]")
+    Dim arr As Variant: arr = Select_(dbExcel, "select * from [myTestTemporarySheet$B2:F7]")
 
     Assert.AreEqualArr Array("Number", "Name", "Price", "Memo1", "Memo2"), arr(0)
 
@@ -775,10 +780,7 @@ Public Sub AdoExHeadless_Test()
     '''   6 |            4
     '''   7 |            5                  600
 
-    Dim adox As AdoEx: Set adox = New AdoEx
-    adox.Init dbExcel, , False
-
-    Dim arr As Variant: arr = adox.Select_("select * from [myTestTemporarySheet$B2:F7]")
+    Dim arr As Variant: arr = Select_(dbExcel, "select * from [myTestTemporarySheet$B2:F7]", , False)
 
     Assert.AreEqualArr Array("F1", "F2", "F3", "F4", "F5"), arr(0)
 
@@ -790,6 +792,7 @@ Public Sub AdoExHeadless_Test()
     Assert.AreEqualArr Array(3#, "Cherry", 400#, Null, "f"), arr(1)(3)
     Assert.AreEqualArr Array(4#, Null, Null, Null, Null), arr(1)(4)
     Assert.AreEqualArr Array(5#, Null, 600#, Null, Null), arr(1)(5)
+
 
     DeleteSheet "myTestTemporarySheet"
 

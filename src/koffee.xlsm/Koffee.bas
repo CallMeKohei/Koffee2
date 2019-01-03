@@ -31,54 +31,79 @@ Option Private Module
 '''                      Util Functions
 ''' --------------------------------------------------------
 
-''' @seealso Jagged Arrays https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/arrays/jagged-arrays
-Public Function IsJagArr(ByVal jagArr As Variant) As Boolean
+''' @param arr As Variant(Of Array(Of Array(Of T)))
+''' @return As Boolean
+Public Function IsJagArr(ByVal arr As Variant) As Boolean
+
+    ''' @seealso Jagged Arrays
+    ''' https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/arrays/jagged-arrays
+
+    On Error GoTo Escape
 
     ''' check outer array
-    If Not IsArray(jagArr) Then GoTo Escape
-    On Error GoTo Escape
-    If ArrRank(jagArr) > 1 Then GoTo Escape
-    If ArrLen(jagArr) = 0 Then GoTo Escape
+    If Not IsArray(arr) Then GoTo Escape
+    If Not ArrRank(arr) = 1 Then GoTo Escape
+    If ArrLen(arr) = 0 Then GoTo Escape
 
     '' check inner array
-    Dim arr As Variant
-    For Each arr In jagArr
-        If Not IsArray(arr) Then GoTo Escape
-        If IsObject(arr) Then GoTo Escape
-    Next arr
+    Dim innerArray As Variant
+    For Each innerArray In arr
+        If Not IsArray(innerArray) Then GoTo Escape
+        If IsObject(innerArray) Then GoTo Escape
+    Next innerArray
 
     IsJagArr = True
 
 Escape:
 End Function
 
-Public Function ArrTranspose(ByVal arr As Variant) As Variant
+''' @param arr2D As Variant(Of Array(Of T, T))
+''' @return As Variant(Of Array(Of T, T))
+Public Function ArrTranspose(ByVal arr2D As Variant) As Variant
 
-    ''' base0 and base1 is available
-    ''' see test script
+    If Not IsArray(arr2D) Then Err.Raise 13
+    If Not ArrRank(arr2D) = 2 Then Err.Raise 13
 
-    If Not IsArray(arr) Then Err.Raise 13
-    If IsJagArr(arr) Then arr = JagArrToArr2D(arr)
-    If Not ArrRank(arr) = 2 Then Err.Raise 13
+    Dim lb1 As Long: lb1 = LBound(arr2D, 2)
+    Dim ub1 As Long: ub1 = UBound(arr2D, 2)
+    Dim lb2 As Long: lb2 = LBound(arr2D, 1)
+    Dim ub2 As Long: ub2 = UBound(arr2D, 1)
 
-    Dim lb1 As Long: lb1 = LBound(arr, 2)
-    Dim lb2 As Long: lb2 = LBound(arr, 1)
-
-    Dim ub1 As Long: ub1 = UBound(arr, 2)
-    Dim ub2 As Long: ub2 = UBound(arr, 1)
-
-    Dim tmp() As Variant: ReDim tmp(lb1 To ub1, lb2 To ub2)
+    Dim tmpArr2D() As Variant
+    ReDim tmpArr2D(lb1 To ub1, lb2 To ub2)
 
     Dim ix1 As Long, ix2 As Long
     For ix1 = lb1 To ub1
         For ix2 = lb2 To ub2
-            tmp(ix1, ix2) = arr(ix2, ix1)
+            If IsObject(arr2D(ix2, ix1)) Then
+                Set tmpArr2D(ix1, ix2) = arr2D(ix2, ix1)
+            Else
+                Let tmpArr2D(ix1, ix2) = arr2D(ix2, ix1)
+            End If
         Next ix2
     Next ix1
 
-    ArrTranspose = tmp
+    ArrTranspose = tmpArr2D
 
 End Function
+
+''' @param dbType As dbTypeEnum
+''' @param sql As String
+''' @return As Variant(Of Array(Of T, T))
+Public Function Select_(ByVal dbType As dbTypeEnum, ByVal sql As String, _
+    Optional ByVal fpath As String = "", _
+    Optional ByVal isTableHeader As Boolean = True) As Variant
+
+    ''' This function is helper function for AdoEx class.
+
+    Dim adox As AdoEx: Set adox = New AdoEx
+    adox.Init dbType, fpath, isTableHeader
+    Dim arr: arr = adox.Select_(sql)
+    Select_ = Array(arr(0), Arr2DToJagArr(arr(1)))
+    Set adox = Nothing
+
+End Function
+
 
 ''' --------------------------------------------------------
 '''                    General Operation
@@ -126,6 +151,7 @@ Public Sub ExcelStatus( _
 
 End Sub
 
+''' @param ws As Worksheet
 Public Sub ProtectSheet(ByVal ws As Worksheet, Optional myPassword As String = "1234")
 
     ws.Protect _
@@ -151,6 +177,7 @@ End Sub
 '''                   WorkSheet Operation
 ''' --------------------------------------------------------
 
+''' @return As Variant(Of Array(Of String))
 Public Function ArrSheetsName(Optional ByVal wb As Workbook = Nothing) As Variant
 
     ''' ( Usage )
@@ -172,6 +199,8 @@ Public Function ArrSheetsName(Optional ByVal wb As Workbook = Nothing) As Varian
 
 End Function
 
+''' @param SheetName As String
+''' @return As Boolean
 Public Function ExistsSheet(ByVal SheetName As String, Optional ByVal wb As Workbook = Nothing) As Boolean
 
     ''' ( Usage )
@@ -190,6 +219,7 @@ Public Function ExistsSheet(ByVal SheetName As String, Optional ByVal wb As Work
 Escape:
 End Function
 
+''' @param SheetName As String
 Public Sub DeleteSheet(ByVal SheetName As String, Optional ByVal wb As Workbook = Nothing)
 
     ''' ( Usage )
@@ -211,6 +241,8 @@ Catch:
 Escape:
 End Sub
 
+''' @param SheetName As String
+''' @return As Worksheet
 Public Function AddSheet(ByVal SheetName As String, Optional ByVal wb As Workbook = Nothing) As Worksheet
 
     ''' ( Usage )
@@ -231,6 +263,9 @@ Catch:
 Escape:
 End Function
 
+''' @param SourceSheetName As String
+''' @param SheetName As String
+''' @return As Worksheet
 Public Function CopySheet(ByVal SourceSheetName As String, ByVal SheetName As String, Optional ByVal wb As Workbook = Nothing) As Worksheet
 
     ''' ( Usage )
@@ -261,6 +296,8 @@ End Function
 '''                     Cells Operation
 ''' --------------------------------------------------------
 
+''' @param rng As Rang
+''' @return As Variant(Of Array(Of Array(Of T)))
 Public Function GetVal(ByVal rng As Range) As Variant
 
     ''' ( Usage ) Dump() is Ariawase's function
@@ -277,79 +314,86 @@ Public Function GetVal(ByVal rng As Range) As Variant
     ''' Array( Array(1,2), Array(3,4) )
 
 
-    Dim arr As Variant: arr = rng
+    Dim arr As Variant: arr = rng.Value
 
     If IsArray(arr) Then
         GetVal = Arr2DToJagArr(arr)
     Else
-        GetVal = Array(arr)
+        GetVal = Array(Array(arr))
     End If
 
 End Function
 
-Public Sub PutVal(ByVal arr As Variant, ByVal rng As Range, Optional isVertical As Boolean = False)
+''' @param arr2D As Variant(Of Array(Of T, T) Or Of Array(Of Array(Of T)) Or T)
+''' @param rng As Rang
+''' @return As Variant(Of Array(Of Array(Of T)))
+Public Sub PutVal(ByVal arr2D As Variant, ByVal rng As Range, Optional isVertical As Boolean = False)
 
     ''' ( Usage )
 
     ''' Dim ws As Worksheet: Set ws = ThisWorkbook.Worksheets("abc")
-    ''' PutVal Array( Array(1,2), Array(3,4) ), ws.Range("B2")
+
+    ''' Hrizontal put
+    ''' PutVal Array( Array(A,B), Array(1,2) ), ws.Range("B2")
 
     '''     |  A   B   C   D
     ''' ----+------------------
     '''   1 |
-    '''   2 |      1   2
-    '''   3 |      3   4
+    '''   2 |      A   B
+    '''   3 |      1   2
     '''   4 |
 
-    ''' PutVal Array( Array(1,2), Array(3,4) ), ws.Range("B2") , True
+    ''' Vertical put
+    ''' PutVal Array( Array(A,B), Array(1,2) ), ws.Range("B2") , True
 
     '''     |  A   B   C   D
     ''' ----+------------------
     '''   1 |
-    '''   2 |      1   3
-    '''   3 |      2   4
+    '''   2 |      A   1
+    '''   3 |      B   2
     '''   4 |
 
 
-    ''' 2D array from value : "foo" ---> array(array("foo")) ---> 2D array
-    If Not IsArray(arr) Then arr = JagArrToArr2D(Array(Array(arr)))
+    ''' Value to 2D array
+    If Not IsArray(arr2D) Then
+        If IsObject(arr2D) Then Err.Raise 13
+        Dim tmp2DArr(0, 0) As Variant: tmp2DArr(0, 0) = arr2D
+        arr2D = tmp2DArr
+    End If
 
-    ''' 2D array from 1D array : array(1,2) ---> array(array(1,2)) ---> 2D array
-    If Not IsJagArr(arr) Then
-        If ArrRank(arr) = 1 Then
-            arr = Array(arr)
+    If ArrRank(arr2D) >= 3 Then Err.Raise 13
+
+    ''' 1D array to 2D array
+    If ArrRank(arr2D) = 1 Then
+        If IsJagArr(arr2D) Then
+            arr2D = JagArrToArr2D(arr2D)
+        Else
+            arr2D = JagArrToArr2D(Array(arr2D))
         End If
     End If
 
-    ''' 2D array from Jag array : array( array(1,2), array(3,4) ) ---> 2D array
-    If IsJagArr(arr) Then
-        arr = JagArrToArr2D(arr)
-    End If
-
-    If ArrRank(arr) <> 2 Then Err.Raise 13  ''' Type mismatch
+    If Not ArrRank(arr2D) = 2 Then Err.Raise 13  ''' Type mismatch
 
     If isVertical Then
-
         ''' Minimum index Excel's Array is 1
-        If LBound(arr, 1) = 1 Then
-            rng.Resize(UBound(arr, 2), UBound(arr, 1)).Value = ArrTranspose(arr)
+        If LBound(arr2D, 1) = 1 Then
+            rng.Resize(UBound(arr2D, 2), UBound(arr2D, 1)).Value = ArrTranspose(arr2D)
         Else
-            rng.Resize(UBound(arr, 2) + 1, UBound(arr, 1) + 1).Value = ArrTranspose(arr)
+            rng.Resize(UBound(arr2D, 2) + 1, UBound(arr2D, 1) + 1).Value = ArrTranspose(arr2D)
         End If
-
     Else
-
         ''' Minimum index Excel's Array is 1
-        If LBound(arr, 1) = 1 Then
-            rng.Resize(UBound(arr, 1), UBound(arr, 2)).Value = arr
+        If LBound(arr2D, 1) = 1 Then
+            rng.Resize(UBound(arr2D, 1), UBound(arr2D, 2)).Value = arr2D
         Else
-            rng.Resize(UBound(arr, 1) + 1, UBound(arr, 2) + 1).Value = arr
+            rng.Resize(UBound(arr2D, 1) + 1, UBound(arr2D, 2) + 1).Value = arr2D
         End If
-
     End If
 
 End Sub
 
+''' @param rng As Rang
+''' @return As Long
 Public Function LastRow(ByVal rng As Range, Optional toDown As Boolean = False) As Long
 
     ''' ( Usage )
@@ -378,6 +422,8 @@ Public Function LastRow(ByVal rng As Range, Optional toDown As Boolean = False) 
 
 End Function
 
+''' @param rng As Rang
+''' @return As Long
 Public Function LastCol(ByVal rng As Range, Optional toRight As Boolean = False) As Long
 
     ''' ( Usage )
@@ -406,6 +452,7 @@ Public Function LastCol(ByVal rng As Range, Optional toRight As Boolean = False)
 
 End Function
 
+''' @param ws As Worksheet
 Public Sub Hankaku(ByVal ws As Worksheet)
 
     ''' ( Usage )
