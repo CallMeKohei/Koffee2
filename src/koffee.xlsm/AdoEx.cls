@@ -198,7 +198,17 @@ End Sub
 '''                      Util Functions
 ''' --------------------------------------------------------
 
+''' @return As Boolean
 Private Function is64bitOS() As Boolean
+    Dim v As Variant
+    For Each v In Wmi_.connectServer.execQuery("Select * From Win32_OperatingSystem")
+      If InStr(v.OSArchitecture, "64") Then
+          is64bitOS = True
+          GoTo Escape
+      End If
+    Next
+Escape:
+End Function
 
 ''' @param arr2D As Variant(Of Array(Of T, T))
 ''' @return As Variant(Of Array(Of T, T))
@@ -214,15 +224,9 @@ Private Function ArrTranspose(ByVal arr2D As Variant) As Variant
     Dim lb2 As Long: lb2 = LBound(arr2D, 1)
     Dim ub2 As Long: ub2 = UBound(arr2D, 1)
 
-  Dim v As Variant
-  For Each v In Wmi_.connectServer.execQuery("Select * From Win32_OperatingSystem")
     Dim tmpArr2D() As Variant
     ReDim tmpArr2D(lb1 To ub1, lb2 To ub2)
 
-    If InStr(v.OSArchitecture, "64") Then
-        is64bitOS = True
-        Exit Function
-    End If
     Dim ix1 As Long, ix2 As Long
     For ix1 = lb1 To ub1
         For ix2 = lb2 To ub2
@@ -234,7 +238,6 @@ Private Function ArrTranspose(ByVal arr2D As Variant) As Variant
         Next ix2
     Next ix1
 
-  Next
     ArrTranspose = tmpArr2D
 
 End Function
