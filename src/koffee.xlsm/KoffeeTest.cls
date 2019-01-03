@@ -22,10 +22,10 @@ Option Explicit
 
 Public Sub IsJagArr_Test()
 
-    ''' "Array of arrays" is Jagged arrays
+    ''' Jagged arrays is "Array of arrays".
     Assert.AreEqual True, IsJagArr(Array(Array(0)))
 
-    ''' Not initalized array is as array.
+    ''' An inner array which is not initialized is regarded as an array.
     Assert.AreEqual True, IsJagArr(Array(Array()))
     Assert.AreEqual True, IsJagArr(Array(Array(), Array(0)))
 

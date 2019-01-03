@@ -7,16 +7,25 @@ Attribute VB_Name = "Koffee"
 Option Explicit
 Option Private Module
 
+
+''' TODO: Reduce dependencies
 ''' Dependencies
 '''
+'''     Ariawase: https://github.com/vbaidiot/ariawase
+'''
 '''     IsJagArr
-'''         ArrRank(Ariawase)
-'''         ArrLen(Ariawse)
+'''         ArrRank       ( Ariawase )
+'''         ArrLen        ( Ariawase )
+'''     ArrTranspose
+'''         ArrLen        ( Ariawase )
+'''     Select_
+'''         Arr2DToJagArr ( Ariawase )
 '''     GetVal
-'''         Arr2DToJagArr(Ariawase)
+'''         Arr2DToJagArr ( Ariawase )
 '''     PutVal
-'''         Arr2DToJagArr(Ariawase)
-'''         ArrRank(Ariawase)
+'''         Arr2DToJagArr ( Ariawase )
+'''         ArrRank       ( Ariawase )
+
 
 ''' --------------------------------------------------------
 '''                      Util Functions
