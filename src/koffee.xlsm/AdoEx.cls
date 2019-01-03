@@ -14,8 +14,13 @@ Attribute VB_Exposed = False
 ''' --------------------------------------------------------
 Option Explicit
 
-
-
+''' TODO: Reduce dependencies
+''' Dependencies
+'''
+'''     Ariawase: https://github.com/vbaidiot/ariawase
+'''
+'''     ArrTranspose
+'''         ArrRank       ( Ariawase )
 
 Public Enum CursorTypeEnum
     adOpenUnspecified = -1

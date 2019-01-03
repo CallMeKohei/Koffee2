@@ -61,11 +61,11 @@ End Sub
 
 Public Sub ArrTranspose_Test()
 
-    '''  Before             After
+    '''  Before           After
     '''
-    '''  A  B  C            A  1
-    '''  1  2  3     --->   B  2
-    '''                     C  3
+    '''  A  B  C          A  1
+    '''  1  2  3   --->   B  2
+    '''                   C  3
 
     ''' validation
     ''' not array
