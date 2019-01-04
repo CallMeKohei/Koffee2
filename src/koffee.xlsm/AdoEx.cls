@@ -70,14 +70,19 @@ Private Sub Class_Initialize()
 
     Set Con_ = CreateObject("ADODB.Connection")
     Set Wmi_ = CreateObject("WbemScripting.SWbemLocator")
+    filePath_ = ThisWorkbook.Path & "\" & ThisWorkbook.Name
 
-    If is64bitOS() Then
-        dbEngine_ = "Microsoft.ACE.OLEDB.12.0"
-    Else
+    dbEngine_ = AceString(IIf(is64bitOS(), 64, 32))
+
+    ''' if Ace is not installed...
+    If dbEngine_ = "" Then
+        ''' Office64 can not use Jet.
+        #If VBA7 Then
+            Err.Raise 9999, , "Please Install ACE Engine"
+        #End If
+        ''' Use Jet ( pre-installed on Windows32 and Wow64 )
         dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
     End If
-
-    filePath_ = ThisWorkbook.Path & "\" & ThisWorkbook.Name
 
 End Sub
 
@@ -216,6 +221,60 @@ Private Function is64bitOS() As Boolean
       End If
     Next
 Escape:
+End Function
+
+''' @param osBit As Long
+''' @return As String
+Private Function AceString(ByVal osBit As Long) As String
+
+    On Error GoTo Escape
+
+    Const strComputer As String = "."
+
+    ''' Context Flags
+    ''' https://docs.microsoft.com/en-us/windows/desktop/WmiSdk/requesting-wmi-data-on-a-64-bit-platform#context-flags
+    Dim wmiCtx As Object: Set wmiCtx = CreateObject("WbemScripting.SWbemNamedValueSet")
+    wmiCtx.Add "__ProviderArchitecture", osBit
+    wmiCtx.Add "__RequiredArchitecture", True
+
+    Dim wmi    As Object: Set wmi = CreateObject("Wbemscripting.SWbemLocator")
+    Dim wmiSrv As Object: Set wmiSrv = wmi.ConnectServer(strComputer, "root\default", "", "", , , , wmiCtx)
+
+    AceString = AceStringImpl(wmiSrv.Get("StdRegProv"))
+
+Escape:
+    Set wmiCtx = Nothing
+    Set wmi = Nothing
+    Set wmiSrv = Nothing
+End Function
+
+''' @param reg As Object Is SWbemObjectEx
+''' @return As String
+Private Function AceStringImpl(ByVal reg As Object) As String
+
+    On Error GoTo Escape
+
+    Const HKLM  As Long = &H80000002
+    Const Ace16 As String = "SOFTWARE\Classes\Microsoft.ACE.OLEDB.16.0"
+    Const Ace15 As String = "SOFTWARE\Classes\Microsoft.ACE.OLEDB.15.0"
+    Const Ace14 As String = "SOFTWARE\Classes\Microsoft.ACE.OLEDB.14.0"
+    Const Ace13 As String = "SOFTWARE\Classes\Microsoft.ACE.OLEDB.13.0"
+    Const Ace12 As String = "SOFTWARE\Classes\Microsoft.ACE.OLEDB.12.0"
+
+    Dim v As Variant, SubKey As Variant
+    For Each v In Array(Ace16, Ace15, Ace12)
+        reg.EnumKey HKEY_LOCAL_MACHINE, v, SubKey
+        If Not IsNull(SubKey) Then
+            Dim arr As Variant: arr = Split(v, "\")
+            AceStringImpl = arr(ArrLen(arr) - 1)
+            Set reg = Nothing
+            Exit Function
+        End If
+    Next v
+
+Escape:
+    AceStringImpl = ""
+    Set reg = Nothing
 End Function
 
 ''' @param arr2D As Variant(Of Array(Of T, T))
