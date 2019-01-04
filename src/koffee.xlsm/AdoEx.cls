@@ -12,15 +12,18 @@ Attribute VB_Exposed = False
 '''  AUTHOR  : callmekohei <callmekohei at gmail.com>
 '''  License : MIT license
 ''' --------------------------------------------------------
-Option Explicit
 
-''' TODO: Reduce dependencies
 ''' Dependencies
 '''
-'''     Ariawase: https://github.com/vbaidiot/ariawase
+'''     ACE Engine
+'''         Microsoft Access Database Engine 2016 Redistributable
+'''         https://www.microsoft.com/en-us/download/details.aspx?id=54920
 '''
-'''     ArrTranspose
-'''         ArrRank       ( Ariawase )
+'''     Ariawase
+'''         https://github.com/vbaidiot/ariawase
+'''         ArrRank ( ArrTranspose )
+
+Option Explicit
 
 Public Enum CursorTypeEnum
     adOpenUnspecified = -1
@@ -57,9 +60,9 @@ Public Enum dbTypeEnum
     dbExcel = 3
 End Enum
 
-Private Con_  As Object
-Private Rcds_ As Object
-Private Wmi_  As Object
+Private Con_  As Object 'Is ADODB.Connection
+Private Rcds_ As Object 'Is ADODB.Recordset
+Private Wmi_  As Object 'Is WbemScripting.SWbemLocator
 Private dbEngine_ As String
 Private filePath_ As String
 
