@@ -214,7 +214,7 @@ End Sub
 ''' @return As Boolean
 Private Function is64bitOS() As Boolean
     Dim v As Variant
-    For Each v In Wmi_.connectServer.execQuery("Select * From Win32_OperatingSystem")
+    For Each v In Wmi_.ConnectServer.ExecQuery("Select * From Win32_OperatingSystem")
       If InStr(v.OSArchitecture, "64") Then
           is64bitOS = True
           GoTo Escape
