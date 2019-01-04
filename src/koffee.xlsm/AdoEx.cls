@@ -263,7 +263,7 @@ Private Function AceStringImpl(ByVal reg As Object) As String
 
     Dim v As Variant, SubKey As Variant
     For Each v In Array(Ace16, Ace15, Ace12)
-        reg.EnumKey HKEY_LOCAL_MACHINE, v, SubKey
+        reg.EnumKey HKLM, v, SubKey
         If Not IsNull(SubKey) Then
             Dim arr As Variant: arr = Split(v, "\")
             AceStringImpl = arr(ArrLen(arr) - 1)
