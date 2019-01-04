@@ -186,7 +186,7 @@ Public Function ArrSheetsName(Optional ByVal wb As Workbook = Nothing) As Varian
 
     If TypeName(wb) = "Nothing" Then Set wb = Application.ThisWorkbook
 
-    Dim arr() As String
+    Dim arr() As Variant
     ReDim arr(0 To wb.Sheets.Count - 1)
 
     Dim ws As Worksheet, i As Long
