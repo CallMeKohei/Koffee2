@@ -372,8 +372,7 @@ Public Sub CopyFromRecordset(ByVal sql As String, ByVal rng As Range)
 
     rng.CopyFromRecordset rcds
 
+Escape:
     If Not rcds Is Nothing Then rcds.Close
     Set rcds = Nothing
-
-Escape:
 End Sub
