@@ -192,9 +192,9 @@ Public Sub Init(ByVal dbType As dbTypeEnum, Optional ByVal fpath As String = "",
             Con_.Provider = dbEngine_
             Con_.Properties("Data Source") = fso.GetParentFolderName(fpath)
             If fileExt = "csv" Then
-                Con_.Properties("Extended Properties") = Join(Array("TEXT", tableHeader), ";")
-            Else
                 Con_.Properties("Extended Properties") = Join(Array("TEXT", tableHeader, "FMT=Delimited"), ";")
+            Else
+                Con_.Properties("Extended Properties") = Join(Array("TEXT", tableHeader), ";")
             End If
             Con_.Open
 
