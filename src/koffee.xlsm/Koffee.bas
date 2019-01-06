@@ -98,10 +98,12 @@ Public Function Select_(ByVal dbType As dbTypeEnum, ByVal sql As String, _
 
     Dim adox As AdoEx: Set adox = New AdoEx
     adox.Init dbType, fpath, isTableHeader
-    Dim arr: arr = adox.Select_(sql)
+    Dim arr As Variant: arr = adox.Select_(sql)
+    If IsEmpty(arr) Then GoTo Escape
     Select_ = Array(arr(0), Arr2DToJagArr(arr(1)))
     Set adox = Nothing
 
+Escape:
 End Function
 
 
