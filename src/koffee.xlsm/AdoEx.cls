@@ -33,6 +33,7 @@ Attribute VB_Exposed = False
 '''      ------ +------ +------- +----- +-------
 '''      Jet    | .dbf  | .mdb   | .txt | .xls
 '''             |       |        | .csv |
+'''      ------ +------ +------- +----- +-------
 '''      Ace    | .dbf  | .mdb   | .txt | .xls
 '''             | .ndx  | .accdb | .csv | .xlsx
 '''             | .mdx  |        |      | .xlsm
