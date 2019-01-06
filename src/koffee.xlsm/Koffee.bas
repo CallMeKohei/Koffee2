@@ -18,8 +18,6 @@ Option Private Module
 '''         ArrLen        ( Ariawase )
 '''     ArrTranspose
 '''         ArrLen        ( Ariawase )
-'''     Select_
-'''         Arr2DToJagArr ( Ariawase )
 '''     GetVal
 '''         Arr2DToJagArr ( Ariawase )
 '''     PutVal
@@ -100,7 +98,7 @@ Public Function Select_(ByVal dbType As dbTypeEnum, ByVal sql As String, _
     adox.Init dbType, fpath, isTableHeader
     Dim arr As Variant: arr = adox.Select_(sql)
     If IsEmpty(arr) Then GoTo Escape
-    Select_ = Array(arr(0), Arr2DToJagArr(arr(1)))
+    Select_ = Array(arr(0), arr(1))
     Set adox = Nothing
 
 Escape:

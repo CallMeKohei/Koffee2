@@ -19,7 +19,8 @@ Attribute VB_Exposed = False
 '''     Ariawase
 '''         https://github.com/vbaidiot/ariawase
 '''         ArrIndexOf ( Init )
-'''         ArrRank    ( ArrTranspose )
+'''     Koffee
+'''         ArrTranspose ( Select_ )
 
 
 '''  --------------------------------------------------------
@@ -261,7 +262,7 @@ Public Function Select_(ByVal sql As String, _
     Next idx
 
     ''' array( array( Table Names ),  array( Table Values ) )
-    Select_ = Array(tableHeaderNamesArray, ArrTranspose(rcds.GetRows()))
+    Select_ = Array(tableHeaderNamesArray, Arr2DToJagArr(ArrTranspose(rcds.GetRows())))
 
     On Error Resume Next
     If Not rcds Is Nothing Then rcds.Close
@@ -324,38 +325,6 @@ Escape:
     Set wmi = Nothing
     Set wmiSrv = Nothing
     Set stdRegProv = Nothing
-End Function
-
-''' @param arr2D As Variant(Of Array(Of T, T))
-''' @return As Variant(Of Array(Of T, T))
-Private Function ArrTranspose(ByVal arr2D As Variant) As Variant
-
-    ''' This original function is from KoffeeVBA
-
-    If Not IsArray(arr2D) Then Err.Raise 13
-    If Not ArrRank(arr2D) = 2 Then Err.Raise 13
-
-    Dim lb1 As Long: lb1 = LBound(arr2D, 2)
-    Dim ub1 As Long: ub1 = UBound(arr2D, 2)
-    Dim lb2 As Long: lb2 = LBound(arr2D, 1)
-    Dim ub2 As Long: ub2 = UBound(arr2D, 1)
-
-    Dim tmpArr2D() As Variant
-    ReDim tmpArr2D(lb1 To ub1, lb2 To ub2)
-
-    Dim ix1 As Long, ix2 As Long
-    For ix1 = lb1 To ub1
-        For ix2 = lb2 To ub2
-            If IsObject(arr2D(ix2, ix1)) Then
-                Set tmpArr2D(ix1, ix2) = arr2D(ix2, ix1)
-            Else
-                Let tmpArr2D(ix1, ix2) = arr2D(ix2, ix1)
-            End If
-        Next ix2
-    Next ix1
-
-    ArrTranspose = tmpArr2D
-
 End Function
 
 ''' @param sql As String
