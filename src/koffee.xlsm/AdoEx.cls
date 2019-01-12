@@ -167,10 +167,17 @@ Public Sub Init(ByVal dbType As dbTypeEnum, Optional ByVal fpath As String = "",
     )
 
     ''' check for readable file type
+    Dim xs As Variant, xFlag As Boolean
     If dbEngine_ = "Microsoft.Jet.OLEDB.4.0" Then
-        If ArrIndexOf(Jet, fileExt) = -1 Then GoTo Catch
+        For Each xs In Jet
+            If xs = fileExt Then xFlag = True
+        Next
+        If xFlag = False Then GoTo Catch
     Else
-        If ArrIndexOf(Ace, fileExt) = -1 Then GoTo Catch
+        For Each xs In Ace
+            If xs = fileExt Then xFlag = True
+        Next
+        If xFlag = False Then GoTo Catch
     End If
 
     Select Case dbType
@@ -316,7 +323,7 @@ Public Function AceString() As String
         stdRegProv.EnumKey HKLM, v, SubKey
         If Not IsNull(SubKey) Then
             Dim arr As Variant: arr = Split(v, "\")
-            AceString = arr(ArrLen(arr) - 1)
+            AceString = arr(UBound(arr, 1))
             GoTo Escape
         End If
     Next v
