@@ -16,11 +16,11 @@ Attribute VB_Exposed = False
 
 ''' Dependencies
 '''
-'''     Ariawase
-'''         https://github.com/vbaidiot/ariawase
-'''         ArrIndexOf ( Init )
-'''     Koffee
-'''         ArrTranspose ( Select_ )
+'''     Ariawase: https://github.com/vbaidiot/ariawase
+'''
+'''                   | Arr2DToJagArr |
+'''     --------------+---------------|
+'''     Select_       |       *       |
 
 
 '''  --------------------------------------------------------

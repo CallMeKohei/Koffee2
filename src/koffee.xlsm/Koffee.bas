@@ -8,21 +8,16 @@ Option Explicit
 Option Private Module
 
 
-''' TODO: Reduce dependencies
 ''' Dependencies
 '''
 '''     Ariawase: https://github.com/vbaidiot/ariawase
 '''
-'''     IsJagArr
-'''         ArrRank       ( Ariawase )
-'''         ArrLen        ( Ariawase )
-'''     ArrTranspose
-'''         ArrLen        ( Ariawase )
-'''     GetVal
-'''         Arr2DToJagArr ( Ariawase )
-'''     PutVal
-'''         Arr2DToJagArr ( Ariawase )
-'''         ArrRank       ( Ariawase )
+'''                   | ArrRank | ArrLen | Arr2DToJagArr |
+'''     --------------+-------- +------- +---------------|
+'''     IsJagArr      |    *    |   *    |               |
+'''     ArrTranspose  |         |   *    |               |
+'''     GetVal        |         |        |       *       |
+'''     PutVal        |         |   *    |       *       |
 
 
 ''' --------------------------------------------------------
