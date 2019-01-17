@@ -143,7 +143,7 @@ Public Sub Init(ByVal dbType As dbTypeEnum, Optional ByVal fpath As String = "",
 
     ''' File extension
     Dim fso As Object: Set fso = CreateObject("Scripting.FileSystemObject")
-    Dim fileExt As String: fileExt = fso.GetExtensionName(fpath)
+    Dim fileExt As String: fileExt = LCase(fso.GetExtensionName(fpath))
 
     ''' I can't understand following. But real is real. :-(
     If fileExt = "dbf" Then dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
