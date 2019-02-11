@@ -463,3 +463,131 @@ Public Sub Hankaku(ByVal ws As Worksheet)
     Next
 
 End Sub
+
+''' --------------------------------------------------------
+'''                    Workbook Operation
+''' --------------------------------------------------------
+
+''' @param excelApp As Excel.Application
+''' @param wb As Workbook
+Public Sub SaveCloseWorkBook(ByRef excelApp As Excel.Application, ByVal wb As Workbook)
+    wb.Save
+    wb.Close
+End Sub
+
+''' @param excelApp As Excel.Application
+''' @param wb As Workbook
+Public Sub CloseWorkBook(ByRef excelApp As Excel.Application, ByVal wb As Workbook)
+    wb.Close
+    If TypeName(excelApp) = "Application" Then excelApp.Quit
+End Sub
+
+''' @param excelApp As Excel.Application
+''' @param filePath As String
+''' @param isReadOnly As Boolean
+''' @return As WorkBook
+Public Function CreateWorkBook(ByRef excelApp As Excel.Application, ByVal filePath As String, Optional isReadOnly As Boolean = True) As Workbook
+    If IsWorkBookOpened(filePath) = True Then
+        If Not isReadOnly Then Err.Raise 9999, , "WorkBook is already opened."
+        Set excelApp = New Excel.Application
+        Set CreateWorkBook = excelApp.Workbooks.Open(Filename:=filePath, UpdateLinks:=0, ReadOnly:=isReadOnly, IgnoreReadOnlyRecommended:=True)
+    Else
+        Set CreateWorkBook = Workbooks.Open(Filename:=filePath, UpdateLinks:=0, ReadOnly:=isReadOnly, IgnoreReadOnlyRecommended:=True)
+    End If
+End Function
+
+''' @param filePath As String
+''' @return As Boolean
+Private Function IsWorkBookOpened(ByVal filePath As String) As Boolean
+    On Error GoTo Err70
+        Open filePath For Append As #1
+        Close #1
+    On Error GoTo 0
+        IsWorkBookOpened = False
+        Exit Function
+Err70:
+    IsWorkBookOpened = True
+End Function
+
+''' @param rng As Range
+''' @param times As Long
+''' @param ptrnFind As String
+''' @return As Boolean
+Public Function InsertRow(ByVal rng As Range, ByVal times As Long, ByVal ptrnFind As String) As Boolean
+    Dim ws As Worksheet: Set ws = rng.Worksheet
+    Dim v As Variant
+    For Each v In ArrRange(1, times)
+        ''' s is array(3,4,5) ---> "3:3, 4:4, 5:5"
+        Dim s: s = RowsString(GetVal2(ws.Range(rng.Address & ":" & Left(rng.Address, 2) & "$" & LastRow(rng)), , ptrnFind)(0).Keys)
+        ws.Range(s).Insert
+    Next v
+    InsertRow = True
+End Function
+
+''' @param rng As Range
+''' @param times As Long
+''' @param ptrnFind As String
+''' @return As Boolean
+Public Function DeletRow(ByVal rng As Range, ByVal times As Long, ByVal ptrnFind As String) As Boolean
+    Dim ws As Worksheet: Set ws = rng.Worksheet
+    Dim v As Variant
+    For Each v In ArrRange(1, times)
+        ''' s is array(3,4,5) ---> "2:2, 3:3, 4:4"
+        Dim s: s = RowsString(ArrMap(Init(New Func, vbLong, AddressOf MinusOne, vbLong) _
+            , GetVal2(ws.Range(rng.Address & ":" & Left(rng.Address, 2) & "$" & LastRow(rng)), , ptrnFind)(0).Keys))
+        ws.Range(s).Delete
+    Next v
+    DeletRow = True
+End Function
+
+Private Function MinusOne(ByVal n As Long) As Long
+    MinusOne = n - 1
+End Function
+
+Private Function RowsString(ByVal arr As Variant) As String
+    Dim row_i As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
+    For Each row_i In arr
+        arrx.AddVal Join(Array(row_i, ":", row_i), "")
+    Next row_i
+    RowsString = Join(arrx.ToArray, ",")
+End Function
+
+''' @param rng As Range
+''' @param isVertical As Boolean
+''' @param truncateEmpty As Boolean
+''' @param ptrnFind As String
+''' @return As Variant(Of Array(Of Array(Of T)))
+Public Function GetVal2(ByVal rng As Range _
+    , Optional ByVal isVertical As Boolean = True _
+    , Optional ByVal ptrnFind As String _
+    ) As Variant
+
+    ''' Minimum Excel's Array index is 1
+    Dim arr As Variant: arr = rng.Value
+    If Not IsArray(arr) Then
+        Dim tmp(1 To 1, 1 To 1) As Variant: tmp(1, 1) = arr: arr = tmp
+    End If
+    If isVertical Then
+        arr = Arr2DToJagArr(ArrTranspose(arr))
+    Else
+        arr = Arr2DToJagArr(arr)
+    End If
+
+    Dim inArr As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
+    For Each inArr In arr
+        Dim dict As Object: Set dict = CreateObject("Scripting.Dictionary")
+        Dim i As Long
+        For i = 1 To ArrLen(inArr)
+            If StrPtr(ptrnFind) = 0 Then
+                dict.Add (i - 1) + rng.Row, inArr(i)
+            Else
+                If ArrLen(ReMatch(inArr(i), ptrnFind)) > 0 Then dict.Add (i - 1) + rng.Row, inArr(i)
+            End If
+        Next i
+        arrx.AddObj dict
+        Set dict = Nothing
+    Next inArr
+
+    GetVal2 = arrx.ToArray
+
+End Function
