@@ -410,9 +410,9 @@ Public Function LastRow(ByVal rng As Range, Optional toDown As Boolean = False) 
     ''' 4
 
     If toDown Then
-        LastRow = rng.End(xlDown).row
+        LastRow = rng.End(xlDown).Row
     Else
-        LastRow = rng.Worksheet.Cells(rng.Worksheet.Rows.Count, rng.Column).End(xlUp).row
+        LastRow = rng.Worksheet.Cells(rng.Worksheet.Rows.Count, rng.Column).End(xlUp).Row
     End If
 
 End Function
@@ -442,7 +442,7 @@ Public Function LastCol(ByVal rng As Range, Optional toRight As Boolean = False)
     If toRight Then
         LastCol = rng.End(xlToRight).Column
     Else
-        LastCol = rng.Worksheet.Cells(rng.row, rng.Worksheet.columns.Count).End(xlToLeft).Column
+        LastCol = rng.Worksheet.Cells(rng.Row, rng.Worksheet.columns.Count).End(xlToLeft).Column
     End If
 
 End Function
