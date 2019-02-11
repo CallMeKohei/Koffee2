@@ -591,3 +591,26 @@ Public Function GetVal2(ByVal rng As Range _
     GetVal2 = arrx.ToArray
 
 End Function
+
+''' @param arr As Variant(Of Array(Of T)
+''' @return As Variant(Of Array(Of T))
+Public Function ArrPadLeft(ByVal arr As Variant) As Variant
+    Dim v As Variant, tmp As String, arrx As ArrayEx: Set arrx = New ArrayEx
+    For Each v In arr
+        If Not IsEmpty(v) Then tmp = v
+        arrx.AddVal tmp ''' TODO: addObj
+    Next v
+    ArrPadLeft = arrx.ToArray
+    Set arrx = Nothing
+End Function
+
+''' @param arr As Variant(Of Array(Of T)
+''' @return As Variant(Of Array(Of T))
+Public Function ArrRemoveEmpty(ByVal arr As Variant) As Variant
+    Dim v As Variant, tmp As String, arrx As ArrayEx: Set arrx = New ArrayEx
+    For Each v In arr
+        If Not IsEmpty(v) Then arrx.AddVal v ''' TODO addObj
+    Next v
+    ArrRemoveEmpty = arrx.ToArray
+    Set arrx = Nothing
+End Function
