@@ -235,7 +235,7 @@ Public Sub GetVal_Test()
     ws.Range("D5").Value = Empty
     ws.Range("E5").Value = Empty
 
-    Assert.AreEqualArr Array(1#), GetVal(ws.Range("B2"))(0)
+    Assert.AreEqualArr Array(1#), GetVal(ws.Range("B2"))(1)
 
     Assert.AreEqualArr Array(1#, 2#, Empty, "a"), GetVal(ws.Range("B2:E2"))(1)
 
@@ -714,97 +714,97 @@ Public Sub Hankaku_Test()
 
 End Sub
 
-Public Sub GetVal2_Test()
-
-    '    |  A   B   C   D   E
-    '----+--------------------
-    '  1 |
-    '  2 |      1   2       a
-    '  3 |      3   4       b
-    '  4 |
-    '  5 |      c   d
-    '  6 |
-
-    If ExistsSheet("myTestTemporarySheet") Then DeleteSheet "myTestTemporarySheet"
-    Dim ws As Worksheet: Set ws = AddSheet("myTestTemporarySheet")
-
-    ws.Range("B2").Value = 1
-    ws.Range("C2").Value = 2
-    ws.Range("D2").Value = Empty
-    ws.Range("E2").Value = "a"
-
-    ws.Range("B3").Value = 3
-    ws.Range("C3").Value = 4
-    ws.Range("D3").Value = Empty
-    ws.Range("E3").Value = "b"
-
-    ws.Range("B4").Value = Empty
-    ws.Range("C4").Value = Empty
-    ws.Range("D4").Value = Empty
-    ws.Range("E4").Value = Empty
-
-    ws.Range("B5").Value = "c"
-    ws.Range("C5").Value = "d"
-    ws.Range("D5").Value = Empty
-    ws.Range("E5").Value = Empty
-
-    ''' single cells
-    Assert.AreEqualArr Array(2&), GetVal2(ws.Range("B2"))(0).Keys
-    Assert.AreEqualArr Array(1#), GetVal2(ws.Range("B2"))(0).Items
-    Assert.AreEqualArr Array(2&), GetVal2(ws.Range("B2"), , "\d")(0).Keys
-    Assert.AreEqualArr Array(1#), GetVal2(ws.Range("B2"), , "\d")(0).Items
-    Assert.AreEqualArr Array(), GetVal2(ws.Range("B2"), , "\D")(0).Keys
-    Assert.AreEqualArr Array(), GetVal2(ws.Range("B2"), , "\D")(0).Items
-
-    Assert.AreEqualArr Array(2&), GetVal2(ws.Range("B2"), False)(0).Keys
-    Assert.AreEqualArr Array(1#), GetVal2(ws.Range("B2"), False)(0).Items
-    Assert.AreEqualArr Array(2&), GetVal2(ws.Range("B2"), False, "\d")(0).Keys
-    Assert.AreEqualArr Array(1#), GetVal2(ws.Range("B2"), False, "\d")(0).Items
-    Assert.AreEqualArr Array(), GetVal2(ws.Range("B2"), False, "\D")(0).Keys
-    Assert.AreEqualArr Array(), GetVal2(ws.Range("B2"), False, "\D")(0).Items
-
-    ''' vertical cells
-    Assert.AreEqualArr Array(2&, 3&, 4&, 5&), GetVal2(ws.Range("B2:C5"))(0).Keys
-    Assert.AreEqualArr Array(1#, 3#, Empty, "c"), GetVal2(ws.Range("B2:C5"))(0).Items
-    Assert.AreEqualArr Array(2&, 3&, 5&), GetVal2(ws.Range("B2:C5"), , "\S")(0).Keys
-    Assert.AreEqualArr Array(1#, 3#, "c"), GetVal2(ws.Range("B2:C5"), , "\S")(0).Items
-    Assert.AreEqualArr Array(5&), GetVal2(ws.Range("B2:C5"), , "\D")(0).Keys
-    Assert.AreEqualArr Array("c"), GetVal2(ws.Range("B2:C5"), , "\D")(0).Items
-    Assert.AreEqualArr Array(2&, 3&), GetVal2(ws.Range("B2:C5"), , "\d")(0).Keys
-    Assert.AreEqualArr Array(1#, 3#), GetVal2(ws.Range("B2:C5"), , "\d")(0).Items
-
-    Assert.AreEqualArr Array(2&, 3&, 4&, 5&), GetVal2(ws.Range("B2:C5"))(1).Keys
-    Assert.AreEqualArr Array(2#, 4#, Empty, "d"), GetVal2(ws.Range("B2:C5"))(1).Items
-    Assert.AreEqualArr Array(2&, 3&, 5&), GetVal2(ws.Range("B2:C5"), , "\S")(1).Keys
-    Assert.AreEqualArr Array(2#, 4#, "d"), GetVal2(ws.Range("B2:C5"), , "\S")(1).Items
-    Assert.AreEqualArr Array(5&), GetVal2(ws.Range("B2:C5"), , "\D")(1).Keys
-    Assert.AreEqualArr Array("d"), GetVal2(ws.Range("B2:C5"), , "\D")(1).Items
-    Assert.AreEqualArr Array(2&, 3&), GetVal2(ws.Range("B2:C5"), , "\d")(1).Keys
-    Assert.AreEqualArr Array(2#, 4#), GetVal2(ws.Range("B2:C5"), , "\d")(1).Items
-
-    ''' holizontal cells
-
-    Assert.AreEqualArr Array(2&, 3&, 4&, 5&), GetVal2(ws.Range("B2:E5"), False)(0).Keys
-    Assert.AreEqualArr Array(1#, 2#, Empty, "a"), GetVal2(ws.Range("B2:E5"), False)(0).Items
-    Assert.AreEqualArr Array(2&, 3&, 5&), GetVal2(ws.Range("B2:E5"), False, "\S")(0).Keys
-    Assert.AreEqualArr Array(1#, 2#, "a"), GetVal2(ws.Range("B2:E5"), False, "\S")(0).Items
-    Assert.AreEqualArr Array(5&), GetVal2(ws.Range("B2:E5"), False, "\D")(0).Keys
-    Assert.AreEqualArr Array("a"), GetVal2(ws.Range("B2:E5"), False, "\D")(0).Items
-    Assert.AreEqualArr Array(2&, 3&), GetVal2(ws.Range("B2:E5"), False, "\d")(0).Keys
-    Assert.AreEqualArr Array(1#, 2#), GetVal2(ws.Range("B2:E5"), False, "\d")(0).Items
-
-    Assert.AreEqualArr Array(2&, 3&, 4&, 5&), GetVal2(ws.Range("B2:E5"), False)(3).Keys
-    Assert.AreEqualArr Array("c", "d", Empty, Empty), GetVal2(ws.Range("B2:E5"), False)(3).Items
-    Assert.AreEqualArr Array(2&, 3&), GetVal2(ws.Range("B2:E5"), False, "\S")(3).Keys
-    Assert.AreEqualArr Array("c", "d"), GetVal2(ws.Range("B2:E5"), False, "\S")(3).Items
-    Assert.AreEqualArr Array(2&, 3&), GetVal2(ws.Range("B2:E5"), False, "\D")(3).Keys
-    Assert.AreEqualArr Array("c", "d"), GetVal2(ws.Range("B2:E5"), False, "\D")(3).Items
-    Assert.AreEqualArr Array(), GetVal2(ws.Range("B2:E5"), False, "\d")(3).Keys
-    Assert.AreEqualArr Array(), GetVal2(ws.Range("B2:E5"), False, "\d")(3).Items
-
-    DeleteSheet "myTestTemporarySheet"
-
-End Sub
+'Public Sub GetVal2_Test()
+'
+'    '    |  A   B   C   D   E
+'    '----+--------------------
+'    '  1 |
+'    '  2 |      1   2       a
+'    '  3 |      3   4       b
+'    '  4 |
+'    '  5 |      c   d
+'    '  6 |
+'
+'    If ExistsSheet("myTestTemporarySheet") Then DeleteSheet "myTestTemporarySheet"
+'    Dim ws As Worksheet: Set ws = AddSheet("myTestTemporarySheet")
+'
+'    ws.Range("B2").Value = 1
+'    ws.Range("C2").Value = 2
+'    ws.Range("D2").Value = Empty
+'    ws.Range("E2").Value = "a"
+'
+'    ws.Range("B3").Value = 3
+'    ws.Range("C3").Value = 4
+'    ws.Range("D3").Value = Empty
+'    ws.Range("E3").Value = "b"
+'
+'    ws.Range("B4").Value = Empty
+'    ws.Range("C4").Value = Empty
+'    ws.Range("D4").Value = Empty
+'    ws.Range("E4").Value = Empty
+'
+'    ws.Range("B5").Value = "c"
+'    ws.Range("C5").Value = "d"
+'    ws.Range("D5").Value = Empty
+'    ws.Range("E5").Value = Empty
+'
+'    ''' single cells
+'    Assert.AreEqualArr Array(2&), GetVal2(ws.Range("B2"))(0).Keys
+'    Assert.AreEqualArr Array(1#), GetVal2(ws.Range("B2"))(0).Items
+'    Assert.AreEqualArr Array(2&), GetVal2(ws.Range("B2"), , "\d")(0).Keys
+'    Assert.AreEqualArr Array(1#), GetVal2(ws.Range("B2"), , "\d")(0).Items
+'    Assert.AreEqualArr Array(), GetVal2(ws.Range("B2"), , "\D")(0).Keys
+'    Assert.AreEqualArr Array(), GetVal2(ws.Range("B2"), , "\D")(0).Items
+'
+'    Assert.AreEqualArr Array(2&), GetVal2(ws.Range("B2"), False)(0).Keys
+'    Assert.AreEqualArr Array(1#), GetVal2(ws.Range("B2"), False)(0).Items
+'    Assert.AreEqualArr Array(2&), GetVal2(ws.Range("B2"), False, "\d")(0).Keys
+'    Assert.AreEqualArr Array(1#), GetVal2(ws.Range("B2"), False, "\d")(0).Items
+'    Assert.AreEqualArr Array(), GetVal2(ws.Range("B2"), False, "\D")(0).Keys
+'    Assert.AreEqualArr Array(), GetVal2(ws.Range("B2"), False, "\D")(0).Items
+'
+'    ''' vertical cells
+'    Assert.AreEqualArr Array(2&, 3&, 4&, 5&), GetVal2(ws.Range("B2:C5"))(0).Keys
+'    Assert.AreEqualArr Array(1#, 3#, Empty, "c"), GetVal2(ws.Range("B2:C5"))(0).Items
+'    Assert.AreEqualArr Array(2&, 3&, 5&), GetVal2(ws.Range("B2:C5"), , "\S")(0).Keys
+'    Assert.AreEqualArr Array(1#, 3#, "c"), GetVal2(ws.Range("B2:C5"), , "\S")(0).Items
+'    Assert.AreEqualArr Array(5&), GetVal2(ws.Range("B2:C5"), , "\D")(0).Keys
+'    Assert.AreEqualArr Array("c"), GetVal2(ws.Range("B2:C5"), , "\D")(0).Items
+'    Assert.AreEqualArr Array(2&, 3&), GetVal2(ws.Range("B2:C5"), , "\d")(0).Keys
+'    Assert.AreEqualArr Array(1#, 3#), GetVal2(ws.Range("B2:C5"), , "\d")(0).Items
+'
+'    Assert.AreEqualArr Array(2&, 3&, 4&, 5&), GetVal2(ws.Range("B2:C5"))(1).Keys
+'    Assert.AreEqualArr Array(2#, 4#, Empty, "d"), GetVal2(ws.Range("B2:C5"))(1).Items
+'    Assert.AreEqualArr Array(2&, 3&, 5&), GetVal2(ws.Range("B2:C5"), , "\S")(1).Keys
+'    Assert.AreEqualArr Array(2#, 4#, "d"), GetVal2(ws.Range("B2:C5"), , "\S")(1).Items
+'    Assert.AreEqualArr Array(5&), GetVal2(ws.Range("B2:C5"), , "\D")(1).Keys
+'    Assert.AreEqualArr Array("d"), GetVal2(ws.Range("B2:C5"), , "\D")(1).Items
+'    Assert.AreEqualArr Array(2&, 3&), GetVal2(ws.Range("B2:C5"), , "\d")(1).Keys
+'    Assert.AreEqualArr Array(2#, 4#), GetVal2(ws.Range("B2:C5"), , "\d")(1).Items
+'
+'    ''' holizontal cells
+'
+'    Assert.AreEqualArr Array(2&, 3&, 4&, 5&), GetVal2(ws.Range("B2:E5"), False)(0).Keys
+'    Assert.AreEqualArr Array(1#, 2#, Empty, "a"), GetVal2(ws.Range("B2:E5"), False)(0).Items
+'    Assert.AreEqualArr Array(2&, 3&, 5&), GetVal2(ws.Range("B2:E5"), False, "\S")(0).Keys
+'    Assert.AreEqualArr Array(1#, 2#, "a"), GetVal2(ws.Range("B2:E5"), False, "\S")(0).Items
+'    Assert.AreEqualArr Array(5&), GetVal2(ws.Range("B2:E5"), False, "\D")(0).Keys
+'    Assert.AreEqualArr Array("a"), GetVal2(ws.Range("B2:E5"), False, "\D")(0).Items
+'    Assert.AreEqualArr Array(2&, 3&), GetVal2(ws.Range("B2:E5"), False, "\d")(0).Keys
+'    Assert.AreEqualArr Array(1#, 2#), GetVal2(ws.Range("B2:E5"), False, "\d")(0).Items
+'
+'    Assert.AreEqualArr Array(2&, 3&, 4&, 5&), GetVal2(ws.Range("B2:E5"), False)(3).Keys
+'    Assert.AreEqualArr Array("c", "d", Empty, Empty), GetVal2(ws.Range("B2:E5"), False)(3).Items
+'    Assert.AreEqualArr Array(2&, 3&), GetVal2(ws.Range("B2:E5"), False, "\S")(3).Keys
+'    Assert.AreEqualArr Array("c", "d"), GetVal2(ws.Range("B2:E5"), False, "\S")(3).Items
+'    Assert.AreEqualArr Array(2&, 3&), GetVal2(ws.Range("B2:E5"), False, "\D")(3).Keys
+'    Assert.AreEqualArr Array("c", "d"), GetVal2(ws.Range("B2:E5"), False, "\D")(3).Items
+'    Assert.AreEqualArr Array(), GetVal2(ws.Range("B2:E5"), False, "\d")(3).Keys
+'    Assert.AreEqualArr Array(), GetVal2(ws.Range("B2:E5"), False, "\d")(3).Items
+'
+'    DeleteSheet "myTestTemporarySheet"
+'
+'End Sub
 
 
 
@@ -813,82 +813,86 @@ End Sub
 '''                        AdoEx Test
 ''' --------------------------------------------------------
 
-Public Sub AdoEx_Test()
-
-    Dim ws As Worksheet: Set ws = AddSheet("myTestTemporarySheet")
-    ws.Cells.Clear
-
-    PutVal Array( _
-        Array("Number", 1, 2, 3, 4, 5), _
-        Array("Name", "Apple", "Banana", "Cherry", Empty, Empty), _
-        Array("Price", 200, 300, 400, Empty, 600), _
-        Array("Memo1", Empty, Empty, Empty, Empty, Empty), _
-        Array("Memo2", "d", "e", "f", Empty, Empty) _
-    ), ws.Range("B2"), True
-
-    '''     |   A        B         C         D        E        F
-    ''' ----+------- --------- --------- --------- ------- ---------
-    '''   1 |
-    '''   2 |          Number    Name      Price    Memo1    Memo2
-    '''   3 |            1       Apple      200                d
-    '''   4 |            2       Banana     300                e
-    '''   5 |            3       Cherry     400                f
-    '''   6 |            4
-    '''   7 |            5                  600
-
-    Dim arr As Variant: arr = Select_(dbExcel, "select * from [myTestTemporarySheet$B2:F7]")
-
-    Assert.AreEqualArr Array("Number", "Name", "Price", "Memo1", "Memo2"), arr(0)
-
-    Assert.AreEqualArr Array(1#, "Apple", 200#, Null, "d"), arr(1)(0)
-    Assert.AreEqualArr Array(2#, "Banana", 300#, Null, "e"), arr(1)(1)
-    Assert.AreEqualArr Array(3#, "Cherry", 400#, Null, "f"), arr(1)(2)
-    Assert.AreEqualArr Array(4#, Null, Null, Null, Null), arr(1)(3)
-    Assert.AreEqualArr Array(5#, Null, 600#, Null, Null), arr(1)(4)
-
-    DeleteSheet "myTestTemporarySheet"
-
-End Sub
-
-Public Sub AdoExHeadless_Test()
-
-    ''' Header as data
-
-    Dim ws As Worksheet: Set ws = AddSheet("myTestTemporarySheet")
-    ws.Cells.Clear
-
-    PutVal Array( _
-        Array("Number", 1, 2, 3, 4, 5), _
-        Array("Name", "Apple", "Banana", "Cherry", Empty, Empty), _
-        Array("Price", 200, 300, 400, Empty, 600), _
-        Array("Memo1", Empty, Empty, Empty, Empty, Empty), _
-        Array("Memo2", "d", "e", "f", Empty, Empty) _
-    ), ws.Range("B2"), True
-
-    '''     |   A        B         C         D        E        F
-    ''' ----+------- --------- --------- --------- ------- ---------
-    '''   1 |
-    '''   2 |          Number    Name      Price    Memo1    Memo2
-    '''   3 |            1       Apple      200                d
-    '''   4 |            2       Banana     300                e
-    '''   5 |            3       Cherry     400                f
-    '''   6 |            4
-    '''   7 |            5                  600
-
-    Dim arr As Variant: arr = Select_(dbExcel, "select * from [myTestTemporarySheet$B2:F7]", , False)
-
-    Assert.AreEqualArr Array("F1", "F2", "F3", "F4", "F5"), arr(0)
-
-    ''' B column type is Double. ---> "Number" strings shows Null.
-    ''' D column type is Double. ---> "Price" strings shows Null.
-    Assert.AreEqualArr Array(Null, "Name", Null, "Memo1", "Memo2"), arr(1)(0)
-    Assert.AreEqualArr Array(1#, "Apple", 200#, Null, "d"), arr(1)(1)
-    Assert.AreEqualArr Array(2#, "Banana", 300#, Null, "e"), arr(1)(2)
-    Assert.AreEqualArr Array(3#, "Cherry", 400#, Null, "f"), arr(1)(3)
-    Assert.AreEqualArr Array(4#, Null, Null, Null, Null), arr(1)(4)
-    Assert.AreEqualArr Array(5#, Null, 600#, Null, Null), arr(1)(5)
-
-
-    DeleteSheet "myTestTemporarySheet"
-
-End Sub
+'''Public Sub AdoEx_Test()
+'''    Dim ws As Worksheet
+'''    If Not ExistsSheet("myTestTemporarySheet") Then
+'''        Set ws = AddSheet("myTestTemporarySheet")
+'''    Else
+'''        Set ws = Worksheets("myTestTemporarySheet")
+'''    End If
+'''    ws.Cells.Clear
+'''
+'''    PutVal Array( _
+'''        Array("Number", 1, 2, 3, 4, 5), _
+'''        Array("Name", "Apple", "Banana", "Cherry", Empty, Empty), _
+'''        Array("Price", 200, 300, 400, Empty, 600), _
+'''        Array("Memo1", Empty, Empty, Empty, Empty, Empty), _
+'''        Array("Memo2", "d", "e", "f", Empty, Empty) _
+'''    ), ws.Range("B2"), True
+'''
+'''    '''     |   A        B         C         D        E        F
+'''    ''' ----+------- --------- --------- --------- ------- ---------
+'''    '''   1 |
+'''    '''   2 |          Number    Name      Price    Memo1    Memo2
+'''    '''   3 |            1       Apple      200                d
+'''    '''   4 |            2       Banana     300                e
+'''    '''   5 |            3       Cherry     400                f
+'''    '''   6 |            4
+'''    '''   7 |            5                  600
+'''
+'''    Dim arr As Variant: arr = Select_(dbExcel, "select * from [myTestTemporarySheet$B2:F7]")
+'''
+'''    Assert.AreEqualArr Array("Number", "Name", "Price", "Memo1", "Memo2"), arr(0)
+'''
+'''    Assert.AreEqualArr Array(1#, "Apple", 200#, Null, "d"), arr(1)(0)
+'''    Assert.AreEqualArr Array(2#, "Banana", 300#, Null, "e"), arr(1)(1)
+'''    Assert.AreEqualArr Array(3#, "Cherry", 400#, Null, "f"), arr(1)(2)
+'''    Assert.AreEqualArr Array(4#, Null, Null, Null, Null), arr(1)(3)
+'''    Assert.AreEqualArr Array(5#, Null, 600#, Null, Null), arr(1)(4)
+'''
+'''    DeleteSheet "myTestTemporarySheet"
+'''
+'''End Sub
+'''
+'''Public Sub AdoExHeadless_Test()
+'''
+'''    ''' Header as data
+'''
+'''    Dim ws As Worksheet: Set ws = AddSheet("myTestTemporarySheet")
+'''    ws.Cells.Clear
+'''
+'''    PutVal Array( _
+'''        Array("Number", 1, 2, 3, 4, 5), _
+'''        Array("Name", "Apple", "Banana", "Cherry", Empty, Empty), _
+'''        Array("Price", 200, 300, 400, Empty, 600), _
+'''        Array("Memo1", Empty, Empty, Empty, Empty, Empty), _
+'''        Array("Memo2", "d", "e", "f", Empty, Empty) _
+'''    ), ws.Range("B2"), True
+'''
+'''    '''     |   A        B         C         D        E        F
+'''    ''' ----+------- --------- --------- --------- ------- ---------
+'''    '''   1 |
+'''    '''   2 |          Number    Name      Price    Memo1    Memo2
+'''    '''   3 |            1       Apple      200                d
+'''    '''   4 |            2       Banana     300                e
+'''    '''   5 |            3       Cherry     400                f
+'''    '''   6 |            4
+'''    '''   7 |            5                  600
+'''
+'''    Dim arr As Variant: arr = Select_(dbExcel, "select * from [myTestTemporarySheet$B2:F7]", , False)
+'''
+'''    Assert.AreEqualArr Array("F1", "F2", "F3", "F4", "F5"), arr(0)
+'''
+'''    ''' B column type is Double. ---> "Number" strings shows Null.
+'''    ''' D column type is Double. ---> "Price" strings shows Null.
+'''    Assert.AreEqualArr Array(Null, "Name", Null, "Memo1", "Memo2"), arr(1)(0)
+'''    Assert.AreEqualArr Array(1#, "Apple", 200#, Null, "d"), arr(1)(1)
+'''    Assert.AreEqualArr Array(2#, "Banana", 300#, Null, "e"), arr(1)(2)
+'''    Assert.AreEqualArr Array(3#, "Cherry", 400#, Null, "f"), arr(1)(3)
+'''    Assert.AreEqualArr Array(4#, Null, Null, Null, Null), arr(1)(4)
+'''    Assert.AreEqualArr Array(5#, Null, 600#, Null, Null), arr(1)(5)
+'''
+'''
+'''    DeleteSheet "myTestTemporarySheet"
+'''
+'''End Sub

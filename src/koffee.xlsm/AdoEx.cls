@@ -49,7 +49,7 @@ Attribute VB_Exposed = False
 '''      Sub ExistAceEngine()
 '''          Dim adox As AdoEx: Set adox = New AdoEx
 '''          ''' Empty strings shows that VBA can not use Ace Engine.
-'''          Debug.Print .adox.AceString
+'''          Debug.Print adox.AceString
 '''      End Sub
 '''
 '''      @seealso https://support.microsoft.com/en-us/help/2874601/can-t-use-the-access-odbc-driver-or-oledb-provider-outside-office-clic

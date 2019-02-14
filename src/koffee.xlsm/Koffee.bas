@@ -9,15 +9,8 @@ Option Private Module
 
 
 ''' Dependencies
-'''
 '''     Ariawase: https://github.com/vbaidiot/ariawase
-'''
-'''                   | ArrRank | ArrLen | Arr2DToJagArr |
-'''     --------------+-------- +------- +---------------|
-'''     IsJagArr      |    *    |   *    |               |
-'''     ArrTranspose  |         |   *    |               |
-'''     GetVal        |         |        |       *       |
-'''     PutVal        |         |   *    |       *       |
+
 
 
 ''' --------------------------------------------------------
@@ -78,6 +71,76 @@ Public Function ArrTranspose(ByVal arr2D As Variant) As Variant
 
     ArrTranspose = tmpArr2D
 
+End Function
+
+Public Function Arr1Dto2D(ByVal arr As Variant) As Variant
+
+    If IsJagArr(arr) Then
+        Arr1Dto2D = JagArrToArr2D(arr)
+        GoTo Escape
+    End If
+
+    If Not LBound(arr) = 1 Then
+        Arr1Dto2D = JagArrToArr2D(Array(arr))
+        GoTo Escape
+    End If
+
+    ''' base1 array is regarded as an array made from Excel worksheet's ranges.
+    Dim lb As Long: lb = LBound(arr)
+    Dim ub As Long: ub = UBound(arr)
+
+    Dim tmp() As Variant
+    ReDim tmp(1 To 1, lb To ub)
+
+    Dim i As Long
+    For i = 1 To UBound(arr)
+        tmp(1, i) = arr(i)
+    Next i
+
+    Arr1Dto2D = tmp
+
+Escape:
+End Function
+
+''' @param arr As Variant(Of Array(Of T)
+''' @return As Variant(Of Array(Of T))
+Public Function ArrPadLeft(ByVal arr As Variant) As Variant
+
+    ''' Array("foo",Empty,"bar",Empty)
+    ''' Array("foo","foo","bar","bar")
+
+    Dim v As Variant, tmp As String, arrx As ArrayEx: Set arrx = New ArrayEx
+    For Each v In arr
+        If Not IsEmpty(v) Then tmp = v
+        If IsObject(tmp) Then
+            arrx.AddObj (tmp)
+        Else
+            arrx.AddVal (tmp)
+        End If
+    Next v
+    ArrPadLeft = arrx.ToArray
+    Set arrx = Nothing
+End Function
+
+''' @param arr As Variant(Of Array(Of T)
+''' @return As Variant(Of Array(Of T))
+Public Function ArrRemoveEmpty(ByVal arr As Variant) As Variant
+    Dim v As Variant, tmp As String, arrx As ArrayEx: Set arrx = New ArrayEx
+
+    ''' Array("foo",Empty,"bar",Empty)
+    ''' Array("foo","bar")
+
+    For Each v In arr
+        If Not IsEmpty(v) Then
+            If IsObject(v) Then
+                arrx.AddObj v
+            Else
+                arrx.AddVal v
+            End If
+        End If
+    Next v
+    ArrRemoveEmpty = arrx.ToArray
+    Set arrx = Nothing
 End Function
 
 ''' @param dbType As dbTypeEnum
@@ -167,6 +230,52 @@ Public Sub ProtectSheet(ByVal ws As Worksheet, Optional myPassword As String = "
         AllowUsingPivotTables:=True
 
 End Sub
+
+
+''' --------------------------------------------------------
+'''                    Workbook Operation
+''' --------------------------------------------------------
+
+''' @param excelApp As Excel.Application
+''' @param filePath As String
+''' @param isReadOnly As Boolean
+''' @return As WorkBook
+Public Function CreateWorkBook(ByVal filePath As String, Optional isReadOnly As Boolean = True) As Workbook
+    Dim flg As Boolean: flg = IsWorkBookClosed(filePath)
+    If Not (isReadOnly Or flg) Then Err.Raise 9999, , "WorkBook is already opened."
+    If flg Then
+            Set CreateWorkBook = Workbooks.Open(Filename:=filePath, UpdateLinks:=0, ReadOnly:=isReadOnly, IgnoreReadOnlyRecommended:=True)
+    Else
+        ''' create anthor Excel application process
+        Dim excelApp As Excel.Application: Set excelApp = New Excel.Application
+        Set CreateWorkBook = excelApp.Workbooks.Open(Filename:=filePath, UpdateLinks:=0, ReadOnly:=isReadOnly, IgnoreReadOnlyRecommended:=True)
+    End If
+End Function
+
+''' @param filePath As String
+''' @return As Boolean
+Private Function IsWorkBookClosed(ByVal filePath As String) As Boolean
+    On Error GoTo Escape
+        Open filePath For Append As #1
+        Close #1
+    On Error GoTo 0
+        IsWorkBookClosed = True
+Escape:
+End Function
+
+''' @param excelApp As Excel.Application
+''' @param wb As Workbook
+Public Sub SaveCloseWorkBook(ByVal wb As Workbook)
+    wb.Save
+    wb.Close   ''' This method contains wb.Application.Quit
+End Sub
+
+''' @param excelApp As Excel.Application
+''' @param wb As Workbook
+Public Sub CloseWorkBook(ByVal wb As Workbook)
+    wb.Close   ''' This method contains wb.Application.Quit
+End Sub
+
 
 ''' --------------------------------------------------------
 '''                   WorkSheet Operation
@@ -287,13 +396,15 @@ Catch2:
 Escape:
 End Function
 
+
 ''' --------------------------------------------------------
-'''                     Cells Operation
+'''                          Ranges
 ''' --------------------------------------------------------
 
 ''' @param rng As Rang
+''' @param isVertical As Boolean
 ''' @return As Variant(Of Array(Of Array(Of T)))
-Public Function GetVal(ByVal rng As Range) As Variant
+Public Function GetVal(ByVal rng As Range, Optional isVertical As Boolean = False) As Variant
 
     ''' ( Usage ) Dump() is Ariawase's function
 
@@ -308,21 +419,44 @@ Public Function GetVal(ByVal rng As Range) As Variant
     ''' Debug.Print Dump( GetVal( ws.Range("B2:C4") ) )
     ''' Array( Array(1,2), Array(3,4) )
 
-
     Dim arr As Variant: arr = rng.Value
-
-    If IsArray(arr) Then
-        GetVal = Arr2DToJagArr(arr)
+    If Not IsArray(arr) Then
+        Dim tmp(1 To 1, 1 To 1) As Variant: tmp(1, 1) = arr: arr = tmp
+    End If
+    If isVertical Then
+        GetVal = Arr2DToJagArr(ArrTranspose(arr))
     Else
-        GetVal = Array(Array(arr))
+        GetVal = Arr2DToJagArr(arr)
     End If
 
 End Function
 
-''' @param arr2D As Variant(Of Array(Of T, T) Or Of Array(Of Array(Of T)) Or T)
 ''' @param rng As Rang
-''' @return As Variant(Of Array(Of Array(Of T)))
-Public Sub PutVal(ByVal arr2D As Variant, ByVal rng As Range, Optional isVertical As Boolean = False)
+''' @param ptrnFind As String
+''' @param isVertical As Boolean
+''' @return As Variant(Of Array(Of Array(Of Range)))
+Public Function RegexRanges(ByVal rng As Range _
+    , ByVal ptrnFind As String _
+    , Optional ByVal isVertical As Boolean = True _
+    ) As Variant
+
+    Dim ws As Worksheet: Set ws = rng.Worksheet
+    Dim inArr As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
+    For Each inArr In GetVal(rng, isVertical)
+        Dim i As Long
+        For i = 1 To ArrLen(inArr)
+            If ArrLen(ReMatch(inArr(i), ptrnFind)) > 0 Then arrx.AddObj ws.Cells(rng.offset(i - 1).Row, rng.Column)
+        Next i
+    Next inArr
+
+    RegexRanges = arrx.ToArray
+
+End Function
+
+''' @param arr As Variant(Of Array(Of T, T) Or Of Array(Of Array(Of T)) Or T)
+''' @param rng As Rang
+''' @param isVertical As Boolean
+Public Sub PutVal(ByVal arr As Variant, ByVal rng As Range, Optional isVertical As Boolean = False)
 
     ''' ( Usage )
 
@@ -348,40 +482,35 @@ Public Sub PutVal(ByVal arr2D As Variant, ByVal rng As Range, Optional isVertica
     '''   3 |      B   2
     '''   4 |
 
-
     ''' Value to 2D array
-    If Not IsArray(arr2D) Then
-        If IsObject(arr2D) Then Err.Raise 13
-        Dim tmp2DArr(0, 0) As Variant: tmp2DArr(0, 0) = arr2D
-        arr2D = tmp2DArr
+    If IsObject(arr) Then Err.Raise 13
+    If Not IsArray(arr) Then
+        Dim tmp(1 To 1, 1 To 1) As Variant: tmp(1, 1) = arr
+        arr = tmp
     End If
-
-    If ArrRank(arr2D) >= 3 Then Err.Raise 13
 
     ''' 1D array to 2D array
-    If ArrRank(arr2D) = 1 Then
-        If IsJagArr(arr2D) Then
-            arr2D = JagArrToArr2D(arr2D)
-        Else
-            arr2D = JagArrToArr2D(Array(arr2D))
-        End If
+    If ArrRank(arr) >= 3 Then Err.Raise 13
+    If ArrRank(arr) = 1 Then
+        arr = Arr1Dto2D(arr)
     End If
 
-    If Not ArrRank(arr2D) = 2 Then Err.Raise 13  ''' Type mismatch
+    ''' Exclude non-2-dimensional arrays
+    If Not ArrRank(arr) = 2 Then Err.Raise 13
 
     If isVertical Then
         ''' Minimum index Excel's Array is 1
-        If LBound(arr2D, 1) = 1 Then
-            rng.Resize(UBound(arr2D, 2), UBound(arr2D, 1)).Value = ArrTranspose(arr2D)
+        If LBound(arr, 1) = 1 Then
+            rng.Resize(UBound(arr, 2), UBound(arr, 1)).Value = ArrTranspose(arr)
         Else
-            rng.Resize(UBound(arr2D, 2) + 1, UBound(arr2D, 1) + 1).Value = ArrTranspose(arr2D)
+            rng.Resize(UBound(arr, 2) + 1, UBound(arr, 1) + 1).Value = ArrTranspose(arr)
         End If
     Else
         ''' Minimum index Excel's Array is 1
-        If LBound(arr2D, 1) = 1 Then
-            rng.Resize(UBound(arr2D, 1), UBound(arr2D, 2)).Value = arr2D
+        If LBound(arr, 1) = 1 Then
+            rng.Resize(UBound(arr, 1), UBound(arr, 2)).Value = arr
         Else
-            rng.Resize(UBound(arr2D, 1) + 1, UBound(arr2D, 2) + 1).Value = arr2D
+            rng.Resize(UBound(arr, 1) + 1, UBound(arr, 2) + 1).Value = arr
         End If
     End If
 
@@ -390,227 +519,97 @@ End Sub
 ''' @param rng As Rang
 ''' @return As Long
 Public Function LastRow(ByVal rng As Range, Optional toDown As Boolean = False) As Long
-
-    ''' ( Usage )
-
-    '''     |  A   B   C   D   E   F   G
-    ''' ----+---------------------------
-    '''   1 |
-    '''   2 |      1
-    '''   3 |      2
-    '''   4 |      3
-    '''   5 |
-    '''   6 |      A
-    '''   7 |      B
-
-    ''' Dim ws As Worksheet: Set ws = AddSheet("abc")
-    ''' Debug.Print LastRow( ws.Range("B2") )
-    ''' 7
-    ''' Debug.Print LastRow( ws.Range("B2") , True)
-    ''' 4
-
     If toDown Then
         LastRow = rng.End(xlDown).Row
     Else
         LastRow = rng.Worksheet.Cells(rng.Worksheet.Rows.Count, rng.Column).End(xlUp).Row
     End If
-
 End Function
 
 ''' @param rng As Rang
 ''' @return As Long
 Public Function LastCol(ByVal rng As Range, Optional toRight As Boolean = False) As Long
-
-    ''' ( Usage )
-
-    '''    |  A   B   C   D   E   F   G
-    '''----+---------------------------
-    '''  1 |
-    '''  2 |      1   2   3       A   B
-    '''  3 |
-    '''  4 |
-    '''  5 |
-    '''  6 |
-    '''  7 |
-
-    ''' Dim ws As Worksheet: Set ws = AddSheet("abc")
-    ''' Debug.Print LastCol( ws.Range("B2") )
-    ''' 7
-    ''' Debug.Print LastCol( ws.Range("B2") , True)
-    ''' 4
-
     If toRight Then
         LastCol = rng.End(xlToRight).Column
     Else
         LastCol = rng.Worksheet.Cells(rng.Row, rng.Worksheet.columns.Count).End(xlToLeft).Column
     End If
-
 End Function
 
 ''' @param ws As Worksheet
 Public Sub Hankaku(ByVal ws As Worksheet)
-
-    ''' ( Usage )
-    ''' Dim ws As Worksheet: Set ws = AddSheet("abc")
-    ''' Hankaku ws
-    ''' "ƒAƒCƒEƒGƒI" -> "±²³´µ"
-    ''' "‚`‚a‚b‚c‚d" -> "ABCDE"
-    ''' "‚P‚Q‚R‚S‚T" -> 12345
-
     Dim v As Range
     For Each v In ws.UsedRange
         v.Value = StrConv(v.Value, vbNarrow)
     Next
-
 End Sub
 
-''' --------------------------------------------------------
-'''                    Workbook Operation
-''' --------------------------------------------------------
-
-''' @param excelApp As Excel.Application
-''' @param wb As Workbook
-Public Sub SaveCloseWorkBook(ByRef excelApp As Excel.Application, ByVal wb As Workbook)
-    wb.Save
-    wb.Close
-End Sub
-
-''' @param excelApp As Excel.Application
-''' @param wb As Workbook
-Public Sub CloseWorkBook(ByRef excelApp As Excel.Application, ByVal wb As Workbook)
-    wb.Close
-    If TypeName(excelApp) = "Application" Then excelApp.Quit
-End Sub
-
-''' @param excelApp As Excel.Application
-''' @param filePath As String
-''' @param isReadOnly As Boolean
-''' @return As WorkBook
-Public Function CreateWorkBook(ByRef excelApp As Excel.Application, ByVal filePath As String, Optional isReadOnly As Boolean = True) As Workbook
-    If IsWorkBookOpened(filePath) = True Then
-        If Not isReadOnly Then Err.Raise 9999, , "WorkBook is already opened."
-        Set excelApp = New Excel.Application
-        Set CreateWorkBook = excelApp.Workbooks.Open(Filename:=filePath, UpdateLinks:=0, ReadOnly:=isReadOnly, IgnoreReadOnlyRecommended:=True)
-    Else
-        Set CreateWorkBook = Workbooks.Open(Filename:=filePath, UpdateLinks:=0, ReadOnly:=isReadOnly, IgnoreReadOnlyRecommended:=True)
-    End If
-End Function
-
-''' @param filePath As String
-''' @return As Boolean
-Private Function IsWorkBookOpened(ByVal filePath As String) As Boolean
-    On Error GoTo Err70
-        Open filePath For Append As #1
-        Close #1
-    On Error GoTo 0
-        IsWorkBookOpened = False
-        Exit Function
-Err70:
-    IsWorkBookOpened = True
-End Function
-
-''' @param rng As Range
+''' @param rng As Rang
+''' @param ptrnFind As String
 ''' @param times As Long
-''' @param ptrnFind As String
-''' @return As Boolean
-Public Function InsertRow(ByVal rng As Range, ByVal times As Long, ByVal ptrnFind As String) As Boolean
-    Dim ws As Worksheet: Set ws = rng.Worksheet
-    Dim v As Variant
-    For Each v In ArrRange(1, times)
-        ''' s is array(3,4,5) ---> "3:3, 4:4, 5:5"
-        Dim s: s = RowsString(GetVal2(ws.Range(rng.Address & ":" & Left(rng.Address, 2) & "$" & LastRow(rng)), , ptrnFind)(0).Keys)
-        ws.Range(s).Insert
-    Next v
-    InsertRow = True
-End Function
+''' @param offsetRow As Long
+''' @param offsetColumn As Long
+Public Sub InsertRows(ByVal rng As Range, ByVal ptrnFind As String _
+    , Optional ByVal times As Long = 1, Optional ByVal offsetRow As Long = 0, Optional ByVal offsetColumn As Long = 0)
+    Dim i As Long
+    For i = 1 To times
+        If offsetRow = 0 And offsetColumn = 0 Then
+            UnionRanges(RegexRanges(rng, ptrnFind)).EntireRow.Insert
+        Else
+            UnionRanges(offsetRanges(RegexRanges(rng, ptrnFind), offsetRow, offsetColumn)).EntireRow.Insert
+        End If
+    Next i
+End Sub
 
-''' @param rng As Range
+''' @param rng As Rang
+''' @param ptrnFind As String
 ''' @param times As Long
+''' @param offsetRow As Long
+''' @param offsetColumn As Long
+Public Sub DeleteRows(ByVal rng As Variant, ByVal ptrnFind As String _
+    , Optional ByVal times As Long = 1, Optional ByVal offsetRow As Long = 0, Optional ByVal offsetColumn As Long = 0)
+    Dim i As Long
+    For i = 1 To times
+        If offsetRow = 0 And offsetColumn = 0 Then
+            UnionRanges(RegexRanges(rng, ptrnFind)).EntireRow.Delete
+        Else
+            UnionRanges(offsetRanges(RegexRanges(rng, ptrnFind), offsetRow, offsetColumn)).EntireRow.Delete
+        End If
+    Next i
+End Sub
+
+''' @param arr As Variant(Of Array(Of Array(Of Range))
 ''' @param ptrnFind As String
-''' @return As Boolean
-Public Function DeletRow(ByVal rng As Range, ByVal times As Long, ByVal ptrnFind As String) As Boolean
-    Dim ws As Worksheet: Set ws = rng.Worksheet
-    Dim v As Variant
-    For Each v In ArrRange(1, times)
-        ''' s is array(3,4,5) ---> "2:2, 3:3, 4:4"
-        Dim s: s = RowsString(ArrMap(Init(New Func, vbLong, AddressOf MinusOne, vbLong) _
-            , GetVal2(ws.Range(rng.Address & ":" & Left(rng.Address, 2) & "$" & LastRow(rng)), , ptrnFind)(0).Keys))
-        ws.Range(s).Delete
-    Next v
-    DeletRow = True
-End Function
-
-Private Function MinusOne(ByVal n As Long) As Long
-    MinusOne = n - 1
-End Function
-
-Private Function RowsString(ByVal arr As Variant) As String
-    Dim row_i As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
-    For Each row_i In arr
-        arrx.AddVal Join(Array(row_i, ":", row_i), "")
-    Next row_i
-    RowsString = Join(arrx.ToArray, ",")
+''' @param times As Long
+''' @param offsetRow As Long
+''' @param offsetColumn As Long
+''' @return Variant(Of Array(Of Range))
+Public Function offsetRanges(ByVal arr As Variant, Optional ByVal offsetRow As Long = 0, Optional ByVal offsetColumn As Long = 0) As Variant
+    Dim rng As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
+    For Each rng In arr
+        arrx.AddObj rng.offset(offsetRow, offsetColumn)
+    Next rng
+    offsetRanges = arrx.ToArray
 End Function
 
 ''' @param rng As Range
-''' @param isVertical As Boolean
-''' @param truncateEmpty As Boolean
-''' @param ptrnFind As String
-''' @return As Variant(Of Array(Of Array(Of T)))
-Public Function GetVal2(ByVal rng As Range _
-    , Optional ByVal isVertical As Boolean = True _
-    , Optional ByVal ptrnFind As String _
-    ) As Variant
-
-    ''' Minimum Excel's Array index is 1
-    Dim arr As Variant: arr = rng.Value
-    If Not IsArray(arr) Then
-        Dim tmp(1 To 1, 1 To 1) As Variant: tmp(1, 1) = arr: arr = tmp
-    End If
-    If isVertical Then
-        arr = Arr2DToJagArr(ArrTranspose(arr))
-    Else
-        arr = Arr2DToJagArr(arr)
-    End If
-
-    Dim inArr As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
-    For Each inArr In arr
-        Dim dict As Object: Set dict = CreateObject("Scripting.Dictionary")
-        Dim i As Long
-        For i = 1 To ArrLen(inArr)
-            If StrPtr(ptrnFind) = 0 Then
-                dict.Add (i - 1) + rng.Row, inArr(i)
-            Else
-                If ArrLen(ReMatch(inArr(i), ptrnFind)) > 0 Then dict.Add (i - 1) + rng.Row, inArr(i)
-            End If
-        Next i
-        arrx.AddObj dict
-        Set dict = Nothing
-    Next inArr
-
-    GetVal2 = arrx.ToArray
-
+''' @return Range
+Public Function xlUpRange(ByVal rng As Range) As Range
+    Set xlUpRange = rng.Worksheet.Range(rng, rng.Worksheet.Cells(rng.Worksheet.Rows.Count, rng.Column).End(xlUp))
 End Function
 
-''' @param arr As Variant(Of Array(Of T)
-''' @return As Variant(Of Array(Of T))
-Public Function ArrPadLeft(ByVal arr As Variant) As Variant
-    Dim v As Variant, tmp As String, arrx As ArrayEx: Set arrx = New ArrayEx
-    For Each v In arr
-        If Not IsEmpty(v) Then tmp = v
-        arrx.AddVal tmp ''' TODO: addObj
-    Next v
-    ArrPadLeft = arrx.ToArray
-    Set arrx = Nothing
+''' @param arr as Vaiant(Of Array(Of Range)
+''' @return Range
+Public Function UnionRanges(ByVal arr As Variant) As Range
+    Dim rng As Variant, uRng As Range
+    For Each rng In arr
+        If uRng Is Nothing Then
+            Set uRng = rng
+        Else
+            Set uRng = Union(uRng, rng)
+        End If
+    Next rng
+    Set UnionRanges = uRng
 End Function
 
-''' @param arr As Variant(Of Array(Of T)
-''' @return As Variant(Of Array(Of T))
-Public Function ArrRemoveEmpty(ByVal arr As Variant) As Variant
-    Dim v As Variant, tmp As String, arrx As ArrayEx: Set arrx = New ArrayEx
-    For Each v In arr
-        If Not IsEmpty(v) Then arrx.AddVal v ''' TODO addObj
-    Next v
-    ArrRemoveEmpty = arrx.ToArray
-    Set arrx = Nothing
-End Function
+
