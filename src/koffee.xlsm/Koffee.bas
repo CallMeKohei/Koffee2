@@ -236,7 +236,6 @@ End Sub
 '''                    Workbook Operation
 ''' --------------------------------------------------------
 
-''' @param excelApp As Excel.Application
 ''' @param filePath As String
 ''' @param isReadOnly As Boolean
 ''' @return As WorkBook
@@ -263,14 +262,14 @@ Private Function IsWorkBookClosed(ByVal filePath As String) As Boolean
 Escape:
 End Function
 
-''' @param excelApp As Excel.Application
+''' TODO: is needed?
 ''' @param wb As Workbook
 Public Sub SaveCloseWorkBook(ByVal wb As Workbook)
     wb.Save
     wb.Close   ''' This method contains wb.Application.Quit
 End Sub
 
-''' @param excelApp As Excel.Application
+''' TODO: is needed?
 ''' @param wb As Workbook
 Public Sub CloseWorkBook(ByVal wb As Workbook)
     wb.Close   ''' This method contains wb.Application.Quit
