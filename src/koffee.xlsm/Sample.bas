@@ -15,19 +15,19 @@ Option Private Module
 Private Sub PageBreakPreview()
 
     Dim ws As Worksheet: Set ws = ThisWorkbook.Worksheets("foo")
-    
+
     ''' Reset page break line
     ws.ResetAllPageBreaks
-    
+
     ''' Vertical page break line
     ws.VPageBreaks.Add Range("O1")
-    
+
     ''' Holizontal page break line
     Dim v As Variant
     For Each v In ArrRange(6, 26, 5)
         ws.HPageBreaks.Add ws.Cells(v, 1)
     Next v
-    
+
     ''' Bold page break line
     ws.PageSetup.PrintArea = ws.Range("A1:N25").Address
 
@@ -40,15 +40,15 @@ End Sub
 Private Sub Read_WorkBook()
 
     ExcelStatus False, xlCalculationManual, False, False, True, False
-    
+
     Dim srcWb As Workbook:  Set srcWb = CreateWorkBook("\\vmware-host\Shared Folders\tmp_icloud\test.xlsx")
     Dim srcWs As Worksheet: Set srcWs = srcWb.Worksheets("nor")
     Dim srcRng As Range:    Set srcRng = srcWs.Range("A1")
 
     Debug.Print srcRng.Value ''' Hello World!
-    
+
     srcWb.Close
-    
+
     ExcelStatus
 
 End Sub
@@ -56,7 +56,7 @@ End Sub
 Private Sub Write_WorkBook()
 
     ExcelStatus False, xlCalculationManual, False, False, True, False
-    
+
     Dim srcWb As Workbook:  Set srcWb = CreateWorkBook("\\vmware-host\Shared Folders\tmp_icloud\test.xlsx")
     Dim srcWs As Worksheet: Set srcWs = srcWb.Worksheets("nor")
     Dim srcRng As Range:    Set srcRng = srcWs.Range("A1")
@@ -67,7 +67,7 @@ Private Sub Write_WorkBook()
 
     srcWb.Save ''' Point!
     srcWb.Close
-    
+
     ExcelStatus
 End Sub
 
@@ -80,11 +80,11 @@ Private Sub ReadAndWrite_WorkSheet()
     Dim srcWb As Workbook:  Set srcWb = ThisWorkbook
     Dim srcWs As Worksheet: Set srcWs = srcWb.Worksheets("foo")
     Dim srcRng As Range:    Set srcRng = srcWs.Range("A1")
-    
+
     Debug.Print srcRng.Value ''' Hello World!
     srcRng.Value = "foo! bar! baz!"
     Debug.Print srcRng.Value ''' foo! bar! baz!
-    
+
 End Sub
 
 ''' -------------------------------------------------------
@@ -100,18 +100,18 @@ Private Sub CopyAndPasteWithPutVal()
     '''   3 |  c                  3 |  c       c
     '''   4 |                     4 |
     '''   5 |                     5 |
-    
+
     Dim srcWb As Workbook:  Set srcWb = ThisWorkbook
     Dim srcWs As Worksheet: Set srcWs = srcWb.Worksheets("zzz")
     Dim srcRng As Range:    Set srcRng = srcWs.Range("A1:A3")
 
     Dim dstWb As Workbook:  Set dstWb = ThisWorkbook
     Dim dstWs As Worksheet: Set dstWs = dstWb.Worksheets("zzz")
-    Dim dstRng As Range: Set dstRng = dstWs.Range("C1")
-    
+    Dim dstRng As Range:    Set dstRng = dstWs.Range("C1")
+
     ''' Copy
     Dim arr As Variant: arr = GetVal(srcRng, True)
-        
+
     ''' Paste with PutVal
     PutVal arr, dstRng, True
 
@@ -133,9 +133,9 @@ Sub CopyAndPasteWithOffset()
 
     Dim dstWb As Workbook:  Set dstWb = ThisWorkbook
     Dim dstWs As Worksheet: Set dstWs = dstWb.Worksheets("zzz")
-    Dim dstRng As Range: Set dstRng = dstWs.Range("C1")
-    
-    
+    Dim dstRng As Range:    Set dstRng = dstWs.Range("C1")
+
+
     ''' Copy
     Dim arr As Variant: arr = GetVal(srcRng, True)
 
@@ -188,20 +188,20 @@ Private Sub foo20190215()
     '''   5 |
     '''   6 |  3   z
     '''   7 |              bar002
-    
+
     ''' Result
     '''
     ''' Array()
     ''' Array(1#, "x", "foo001")
     ''' Array(2#, "y")
     ''' Array(3#, "z", "foo002")
-    
+
     ''' @param
-    Dim ws As Worksheet: Set ws = Worksheets("suntory")
-    Dim rng As Range: Set rng = ws.Range("A2:D7")
+    Dim ws As Worksheet:     Set ws = Worksheets("suntory")
+    Dim rng As Range:        Set rng = ws.Range("A2:D7")
     Dim ptrnFind1 As String: ptrnFind1 = "\d.*"
     Dim ptrnFind2 As String: ptrnFind2 = ".*\d\d\d"
-    
+
     Dim arrx As ArrayEx: Set arrx = New ArrayEx
     Dim arr As Variant, tmp As Variant, tmpArrx As ArrayEx: Set tmpArrx = New ArrayEx
     For Each arr In GetVal(rng)
@@ -219,12 +219,12 @@ Private Sub foo20190215()
             End If
         End If
     Next arr
-    
+
     arrx.AddVal tmpArrx.ToArray
-    
+
     Dim vv As Variant
     For Each vv In arrx.ToArray
         Debug.Print Dump(ArrRemoveEmpty(ArrFlatten(vv)))
     Next vv
-    
+
 End Sub
