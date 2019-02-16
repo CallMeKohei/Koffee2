@@ -17,6 +17,11 @@ Option Private Module
 '''                      Util Functions
 ''' --------------------------------------------------------
 
+''' @param second As Long
+Public Sub Wait(ByVal milliSecond As Long)
+    Application.Wait [Now()] + milliSecond / 86400000
+End Sub
+
 ''' @param arr As Variant(Of Array(Of Array(Of T)))
 ''' @return As Boolean
 Public Function IsJagArr(ByVal arr As Variant) As Boolean
@@ -550,6 +555,10 @@ End Sub
 ''' @param offsetColumn As Long
 Public Sub InsertRows(ByVal rng As Range, ByVal ptrnFind As String _
     , Optional ByVal times As Long = 1, Optional ByVal offsetRow As Long = 0, Optional ByVal offsetColumn As Long = 0)
+
+    ''' EXAMPLES :
+    ''' InsertRows xlUpRange(ws.Range("B6")), "\d-\d.*", 3
+
     Dim i As Long
     For i = 1 To times
         If offsetRow = 0 And offsetColumn = 0 Then
@@ -567,6 +576,10 @@ End Sub
 ''' @param offsetColumn As Long
 Public Sub DeleteRows(ByVal rng As Variant, ByVal ptrnFind As String _
     , Optional ByVal times As Long = 1, Optional ByVal offsetRow As Long = 0, Optional ByVal offsetColumn As Long = 0)
+
+    ''' EXAMPLES :
+    ''' DeleteRows xlUpRange(ws.Range("B6")), "\d-\d.*", 3, -1
+
     Dim i As Long
     For i = 1 To times
         If offsetRow = 0 And offsetColumn = 0 Then

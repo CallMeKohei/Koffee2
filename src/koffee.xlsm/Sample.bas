@@ -1,164 +1,168 @@
 Attribute VB_Name = "Sample"
-Option Explicit
+''' --------------------------------------------------------
+'''  FILE    : Sample.bas
+'''  AUTHOR  : callmekohei <callmekohei at gmail.com>
+'''  License : MIT license
+''' --------------------------------------------------------
 
-Public Sub Sample_PageBreakPreview()
+Option Explicit
+Option Private Module
+
+''' --------------------------------------------------------
+'''                     Page Break Line
+''' --------------------------------------------------------
+
+Private Sub PageBreakPreview()
 
     Dim ws As Worksheet: Set ws = ThisWorkbook.Worksheets("foo")
-
+    
+    ''' Reset page break line
     ws.ResetAllPageBreaks
-
+    
+    ''' Vertical page break line
     ws.VPageBreaks.Add Range("O1")
-
+    
+    ''' Holizontal page break line
     Dim v As Variant
     For Each v In ArrRange(6, 26, 5)
         ws.HPageBreaks.Add ws.Cells(v, 1)
     Next v
-
+    
+    ''' Bold page break line
     ws.PageSetup.PrintArea = ws.Range("A1:N25").Address
 
 End Sub
 
-Sub foo()
+''' --------------------------------------------------------
+'''                        WorkBooks
+''' --------------------------------------------------------
 
-    Dim ws As Worksheet: Set ws = ThisWorkbook.Worksheets("bbb")
+Private Sub Read_WorkBook()
+
+    ExcelStatus False, xlCalculationManual, False, False, True, False
     
-    Dim i As Long
-    For i = 1 To 10
-        InsertRows xlUpRange(ws.Range("b6")), "\d-\d.*", 3
-        Application.Wait [Now()] + 500 / 86400000
-        DeleteRows xlUpRange(ws.Range("b6")), "\d-\d.*", 3, -1
-        Application.Wait [Now()] + 500 / 86400000
-    Next i
+    Dim srcWb As Workbook:  Set srcWb = CreateWorkBook("\\vmware-host\Shared Folders\tmp_icloud\test.xlsx")
+    Dim srcWs As Worksheet: Set srcWs = srcWb.Worksheets("nor")
+    Dim srcRng As Range:    Set srcRng = srcWs.Range("A1")
+
+    Debug.Print srcRng.Value ''' Hello World!
+    
+    srcWb.Close
+    
+    ExcelStatus
+
+End Sub
+
+Private Sub Write_WorkBook()
+
+    ExcelStatus False, xlCalculationManual, False, False, True, False
+    
+    Dim srcWb As Workbook:  Set srcWb = CreateWorkBook("\\vmware-host\Shared Folders\tmp_icloud\test.xlsx")
+    Dim srcWs As Worksheet: Set srcWs = srcWb.Worksheets("nor")
+    Dim srcRng As Range:    Set srcRng = srcWs.Range("A1")
+
+    Debug.Print srcRng.Value ''' Hello World!
+    srcRng.Value = "foo! bar! baz!"
+    Debug.Print srcRng.Value ''' foo! bar! baz!
+
+    srcWb.Save ''' Point!
+    srcWb.Close
+    
+    ExcelStatus
+End Sub
+
+''' --------------------------------------------------------
+'''                        WorkSheets
+''' --------------------------------------------------------
+
+Private Sub ReadAndWrite_WorkSheet()
+
+    Dim srcWb As Workbook:  Set srcWb = ThisWorkbook
+    Dim srcWs As Worksheet: Set srcWs = srcWb.Worksheets("foo")
+    Dim srcRng As Range:    Set srcRng = srcWs.Range("A1")
+    
+    Debug.Print srcRng.Value ''' Hello World!
+    srcRng.Value = "foo! bar! baz!"
+    Debug.Print srcRng.Value ''' foo! bar! baz!
     
 End Sub
 
-Sub Sample_InsertRows()
-    Dim ws As Worksheet: Set ws = ThisWorkbook.Worksheets("bbb")
-    InsertRows xlUpRange(ws.Range("b6")), "\d-\d.*", 3
+''' -------------------------------------------------------
+'''                      Copy and Paste
+''' --------------------------------------------------------
+
+Private Sub CopyAndPasteWithPutVal()
+
+    '''     |  A   B   C   D        |  A   B   C   D   E
+    ''' ----+----------------   ----+--------------------
+    '''   1 |  a                  1 |  a       a
+    '''   2 |  b                  2 |  b       b
+    '''   3 |  c                  3 |  c       c
+    '''   4 |                     4 |
+    '''   5 |                     5 |
+    
+    Dim srcWb As Workbook:  Set srcWb = ThisWorkbook
+    Dim srcWs As Worksheet: Set srcWs = srcWb.Worksheets("zzz")
+    Dim srcRng As Range:    Set srcRng = srcWs.Range("A1:A3")
+
+    Dim dstWb As Workbook:  Set dstWb = ThisWorkbook
+    Dim dstWs As Worksheet: Set dstWs = dstWb.Worksheets("zzz")
+    Dim dstRng As Range: Set dstRng = dstWs.Range("C1")
+    
+    ''' Copy
+    Dim arr As Variant: arr = GetVal(srcRng, True)
+        
+    ''' Paste with PutVal
+    PutVal arr, dstRng, True
+
 End Sub
 
-Sub Sample_DeleteRows()
-    Dim ws As Worksheet: Set ws = ThisWorkbook.Worksheets("bbb")
-    DeleteRows xlUpRange(ws.Range("b6")), "\d-\d.*", 3, -1
-End Sub
+Sub CopyAndPasteWithOffset()
 
-Sub Sample_CopyFromOtherWorkBook()
+    '''     |  A   B   C   D        |  A   B   C   D
+    ''' ----+----------------   ----+----------------
+    '''   1 |  a                  1 |  a       a
+    '''   2 |  b                  2 |  b
+    '''   3 |  c                  3 |  c       b
+    '''   4 |                     4 |
+    '''   5 |                     5 |          c
 
-'    ExcelStatus False, xlCalculationManual, False, False, True, False
+    Dim srcWb As Workbook:  Set srcWb = ThisWorkbook
+    Dim srcWs As Worksheet: Set srcWs = srcWb.Worksheets("zzz")
+    Dim srcRng As Range:    Set srcRng = srcWs.Range("A1:A3")
 
-'    Dim excelApp As Excel.Application
-    Dim wb As Workbook: Set wb = CreateWorkBook("\\vmware-host\Shared Folders\tmp_icloud\test.xlsx")
-
-    ''' ---------- Body ----------
-
-    Dim ws As Worksheet: Set ws = wb.Worksheets(1)
-    Dim v As Variant
-'    For Each v In GetVal2(ws.Range("B6:B" & LastRow(ws.Range("B6"))), , "\d-\d.*")(0).Items
-'        Debug.Print v
-'    Next v
+    Dim dstWb As Workbook:  Set dstWb = ThisWorkbook
+    Dim dstWs As Worksheet: Set dstWs = dstWb.Worksheets("zzz")
+    Dim dstRng As Range: Set dstRng = dstWs.Range("C1")
     
-    Debug.Print "---"
     
-    For Each v In RegexRanges(xlUpRanges(ws.Range("b6")), "\d-\d.*", True)
-        Debug.Print v
+    ''' Copy
+    Dim arr As Variant: arr = GetVal(srcRng, True)
+
+    ''' Paste with Offset
+    Const Interval As Long = 2
+    Dim v As Variant, row_i As Long
+    For Each v In arr(1)
+        dstRng.offset((IncrPst(row_i)) * Interval, 0).Value = v
     Next v
-
-    ''' --------------------------
-
-    CloseWorkBook wb
-'    ExcelStatus
-
-End Sub
-
-Sub Sample_CopyFromOtherWorkBook2()
-
-    Dim wb As Workbook: Set wb = CreateWorkBook("\\vmware-host\Shared Folders\tmp_icloud\test.xlsx")
-
-    ''' ---------- Body ----------
-
-    Dim ws As Worksheet: Set ws = wb.Worksheets("‚ ‚¢‚¤‚¦‚¨")
-    Dim srcArr As Variant: srcArr = GetVal(ws.Range("b5:e18"), True)
-    
-    Dim dstWs As Worksheet: Set dstWs = ThisWorkbook.Worksheets("‚©‚«‚­‚¯‚±")
-    Dim dstRng As Range: Set dstRng = dstWs.Range("B2")
-
-    PutVal srcArr, dstRng.offset(0, 2), True
-    PutVal ArrPadLeft(srcArr(1)), dstRng.offset(0, 0), True
-
-    ''' --------------------------
-
-    CloseWorkBook wb
-
-End Sub
-
-
-
-Sub Sample_CopyAndPaste()
-
-    Dim ws As Worksheet: Set ws = ThisWorkbook.Worksheets("’ •[")
-    Dim rng As Range: Set rng = ws.Range("B2:N6")
-    Const dstInterval As Long = 5
-
-    rng.Copy
-
-    Dim row_i As Long
-    For row_i = 0 To 4
-        rng.offset(row_i * dstInterval, 0).PasteSpecial xlPasteFormats
-    Next row_i
-
-End Sub
-
-Sub Sample_CopyAndPasteFromOtherWorksheet()
-
-    Dim srcWs As Worksheet: Set srcWs = ThisWorkbook.Worksheets("aaa")
-'    Dim srcArr As Variant: srcArr = GetVal2(srcWs.Range("D1:D5"), , "\d-\d:.*")(0).Items
-    Dim srcArr As Variant: srcArr = RegexRanges(srcWs.Range("D1:D5"), "\d-\d:.*")
-    
-
-    Dim dstWs As Worksheet: Set dstWs = ThisWorkbook.Worksheets("’ •[")
-    Dim dstRng As Range: Set dstRng = dstWs.Range("B2")
-    Const dstInterval As Long = 5
-
-    Dim i As Long, v As Variant
-    For Each v In srcArr
-        dstRng.offset((IncrPst(i)) * dstInterval, 0).Value = v.Value
-    Next v
-
-End Sub
-
-Sub Sample_ModifyOtherWorkBook()
-
-'    ExcelStatus False, xlCalculationManual, False, False, True, False
-
-    'Dim excelApp As Excel.Application
-    Dim wb As Workbook: Set wb = CreateWorkBook("\\vmware-host\Shared Folders\tmp_icloud\test.xlsx", False)
-'    Dim wb As Workbook: Set wb = CreateWorkBook(excelApp, "\\vmware-host\Shared Folders\tmp_icloud\test.xlsx", False)
-
-    ''' ---------- Body ----------
-
-    Dim ws As Worksheet: Set ws = wb.Worksheets(1)
-    Debug.Print (ws.Range("A1").Value)
-    ws.Range("A1").Value = "ccc!"
-    Debug.Print (ws.Range("A1").Value)
-
-    ''' --------------------------
-
-    SaveCloseWorkBook wb
-'    SaveCloseWorkBook excelApp, wb
-'    ExcelStatus
 
 End Sub
 
 ''' xlClipboardFormat enumeration (Excel) : https://docs.microsoft.com/en-us/office/vba/api/excel.xlclipboardformat
 ''' xlClipboardFormatBitmap is 9&
-Sub SampleCopyAsBipmap_pasteAsPicture()
+Sub CopyAsBipmap_PasteAsPicture()
 
-    Dim srcWs As Worksheet: Set srcWs = ThisWorkbook.Worksheets("’ •[")
-    Dim srcRng As Range: Set srcRng = srcWs.Range("B2:N6")
+    ''' TODO : more simple
 
-    Dim dstWs As Worksheet: Set dstWs = ThisWorkbook.Worksheets("Pic")
-    Dim dstRng As Range: Set dstRng = dstWs.Range("A1")
+    Dim srcWb As Workbook:  Set srcWb = ThisWorkbook
+    Dim srcWs As Worksheet: Set srcWs = srcWb.Worksheets("’ •[")
+    Dim srcRng As Range:    Set srcRng = srcWs.Range("B2:N6")
 
+    Dim dstWb As Workbook:  Set dstWb = ThisWorkbook
+    Dim dstWs As Worksheet: Set dstWs = dstWb.Worksheets("Pic")
+    Dim dstRng As Range:    Set dstRng = dstWs.Range("A1")
+
+    ''' Copy and Paste( needs alternate cause clipboard has only one data )
     Dim row_i As Variant
     For Each row_i In ArrRange2(0, 4, 5)
         srcRng.offset(row_i, 0).CopyPicture xlScreen, xlBitmap
@@ -167,12 +171,60 @@ Sub SampleCopyAsBipmap_pasteAsPicture()
 
 End Sub
 
+''' --------------------------------------------------------
+'''                           misc
+''' --------------------------------------------------------
 
+Private Sub foo20190215()
 
-
-
-
-
-
-
-
+    ''' Worksheet
+    '''
+    '''     |  A   B   C   D   E
+    ''' ----+--------------------
+    '''   1 |
+    '''   2 |  1   x
+    '''   3 |              foo001
+    '''   4 |  2   y
+    '''   5 |
+    '''   6 |  3   z
+    '''   7 |              bar002
+    
+    ''' Result
+    '''
+    ''' Array()
+    ''' Array(1#, "x", "foo001")
+    ''' Array(2#, "y")
+    ''' Array(3#, "z", "foo002")
+    
+    ''' @param
+    Dim ws As Worksheet: Set ws = Worksheets("suntory")
+    Dim rng As Range: Set rng = ws.Range("A2:D7")
+    Dim ptrnFind1 As String: ptrnFind1 = "\d.*"
+    Dim ptrnFind2 As String: ptrnFind2 = ".*\d\d\d"
+    
+    Dim arrx As ArrayEx: Set arrx = New ArrayEx
+    Dim arr As Variant, tmp As Variant, tmpArrx As ArrayEx: Set tmpArrx = New ArrayEx
+    For Each arr In GetVal(rng)
+        If Not ArrLen(ArrUniq(arr)) = 1 Then
+            If ArrLen(ReMatch(arr(1), ptrnFind1)) > 0 Then
+                arrx.AddVal tmpArrx.ToArray
+                Set tmpArrx = Nothing
+                Set tmpArrx = New ArrayEx
+                tmpArrx.AddVal arr
+            Else
+                Dim v As Variant
+                For Each v In arr
+                    If ArrLen(ReMatch(v, ptrnFind2)) > 0 Then tmpArrx.AddVal arr
+                Next v
+            End If
+        End If
+    Next arr
+    
+    arrx.AddVal tmpArrx.ToArray
+    
+    Dim vv As Variant
+    For Each vv In arrx.ToArray
+        Debug.Print Dump(ArrRemoveEmpty(ArrFlatten(vv)))
+    Next vv
+    
+End Sub
