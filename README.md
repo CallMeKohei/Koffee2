@@ -1,12 +1,35 @@
-# KoffeeVBA
+## KoffeeVBA
 
-callmekohei's VBA utility code.
+callmekohei の VBA をラクに書くためのコード
 
-## License
+### startup script
 
-This software is released under the MIT License, see [LICENSE.txt](https://github.com/callmekohei/koffeeVBA/blob/master/LICENSE.txt).
+`gitbash`上で適当なフォルダを作り下記のコードを実行します
 
-## Sample code
+```bash
+#! /bin/bash
+
+mkdir -p ./src/foo.xlsm/
+
+git clone --depth 1 https://github.com/callmekohei/koffeeVBA
+git clone --depth 1 https://github.com/callmekohei/ariawaseModified
+
+cp ariawaseModified/vbac.wsf ./
+
+mv ariawaseModified/src/Ariawase.xlsm/* ./src/foo.xlsm/
+mv koffeeVBA/src/koffee.xlsm/* ./src/foo.xlsm/
+
+cscript vbac.wsf combine
+
+rm -rf koffeeVBA
+rm -rf ariawaseModified
+
+cd bin
+explorer foo.xlsm
+
+```
+
+### Sample code
 
 ```vb
 Private Sub Sample_koffeeArray()
@@ -149,3 +172,12 @@ Private Sub Sample_koffeeTime()
 End Sub
 
 ```
+
+### その他
+
+こんなコードあるよとか、ここもう少しこうしたらとかあったらぜひ`issue`もしくは`twitter(@callmekohei)`にお願いします
+
+### License
+
+This software is released under the MIT License, see [LICENSE.txt](https://github.com/callmekohei/koffeeVBA/blob/master/LICENSE.txt).
+
