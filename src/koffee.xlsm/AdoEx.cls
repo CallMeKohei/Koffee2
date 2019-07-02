@@ -7,66 +7,12 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-''' --------------------------------------------------------
-'''  FILE    : AdoEx.cls
-'''  AUTHOR  : callmekohei <callmekohei at gmail.com>
-'''  License : MIT license
-''' --------------------------------------------------------
-
-
-''' Dependencies
-'''
-'''     Ariawase: https://github.com/vbaidiot/ariawase
-'''
-'''                   | Arr2DToJagArr |
-'''     --------------+---------------|
-'''     Select_       |       *       |
-
-
-'''  --------------------------------------------------------
-'''     Please read below if you read xlsx Excel file ....
-'''  --------------------------------------------------------
-'''
-'''  1) VBA can read .xlsx file with only Ace Engine.
-'''
-'''      ( Readable Files )
-'''      Engine | dBase | Access | Text | Excel
-'''      ------ +------ +------- +----- +-------
-'''      Jet    | .dbf  | .mdb   | .txt | .xls
-'''             |       |        | .csv |
-'''      ------ +------ +------- +----- +-------
-'''      Ace    | .dbf  | .mdb   | .txt | .xls
-'''             | .ndx  | .accdb | .csv | .xlsx
-'''             | .mdx  |        |      | .xlsm
-'''             |       |        |      | .xlsb
-'''
-'''  2) VBA can use installed Ace Engine.
-'''
-'''      VBA see the following place.
-'''          \HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Microsoft.ACE.OLEDB.xx.0
-'''
-'''      Check code whether Ace Engine already be installed.
-'''      Sub ExistAceEngine()
-'''          Dim adox As AdoEx: Set adox = New AdoEx
-'''          ''' Empty strings shows that VBA can not use Ace Engine.
-'''          Debug.Print adox.AceString
-'''      End Sub
-'''
-'''      @seealso https://support.microsoft.com/en-us/help/2874601/can-t-use-the-access-odbc-driver-or-oledb-provider-outside-office-clic
-'''      @seealso https://support.microsoft.com/ja-jp/help/2874601/can-t-use-the-access-odbc-driver-or-oledb-provider-outside-office-clic
-'''
-'''      Install Ace Engine
-'''      Microsoft Access Database Engine 2016 Redistributable
-'''      https://www.microsoft.com/en-us/download/details.aspx?id=54920
-'''
-'''      Is's OK whichever program
-'''          AccessDatabaseEngine.exe
-'''          AccessDatabaseEngine_X64.exe
-'''      because VBA see just the following place.
-'''          \HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Microsoft.ACE.OLEDB.xx.0
-
-
+''' AdoEx.cls
+''' written by callmekohei(twitter at callmekohei)
+''' MIT license
 Option Explicit
+Option Compare Text
+Option Base 0
 
 Public Enum CursorTypeEnum
     adOpenUnspecified = -1
@@ -107,43 +53,36 @@ Private Con_  As Object 'Is ADODB.Connection
 Private dbEngine_ As String
 
 Private Sub Class_Initialize()
-
     Set Con_ = CreateObject("ADODB.Connection")
-    dbEngine_ = AceString()
-    If dbEngine_ = "" Then dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
-
+    dbEngine_ = Ace
 End Sub
 
 Private Sub Class_Terminate()
-
     Class_TerminateImpl
-
 End Sub
 
 Private Sub Class_TerminateImpl()
-
     On Error Resume Next
     Con_.Close
     Set Con_ = Nothing
-
 End Sub
 
-Public Sub Init(ByVal dbType As dbTypeEnum, Optional ByVal fpath As String = "", Optional isTableHeader As Boolean = True)
+Public Sub init(ByVal dbType As dbTypeEnum, Optional ByVal fPath As String = "", Optional isTableHeader As Boolean = True)
 
     ''' File path is current excel book if not specify.
-    If fpath = "" Then
+    If fPath = "" Then
         If dbType = dbAccess Then Err.Raise 76 ''' Path not found
-        fpath = ThisWorkbook.Path & "\" & ThisWorkbook.Name
+        fPath = ThisWorkbook.Path & "\" & ThisWorkbook.Name
     Else
-        fpath = fpath
+        fPath = fPath
     End If
 
     ''' Table header is default yes.
     Dim tableHeader As String: tableHeader = IIf(isTableHeader, "HDR=YES", "HDR=NO")
 
     ''' File extension
-    Dim fso As Object: Set fso = CreateObject("Scripting.FileSystemObject")
-    Dim fileExt As String: fileExt = LCase(fso.GetExtensionName(fpath))
+    Dim Fso As Object: Set Fso = CreateObject("Scripting.FileSystemObject")
+    Dim fileExt As String: fileExt = LCase(Fso.GetExtensionName(fPath))
 
     ''' I can't understand following. But real is real. :-(
     If fileExt = "dbf" Then dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
@@ -185,20 +124,20 @@ Public Sub Init(ByVal dbType As dbTypeEnum, Optional ByVal fpath As String = "",
         Case 0: ''' DBF
 
             Con_.Provider = dbEngine_
-            Con_.Properties("Data Source") = fso.GetParentFolderName(fpath)
+            Con_.Properties("Data Source") = Fso.GetParentFolderName(fPath)
             Con_.Properties("Extended Properties") = Join(Array("dBASE IV"), ";")
             Con_.Open
 
         Case 1: ''' Access
 
             Con_.Provider = dbEngine_
-            Con_.Properties("Data Source") = fpath
+            Con_.Properties("Data Source") = fPath
             Con_.Open
 
         Case 2: ''' Text
 
             Con_.Provider = dbEngine_
-            Con_.Properties("Data Source") = fso.GetParentFolderName(fpath)
+            Con_.Properties("Data Source") = Fso.GetParentFolderName(fPath)
             If fileExt = "csv" Then
                 Con_.Properties("Extended Properties") = Join(Array("TEXT", tableHeader, "FMT=Delimited"), ";")
             Else
@@ -211,7 +150,7 @@ Public Sub Init(ByVal dbType As dbTypeEnum, Optional ByVal fpath As String = "",
             Dim dbTypeExcel As String
             Select Case fileExt
                 Case "xls" ''' Excel5.0/95 Workbook(*.xls) or Excel97-2003 WorkBook(*.xls)
-                    If InStr(fso.getfile(fpath).Type, 95) Then
+                    If InStr(Fso.getfile(fPath).Type, 95) Then
                         dbTypeExcel = "Excel 5.0"
                     Else
                         dbTypeExcel = "Excel 8.0"
@@ -225,7 +164,7 @@ Public Sub Init(ByVal dbType As dbTypeEnum, Optional ByVal fpath As String = "",
             End Select
 
             Con_.Provider = dbEngine_
-            Con_.Properties("Data Source") = fpath
+            Con_.Properties("Data Source") = fPath
             Con_.Properties("Extended Properties") = Join(Array(dbTypeExcel, tableHeader), ";")
             Con_.Open
 
@@ -250,26 +189,26 @@ End Sub
 
 ''' @param sql As String
 ''' @return As Variant(Of Array(Of T, T))
-Public Function Select_(ByVal sql As String, _
+Public Function ArraySelect(ByVal sql As String, _
     Optional ByVal propCursorType As CursorTypeEnum = adOpenStatic, _
     Optional ByVal propLockType As LockTypeEnum = adLockReadOnly, _
     Optional ByVal propCommandType As CommandTypeEnum = adCmdText _
     ) As Variant
 
     Dim rcds As Object: Set rcds = CreateObject("ADODB.Recordset")
-    rcds.Open Source:=sql, ActiveConnection:=Con_, CursorType:=propCursorType, LockType:=propLockType, Options:=propCommandType
+    rcds.Open Source:=sql, ActiveConnection:=Con_, CursorType:=propCursorType, LockType:=propLockType, options:=propCommandType
 
     ''' Table header names
-    Dim fieldsCnt As Long: fieldsCnt = rcds.Fields.Count
+    Dim fieldsCnt As Long: fieldsCnt = rcds.fields.Count
     Dim tableHeaderNamesArray() As String: ReDim tableHeaderNamesArray(fieldsCnt - 1)
 
     Dim idx As Long
     For idx = 0 To (fieldsCnt - 1)
-        tableHeaderNamesArray(idx) = rcds.Fields.Item(idx).Name
+        tableHeaderNamesArray(idx) = rcds.fields.Item(idx).Name
     Next idx
 
     ''' array( array( Table Names ),  array( Table Values ) )
-    Select_ = Array(tableHeaderNamesArray, Arr2DToJagArr(ArrTranspose(rcds.GetRows())))
+    ArraySelect = Array(tableHeaderNamesArray, Arr2DToJagArr(ArrayTranspose(rcds.GetRows())))
 
     On Error Resume Next
     If Not rcds Is Nothing Then rcds.Close
@@ -279,31 +218,55 @@ End Function
 
 ''' @param sql As String
 ''' @return As Long
-Public Function Execute(ByVal sql As String) As Long
-    Dim rcdNumbers As Long
-    Con_.Execute sql, ARecNum
-    Execute = rcdNumbers
+'Public Function Execute(ByVal sql As String) As Long
+'    Dim rcdNumbers As Long
+'    Con_.Execute sql, ARecNum
+'    Execute = rcdNumbers
+'End Function
+
+'Public Sub BeginTrans()
+'    cn.BeginTrans
+'End Sub
+'
+'Public Sub CommitTrans()
+'    Con_.CommitTrans
+'End Sub
+'
+'Public Sub RollbackTrans()
+'    cn.RollbackTrans
+'End Sub
+
+
+''' ----- Utility functions
+
+Public Sub CopyFromRecordset(ByVal sql As String, ByVal rng As Range)
+
+    Dim rcds As Object: Set rcds = CreateObject("ADODB.Recordset")
+    rcds.Open Source:=sql, ActiveConnection:=Con_, CursorType:=adOpenStatic, LockType:=adLockReadOnly, options:=adCmdText
+
+    If rcds.EOF Then
+        Debug.Print "No Date!: " & Now()
+        GoTo Escape
+    End If
+
+    rng.CopyFromRecordset rcds
+
+Escape:
+    If Not rcds Is Nothing Then rcds.Close
+    Set rcds = Nothing
+End Sub
+
+Public Function Ace() As String
+    Dim s As String
+    s = AceDirect
+    If s = "" Then s = AceOffice32ClickToRun
+    If s = "" Then s = AceClickToRunOffice32
+    If s = "" Then s = "Microsoft.Jet.OLEDB.4.0"
+    Ace = s
 End Function
 
-Public Sub BeginTrans()
-    cn.BeginTrans
-End Sub
-
-Public Sub CommitTrans()
-    Con_.CommitTrans
-End Sub
-
-Public Sub RollbackTrans()
-    cn.RollbackTrans
-End Sub
-
-''' --------------------------------------------------------
-'''                      Util Functions
-''' --------------------------------------------------------
-
-''' @param reg As Object Is SWbemObjectEx
-''' @return As String
-Public Function AceString() As String
+''' direct driver
+Private Function AceDirect() As String
 
     ''' The Ace Engine is the same place whether it is 32 bit OS or 64 bit OS
     ''' HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Microsoft.ACE.OLEDB.xx.0
@@ -318,12 +281,12 @@ Public Function AceString() As String
     Const Ace13 As String = "SOFTWARE\Classes\Microsoft.ACE.OLEDB.13.0"
     Const Ace12 As String = "SOFTWARE\Classes\Microsoft.ACE.OLEDB.12.0"
 
-    Dim v As Variant, SubKey As Variant
+    Dim v As Variant, subkey As Variant
     For Each v In Array(Ace16, Ace15, Ace14, Ace13, Ace12)
-        stdRegProv.EnumKey HKLM, v, SubKey
-        If Not IsNull(SubKey) Then
+        stdRegProv.EnumKey HKLM, v, subkey
+        If Not IsNull(subkey) Then
             Dim arr As Variant: arr = Split(v, "\")
-            AceString = arr(UBound(arr, 1))
+            AceDirect = arr(UBound(arr, 1))
             GoTo Escape
         End If
     Next v
@@ -334,21 +297,83 @@ Escape:
     Set stdRegProv = Nothing
 End Function
 
-''' @param sql As String
-''' @param rng As Range
-Public Sub CopyFromRecordset(ByVal sql As String, ByVal rng As Range)
+''' under office driver ( 64bit win, 32bit office )
+Private Function AceOffice32ClickToRun() As String
 
-    Dim rcds As Object: Set rcds = CreateObject("ADODB.Recordset")
-    rcds.Open Source:=sql, ActiveConnection:=Con_, CursorType:=adOpenStatic, LockType:=adLockReadOnly, Options:=adCmdText
+    On Error GoTo Escape
 
-    If rcds.EOF Then
-        Debug.Print "No Date!: " & Now()
-        GoTo Escape
-    End If
+    Const strComputer As String = "."
 
-    rng.CopyFromRecordset rcds
+    ''' Context Flags
+    ''' https://docs.microsoft.com/en-us/windows/desktop/WmiSdk/requesting-wmi-data-on-a-64-bit-platform#context-flags
+    Dim wmiCtx As Object: Set wmiCtx = CreateObject("WbemScripting.SWbemNamedValueSet")
+    wmiCtx.Add "__ProviderArchitecture", 64
+    wmiCtx.Add "__RequiredArchitecture", True
+
+    Dim wmi        As Object: Set wmi = CreateObject("Wbemscripting.SWbemLocator")
+    Dim wmiSrv     As Object: Set wmiSrv = wmi.ConnectServer(strComputer, "root\default", "", "", , , , wmiCtx)
+    Dim stdRegProv As Object: Set stdRegProv = wmiSrv.Get("StdRegProv")
+
+    Const HKEY_LOCAL_MACHINE  As Long = &H80000002
+
+    Dim v, officeVersionArray, clct As Collection: Set clct = New Collection
+    stdRegProv.EnumKey HKEY_LOCAL_MACHINE, "SOFTWARE\Microsoft\Office\", officeVersionArray
+    For Each v In ArrayRegexFilter(officeVersionArray, "\d\d\.\d")
+        clct.Add "SOFTWARE\Microsoft\Office\" & v & "\ClickToRun\REGISTRY\MACHINE\Software\Classes\"
+    Next v
+
+    Dim subkey, i As Long, j As Long
+    For i = 9 To 0 Step -1
+        For j = 1 To clct.Count
+            stdRegProv.EnumKey HKEY_LOCAL_MACHINE, clct.Item(j) & "Microsoft.ACE.OLEDB.1" & i & ".0", subkey
+            If Not IsNull(subkey) Then
+                AceOffice32ClickToRun = "Microsoft.ACE.OLEDB.1" & i & ".0"
+                GoTo Escape:
+            End If
+        Next j
+    Next i
 
 Escape:
-    If Not rcds Is Nothing Then rcds.Close
-    Set rcds = Nothing
-End Sub
+    Set wmi = Nothing
+    Set wmiSrv = Nothing
+    Set stdRegProv = Nothing
+    Set clct = Nothing
+End Function
+
+''' under ClickToRun ( 64bit win, 32bit office )
+Private Function AceClickToRunOffice32() As String
+
+    On Error GoTo Escape
+
+    Const strComputer As String = "."
+
+    ''' Context Flags
+    ''' https://docs.microsoft.com/en-us/windows/desktop/WmiSdk/requesting-wmi-data-on-a-64-bit-platform#context-flags
+    Dim wmiCtx As Object: Set wmiCtx = CreateObject("WbemScripting.SWbemNamedValueSet")
+    wmiCtx.Add "__ProviderArchitecture", 64
+    wmiCtx.Add "__RequiredArchitecture", True
+
+    Dim wmi        As Object: Set wmi = CreateObject("Wbemscripting.SWbemLocator")
+    Dim wmiSrv     As Object: Set wmiSrv = wmi.ConnectServer(strComputer, "root\default", "", "", , , , wmiCtx)
+    Dim stdRegProv As Object: Set stdRegProv = wmiSrv.Get("StdRegProv")
+
+    Const HKEY_LOCAL_MACHINE  As Long = &H80000002
+
+    Const clicktorun As String = "SOFTWARE\Microsoft\Office\ClickToRun\REGISTRY\MACHINE\Software\Classes\"
+
+    Dim subkey, i As Long
+    For i = 9 To 0 Step -1
+        stdRegProv.EnumKey HKEY_LOCAL_MACHINE, clicktorun & "Microsoft.ACE.OLEDB.1" & i & ".0", subkey
+        If Not IsNull(subkey) Then
+            AceClickToRunOffice32 = "Microsoft.ACE.OLEDB.1" & i & ".0"
+            GoTo Escape:
+        End If
+    Next i
+
+Escape:
+    Set wmi = Nothing
+    Set wmiSrv = Nothing
+    Set stdRegProv = Nothing
+End Function
+
+
