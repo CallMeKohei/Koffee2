@@ -175,7 +175,9 @@ End Sub
 
 ### その他
 
-こんなコードあるよとか、ここもう少しこうしたらとかあったらぜひ`issue`もしくは`twitter(@callmekohei)`にお願いします
+こんなコードあるよとか、ここもう少しこうしたらとかあったら  
+ぜひ`issue`もしくは`twitter(@callmekohei)`にいただけると  
+喜びます！
 
 ### License
 
