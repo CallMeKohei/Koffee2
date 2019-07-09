@@ -70,7 +70,7 @@ Public Function CreateTextFile(ByVal aFilePath As String, ByVal aText As String)
             , overwrite:=True _
             , Unicode:=False _
         )
-        .WriteLine Now
+        .WriteLine aText
         .Close
     End With
 
