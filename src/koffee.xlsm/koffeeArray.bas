@@ -167,6 +167,48 @@ Public Function ArraySelect(ByVal dbType As dbTypeEnum, ByVal sql As String, _
 Escape:
 End Function
 
+''' ----- temporary
+
+Public Function ArrayGroupV1(ByVal arr As Variant) As Variant
+    
+    ''' value x 1
+    '''    array( array( keyA, valA ), array( keyB, valB ) )
+    ''' => array( array( keyA, keyB), array( array( valA ), array( valB ) ) )
+    
+    ''' group by
+    Dim v
+    Dim dict As Dictionary: Set dict = New Dictionary
+    Dim arrx As ArrayEx: Set arrx = New ArrayEx
+    Dim i As Long
+    For i = 0 To UBound(arr)
+        
+        If i = 0 Then
+            dict.Add arr(i)(0), ""
+            arrx.AddVal arr(i)(1)
+        ElseIf i = UBound(arr) Then
+            If arr(i)(0) = arr(i - 1)(0) Then
+                arrx.AddVal arr(i)(1)
+                dict.Item(arr(i - 1)(0)) = arrx.ToArray()
+            Else
+                dict.Item(arr(i - 1)(0)) = arrx.ToArray()
+                dict.Add arr(i)(0), arr(i)(1)
+            End If
+        ElseIf arr(i)(0) = arr(i - 1)(0) Then
+            arrx.AddVal arr(i)(1)
+        Else
+            dict.Item(arr(i - 1)(0)) = arrx.ToArray()
+            dict.Add arr(i)(0), ""
+            Set arrx = Nothing
+            Set arrx = New ArrayEx
+            arrx.AddVal arr(i)(1)
+        End If
+
+    Next i
+        
+    ArrayGroupV1 = Array(dict.Keys, dict.Items)
+    Set arrx = Nothing
+    Set dict = Nothing
+End Function
 
 ''' ----- predicated
 
