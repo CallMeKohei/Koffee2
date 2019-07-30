@@ -151,6 +151,48 @@ Public Function ArrayRemoveEmpties(ByVal aSourceArray As Variant) As Variant
     ArrayRemoveEmpties = arrx.ToArray
     Set arrx = Nothing
 End Function
+                                        
+Public Function ArrayWindow(ByVal arr As Variant, ByVal divisionNumber As Long) As Variant
+
+    If Not IsArray(arr) Then Err.Raise 13
+    If ArrLen(arr) < 0 Then Err.Raise 13
+    If divisionNumber < 0 Then Err.Raise 13
+    If divisionNumber = 0 Then ArrayWindow = arr: GoTo Ending
+    If divisionNumber = 1 Then ArrayWindow = arr: GoTo Ending
+    If ArrLen(arr) / divisionNumber <= 1 Then ArrayWindow = arr: GoTo Ending
+
+    Dim total As Long: total = ArrLen(arr)
+    Dim groupingNumber As Long: groupingNumber = total / divisionNumber
+    
+    If (ArrLen(arr) Mod groupingNumber) = 0 Then
+        ArrayWindow = ArrayWindowImpl(arr, groupingNumber)
+    Else
+        Dim fstArray(): fstArray = ArrSlice(arr, 0, groupingNumber)
+        Dim rstArray(): rstArray = ArrayWindowImpl(ArrSlice(arr, groupingNumber + 1), groupingNumber)
+        ArrayWindow = ArrConcat(Array(fstArray), rstArray)
+    End If
+
+Ending:
+End Function
+
+Private Function ArrayWindowImpl(ByVal arr As Variant, ByVal n As Long) As Variant
+
+    Dim arrx As ArrayEx: Set arrx = New ArrayEx
+
+    Dim i As Long
+    For i = 0 To UBound(arr) Step n
+        If UBound(arr) - i < n Then
+            arrx.AddVal ArrSlice(arr, i)
+        Else
+            arrx.AddVal ArrSlice(arr, i, i + (n - 1))
+        End If
+    Next i
+    
+    ArrayWindowImpl = arrx.ToArray
+    Set arrx = Nothing
+
+Ending:
+End Function
 
 ''' This function is helper function for AdoEx class.
 Public Function ArraySelect(ByVal dbType As dbTypeEnum, ByVal sql As String, _
