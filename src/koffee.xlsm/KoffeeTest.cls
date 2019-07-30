@@ -173,6 +173,17 @@ Public Sub ArrayRemoveEmpties_Test()
     Assert.AreEqualArr Array(1, 2, 4, 5), ArrayRemoveEmpties(ary)
 End Sub
 
+Public Sub ArrayWindow_Test()
+    Dim arr(): arr = Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    Assert.AreEqualArr Array(1, 2, 3, 4), ArrayWindow(arr, 3)(0)
+    
+    Dim ary(): ary = Array(1, 2, 3, 4, 5, 6, 7, 8, 9)
+    Assert.AreEqualArr Array(1, 2, 3), ArrayWindow(ary, 3)(0)
+    
+    Assert.AreEqualArr Array(1, 2, 3), ArrayWindow(Array(1, 2, 3), 1)
+    Assert.AreEqualArr Array(1, 2, 3), ArrayWindow(Array(1, 2, 3), 99)
+End Sub
+
 
 ''' ----- koffeeExcel test
 
@@ -740,13 +751,13 @@ End Sub
 Public Sub Hankaku_Test()
 
     Dim ws As Worksheet: Set ws = AddSheet("myTestTemporarySheet")
-    ws.Range("A1").Value = "ƒAƒCƒEƒGƒI"
-    ws.Range("A2").Value = "‚`‚a‚b‚c‚d"
-    ws.Range("A3").Value = "‚P‚Q‚R‚S‚T"
+    ws.Range("A1").Value = "ã‚¢ã‚¤ã‚¦ã‚¨ã‚ª"
+    ws.Range("A2").Value = "ï¼¡ï¼¢ï¼£ï¼¤ï¼¥"
+    ws.Range("A3").Value = "ï¼‘ï¼’ï¼“ï¼”ï¼•"
 
     Hankaku ws
 
-    Assert.AreEqual "±²³´µ", ws.Range("A1").Value
+    Assert.AreEqual "ï½±ï½²ï½³ï½´ï½µ", ws.Range("A1").Value
     Assert.AreEqual "ABCDE", ws.Range("A2").Value
     Assert.AreEqual 12345#, ws.Range("A3").Value
 
