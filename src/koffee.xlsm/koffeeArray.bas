@@ -151,46 +151,45 @@ Public Function ArrayRemoveEmpties(ByVal aSourceArray As Variant) As Variant
     ArrayRemoveEmpties = arrx.ToArray
     Set arrx = Nothing
 End Function
-                                        
-Public Function ArrayWindow(ByVal arr As Variant, ByVal divisionNumber As Long) As Variant
+               
+Public Function ArrayWindow(ByVal arr As Variant, ByVal GroupN As Long) As Variant
 
+    ''' guard
     If Not IsArray(arr) Then Err.Raise 13
-    If ArrLen(arr) < 0 Then Err.Raise 13
-    If divisionNumber < 0 Then Err.Raise 13
-    If divisionNumber = 0 Then ArrayWindow = arr: GoTo Ending
-    If divisionNumber = 1 Then ArrayWindow = arr: GoTo Ending
-    If ArrLen(arr) / divisionNumber <= 1 Then ArrayWindow = arr: GoTo Ending
-
-    Dim total As Long: total = ArrLen(arr)
-    Dim groupingNumber As Long: groupingNumber = total / divisionNumber
+    If ArrRank(arr) > 1 Then Err.Raise 13
+    If LBound(arr) < 0 Then Err.Raise 13
+    If GroupN < 0 Then Err.Raise 13
+    If GroupN = 0 Then ArrayWindow = arr: GoTo Ending
+    If GroupN = 1 Then ArrayWindow = arr: GoTo Ending
+    If (UBound(arr) + 1) / GroupN <= 1 Then ArrayWindow = arr: GoTo Ending
     
-    If (ArrLen(arr) Mod groupingNumber) = 0 Then
-        ArrayWindow = ArrayWindowImpl(arr, groupingNumber)
-    Else
-        Dim fstArray(): fstArray = ArrSlice(arr, 0, groupingNumber)
-        Dim rstArray(): rstArray = ArrayWindowImpl(ArrSlice(arr, groupingNumber + 1), groupingNumber)
-        ArrayWindow = ArrConcat(Array(fstArray), rstArray)
-    End If
-
-Ending:
-End Function
-
-Private Function ArrayWindowImpl(ByVal arr As Variant, ByVal n As Long) As Variant
-
-    Dim arrx As ArrayEx: Set arrx = New ArrayEx
-
+    Dim groupElm As Long: groupElm = Int(ArrLen(arr) / GroupN)
+    Dim rest As Long: rest = ArrLen(arr) Mod GroupN
+    
+    ''' simple divison
+    Dim groupElmArray(): groupElmArray = Array(): ReDim groupElmArray(0 To GroupN - 1)
     Dim i As Long
-    For i = 0 To UBound(arr) Step n
-        If UBound(arr) - i < n Then
-            arrx.AddVal ArrSlice(arr, i)
-        Else
-            arrx.AddVal ArrSlice(arr, i, i + (n - 1))
-        End If
+    For i = 0 To GroupN - 1
+        groupElmArray(i) = groupElm
     Next i
     
-    ArrayWindowImpl = arrx.ToArray
-    Set arrx = Nothing
-
+    ''' add weight 1 ( modula always takes 0 .. n - 1 )
+    If Not rest = 0 Then
+        Dim j As Long
+        For j = 0 To rest - 1
+            groupElmArray(j) = groupElmArray(j) + 1
+        Next j
+    End If
+    
+    Dim ary(): ary = Array(): ReDim ary(0 To GroupN - 1)
+    Dim k As Long, acc_idx As Long
+    For k = 0 To UBound(groupElmArray)
+        ary(k) = ArrSlice(arr, acc_idx, acc_idx + groupElmArray(k) - 1)
+        acc_idx = acc_idx + groupElmArray(k)
+    Next k
+    
+    ArrayWindow = ary
+    
 Ending:
 End Function
 
