@@ -174,14 +174,21 @@ Public Sub ArrayRemoveEmpties_Test()
 End Sub
 
 Public Sub ArrayWindow_Test()
+    
+    Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf ArrayWindow, vbVariant, vbVariant), Array(Array(1, 2, 3), -99)
+    Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf ArrayWindow, vbVariant, vbVariant), Array(Array(1, 2, 3), 0)
+    Assert.AreEqualArr Array(1, 2, 3), ArrayWindow(Array(1, 2, 3), 1)(0)
+    Assert.AreEqualArr Array(2), ArrayWindow(Array(1, 2, 3), 99)(1)
+    
     Dim arr(): arr = Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    
+    Assert.AreEqualArr Array(1, 2, 3, 4, 5), ArrayWindow(arr, 2)(0)
+    Assert.AreEqualArr Array(6, 7, 8, 9, 10), ArrayWindow(arr, 2)(1)
+    
     Assert.AreEqualArr Array(1, 2, 3, 4), ArrayWindow(arr, 3)(0)
-    
-    Dim ary(): ary = Array(1, 2, 3, 4, 5, 6, 7, 8, 9)
-    Assert.AreEqualArr Array(1, 2, 3), ArrayWindow(ary, 3)(0)
-    
-    Assert.AreEqualArr Array(1, 2, 3), ArrayWindow(Array(1, 2, 3), 1)
-    Assert.AreEqualArr Array(1, 2, 3), ArrayWindow(Array(1, 2, 3), 99)
+    Assert.AreEqualArr Array(5, 6, 7), ArrayWindow(arr, 3)(1)
+    Assert.AreEqualArr Array(8, 9, 10), ArrayWindow(arr, 3)(2)
+
 End Sub
 
 
