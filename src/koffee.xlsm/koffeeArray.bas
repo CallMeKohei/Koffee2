@@ -152,40 +152,65 @@ Public Function ArrayRemoveEmpties(ByVal aSourceArray As Variant) As Variant
     Set arrx = Nothing
 End Function
                
-Public Function ArrayWindow(ByVal arr As Variant, ByVal GroupN As Long) As Variant
+Public Function ArrayWindow(ByVal arr As Variant, ByVal GroupN As Variant) As Variant
+
+    ' Array(1..10) divided by 3
+    ' -------------------------
+    ' => Array(1%, 2%, 3%, 4%)
+    ' => Array(5%, 6%, 7%)
+    ' => Array(8%, 9%, 10%)
+    
+    ''' dependence: ariawase Core.ArrSlice
+    
 
     ''' guard
     If Not IsArray(arr) Then Err.Raise 13
     If ArrRank(arr) > 1 Then Err.Raise 13
     If LBound(arr) < 0 Then Err.Raise 13
-    If GroupN < 0 Then Err.Raise 13
-    If GroupN = 0 Then ArrayWindow = arr: GoTo Ending
-    If GroupN = 1 Then ArrayWindow = arr: GoTo Ending
-    If (UBound(arr) + 1) / GroupN <= 1 Then ArrayWindow = arr: GoTo Ending
     
-    Dim groupElm As Long: groupElm = Int(ArrLen(arr) / GroupN)
+    ''' guard2( GroupN )
+    Select Case GroupN
+        Case Is <= 0: Err.Raise 13
+        Case Is = 1:  ArrayWindow = Array(arr): GoTo Ending
+        Case Is >= (UBound(arr) + 1)
+            Dim tmpArray(): tmpArray = Array(): ReDim tmpArray(0 To UBound(arr))
+            Dim idx As Long
+            For idx = 0 To UBound(arr)
+                tmpArray(idx) = Array(arr(idx))
+            Next idx
+            ArrayWindow = tmpArray
+            GoTo Ending
+        Case Else
+            GoTo ArrayWindowImpl
+    End Select
+   
+   
+ArrayWindowImpl:
+
+    Dim groupIndex As Long: groupIndex = Int(ArrLen(arr) / GroupN)
     Dim rest As Long: rest = ArrLen(arr) Mod GroupN
     
-    ''' simple divison
-    Dim groupElmArray(): groupElmArray = Array(): ReDim groupElmArray(0 To GroupN - 1)
+    ''' simple divison : e.g. 8 / 3 => array(2,2,2)
+    Dim groupIndexArray(): groupIndexArray = Array(): ReDim groupIndexArray(0 To GroupN - 1)
     Dim i As Long
     For i = 0 To GroupN - 1
-        groupElmArray(i) = groupElm
+        groupIndexArray(i) = groupIndex
     Next i
     
-    ''' add weight 1 ( modula always takes 0 .. n - 1 )
+    ''' add weight 1 : e.g. 8 / 3 => array(3,3,2)
     If Not rest = 0 Then
         Dim j As Long
         For j = 0 To rest - 1
-            groupElmArray(j) = groupElmArray(j) + 1
+            groupIndexArray(j) = groupIndexArray(j) + 1
         Next j
     End If
     
+    ''' slice array by group index
     Dim ary(): ary = Array(): ReDim ary(0 To GroupN - 1)
     Dim k As Long, acc_idx As Long
-    For k = 0 To UBound(groupElmArray)
-        ary(k) = ArrSlice(arr, acc_idx, acc_idx + groupElmArray(k) - 1)
-        acc_idx = acc_idx + groupElmArray(k)
+    For k = 0 To UBound(groupIndexArray)
+        ary(k) = Core.ArrSlice(arr, acc_idx, acc_idx + groupIndexArray(k) - 1)
+        acc_idx = acc_idx + groupIndexArray(k)
     Next k
     
     ArrayWindow = ary
