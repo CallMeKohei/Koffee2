@@ -191,7 +191,7 @@ ArrayWindowImpl:
     Dim rest As Long: rest = ArrLen(arr) Mod GroupN
     
     ''' simple divison : e.g. 8 / 3 => array(2,2,2)
-    Dim groupIndexArray(): groupIndexArray = Array(): ReDim groupIndexArray(0 To GroupN - 1)
+    Dim groupIndexArray: groupIndexArray = Array(): ReDim groupIndexArray(0 To GroupN - 1)
     Dim i As Long
     For i = 0 To GroupN - 1
         groupIndexArray(i) = groupIndex
@@ -206,7 +206,7 @@ ArrayWindowImpl:
     End If
     
     ''' slice array by group index
-    Dim ary(): ary = Array(): ReDim ary(0 To GroupN - 1)
+    Dim ary: ary = Array(): ReDim ary(0 To GroupN - 1)
     Dim k As Long, acc_idx As Long
     For k = 0 To UBound(groupIndexArray)
         ary(k) = Core.ArrSlice(arr, acc_idx, acc_idx + groupIndexArray(k) - 1)
