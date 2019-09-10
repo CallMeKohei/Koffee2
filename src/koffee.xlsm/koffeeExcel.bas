@@ -7,7 +7,6 @@ Option Compare Text
 Option Private Module
 Option Base 0
 
-
 ''' ----- Workbook
 
 Public Function CreateWorkBook(ByVal FilePath As String, Optional isReadOnly As Boolean = True) As Workbook
@@ -74,9 +73,6 @@ End Function
 ''' DeleteSheet "abc"
 Public Sub DeleteSheet(ByVal SheetName As String, Optional ByVal Wb As Workbook = Nothing)
 
-    ''' ( Usage )
-
-
     If TypeName(Wb) = "Nothing" Then Set Wb = Application.ThisWorkbook
 
     If Not ExistsSheet(SheetName, Wb) Then GoTo Catch
@@ -97,7 +93,7 @@ End Sub
 Public Function AddSheet(ByVal SheetName As String, Optional ByVal Wb As Workbook = Nothing) As Worksheet
     If TypeName(Wb) = "Nothing" Then Set Wb = Application.ThisWorkbook
     If ExistsSheet(SheetName, Wb) Then GoTo Catch
-    Wb.Worksheets.Add(after:=Worksheets(Wb.Worksheets.Count)).Name = SheetName
+    Wb.Worksheets.add(after:=Worksheets(Wb.Worksheets.Count)).Name = SheetName
     Set AddSheet = Wb.Worksheets(SheetName)
     GoTo Escape
 Catch:
@@ -180,30 +176,33 @@ End Function
 
 ''' ----- Cells(Ranges)
 
-Public Function GetVal(ByVal rng As Range, Optional isVertical As Boolean = False) As Variant
+Public Function GetVal(ByRef rng As Range, Optional isVertical As Boolean = False)
+    Dim arr
+    sGetVal rng, arr, isVertical
+    GetVal = arr
+End Function
+
+Public Function sGetVal(ByRef rng As Range, ByRef tmp As Variant, Optional isVertical As Boolean = False)
 
     Dim arr As Variant: arr = rng.Value
 
     If Not IsArray(arr) Then
-        GetVal = Array(Array(arr))
+        tmp = Array(Array(arr))
         GoTo Ending
     End If
 
     If isVertical Then
-        arr = ArrayTranspose(arr)
-        ReDim Preserve arr(1 To UBound(arr, 1), 0 To UBound(arr, 2) - 1)
-        arr = Core.Arr2DToJagArr(arr)
-        ReDim Preserve arr(0 To UBound(arr) - 1)
-        GetVal = arr
+        Dim tmptmp()
+        sArrayTransposeLet arr, tmptmp
+        sArray2DToJagArrayLet tmptmp, tmp
     Else
-        ArrayBase0_2ndDimension arr
-        GetVal = arr
+        sArray2DToJagArrayLet arr, tmp
     End If
 
 Ending:
 End Function
 
-Public Sub PutVal(ByVal arr As Variant, ByVal rng As Range, Optional isVertical As Boolean = False)
+Public Sub PutVal(ByRef arr As Variant, ByRef rng As Range, Optional isVertical As Boolean = False)
 
     If IsObject(arr) Then Err.Raise 13
 
@@ -213,24 +212,29 @@ Public Sub PutVal(ByVal arr As Variant, ByVal rng As Range, Optional isVertical 
         arr = tmp
     End If
 
-    If ArrRank(arr) >= 3 Then Err.Raise 13
+    If ArrayRank(arr) >= 3 Then Err.Raise 13
 
     ''' 1D array to 2D array
-    If ArrRank(arr) = 1 Then
+    If ArrayRank(arr) = 1 Then
+        Dim tmpArr
         If IsJaggedArray(arr) Then
-            arr = JagArrToArr2D(arr)
+            JagArrayToArray2DLet arr, tmpArr
         Else
-            arr = JagArrToArr2D(Array(arr))
+            JagArrayToArray2DLet Array(arr), tmpArr
         End If
+        
+        PutValImpl tmpArr, rng, isVertical
+    
+    Else
+        PutValImpl arr, rng, isVertical
     End If
 
-    PutValImpl arr, rng, isVertical
 
 End Sub
 
-Private Sub PutValImpl(ByVal arr2D As Variant, ByVal rng As Range, Optional isVertical As Boolean = False)
+Private Sub PutValImpl(ByRef arr2D As Variant, ByRef rng As Range, Optional isVertical As Boolean = False)
 
-    If Not ArrRank(arr2D) = 2 Then Err.Raise 13
+    If Not ArrayRank(arr2D) = 2 Then Err.Raise 13
 
     If isVertical Then
         ''' Minimum index Excel's Array is 1
@@ -254,7 +258,7 @@ Public Function LastRow(ByVal rng As Range, Optional toDown As Boolean = False) 
     If toDown Then
         LastRow = rng.End(xlDown).row
     Else
-        LastRow = rng.Worksheet.Cells(rng.Worksheet.rows.Count, rng.Column).End(xlUp).row
+        LastRow = rng.Worksheet.Cells(rng.Worksheet.Rows.Count, rng.Column).End(xlUp).row
     End If
 End Function
 

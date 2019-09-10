@@ -7,7 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-''' AdoEx.cls
+'    Const strComputer As String = "."
 ''' written by callmekohei(twitter at callmekohei)
 ''' MIT license
 Option Explicit
@@ -54,7 +54,7 @@ Private dbEngine_ As String
 
 Private Sub Class_Initialize()
     Set Con_ = CreateObject("ADODB.Connection")
-    dbEngine_ = Ace
+'    dbEngine_ = Ace
 End Sub
 
 Private Sub Class_Terminate()
@@ -67,125 +67,257 @@ Private Sub Class_TerminateImpl()
     Set Con_ = Nothing
 End Sub
 
-Public Sub init(ByVal dbType As dbTypeEnum, Optional ByVal fPath As String = "", Optional isTableHeader As Boolean = True)
-
-    ''' File path is current excel book if not specify.
-    If fPath = "" Then
-        If dbType = dbAccess Then Err.Raise 76 ''' Path not found
-        fPath = ThisWorkbook.Path & "\" & ThisWorkbook.Name
-    Else
-        fPath = fPath
-    End If
-
-    ''' Table header is default yes.
-    Dim tableHeader As String: tableHeader = IIf(isTableHeader, "HDR=YES", "HDR=NO")
-
-    ''' File extension
-    Dim Fso As Object: Set Fso = CreateObject("Scripting.FileSystemObject")
-    Dim fileExt As String: fileExt = LCase(Fso.GetExtensionName(fPath))
-
-    ''' I can't understand following. But real is real. :-(
-    If fileExt = "dbf" Then dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
-    If fileExt = "mdb" Then dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
-    If fileExt = "txt" Then dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
-    If fileExt = "csv" Then dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
-    If fileExt = "xls" Then dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
-
-    Dim Jet As Variant: Jet = Array( _
-          "dbf" _
-        , "mdb" _
-        , "txt", "csv" _
-        , "xls" _
-    )
-
-    Dim Ace As Variant: Ace = Array( _
-          "dbf", "ndx", "mdx" _
-        , "mdb", "accdb" _
-        , "txt", "csv" _
-        , "xls", "xlsx", "xlsm", "xlsb" _
-    )
-
-    ''' check for readable file type
-    Dim xs As Variant, xFlag As Boolean
-    If dbEngine_ = "Microsoft.Jet.OLEDB.4.0" Then
-        For Each xs In Jet
-            If xs = fileExt Then xFlag = True
-        Next
-        If xFlag = False Then GoTo Catch
-    Else
-        For Each xs In Ace
-            If xs = fileExt Then xFlag = True
-        Next
-        If xFlag = False Then GoTo Catch
-    End If
-
-    Select Case dbType
-
-        Case 0: ''' DBF
-
-            Con_.Provider = dbEngine_
-            Con_.Properties("Data Source") = Fso.GetParentFolderName(fPath)
-            Con_.Properties("Extended Properties") = Join(Array("dBASE IV"), ";")
-            Con_.Open
-
-        Case 1: ''' Access
-
-            Con_.Provider = dbEngine_
-            Con_.Properties("Data Source") = fPath
-            Con_.Open
-
-        Case 2: ''' Text
-
-            Con_.Provider = dbEngine_
-            Con_.Properties("Data Source") = Fso.GetParentFolderName(fPath)
-            If fileExt = "csv" Then
-                Con_.Properties("Extended Properties") = Join(Array("TEXT", tableHeader, "FMT=Delimited"), ";")
-            Else
-                Con_.Properties("Extended Properties") = Join(Array("TEXT", tableHeader), ";")
-            End If
-            Con_.Open
-
-        Case 3: ''' Excel
-
-            Dim dbTypeExcel As String
-            Select Case fileExt
-                Case "xls" ''' Excel5.0/95 Workbook(*.xls) or Excel97-2003 WorkBook(*.xls)
-                    If InStr(Fso.getfile(fPath).Type, 95) Then
-                        dbTypeExcel = "Excel 5.0"
-                    Else
-                        dbTypeExcel = "Excel 8.0"
-                    End If
-                Case "xlsb" ''' Excel binary Workbook(*.xlsb)
-                    dbTypeExcel = "Excel 12.0"
-                Case "xlsm" ''' Excel Macro-Enabled Wrokbook(*.xlsm)
-                    dbTypeExcel = "Excel 12.0 Macro"
-                Case "xlsx" ''' Excel Workbook(*.xlsx)
-                    dbTypeExcel = "Excel 12.0 Xml"
-            End Select
-
-            Con_.Provider = dbEngine_
-            Con_.Properties("Data Source") = fPath
-            Con_.Properties("Extended Properties") = Join(Array(dbTypeExcel, tableHeader), ";")
-            Con_.Open
-
-    End Select
-
-    GoTo Escape
-
-Catch:
-
-    Class_TerminateImpl
-
-    If dbEngine_ = "Microsoft.Jet.OLEDB.4.0" Then
-        Debug.Print "(AdoEX/Init) Jet can not read file. Please check file extension"
-        Err.Raise 9999, , "(AdoEX/Init) Jet can not read file. Please check file extension"
-    Else
-        Debug.Print "(AdoEX/Init) Ace can not read file. Please check file extension"
-        Err.Raise 9999, , "(AdoEX/Init) Ace can not read file. Please check file extension"
-    End If
-
-Escape:
+Public Sub InitCSV(ByVal aFolderPath As String)
+    Con_.Provider = "Microsoft.Jet.OLEDB.4.0"
+    Con_.Properties("Data Source") = aFolderPath
+    Con_.Properties("Extended Properties") = Join(Array("TEXT", "HDR=NO", "FMT=Delimited"), ";")
+    Con_.Open
 End Sub
+
+Public Sub InitCSVHeader(ByVal aFolderPath As String)
+    Con_.Provider = "Microsoft.Jet.OLEDB.4.0"
+    Con_.Properties("Data Source") = aFolderPath
+    Con_.Properties("Extended Properties") = Join(Array("TEXT", "HDR=YES", "FMT=Delimited"), ";")
+    Con_.Open
+End Sub
+
+Public Sub InitText(ByVal aFolderPath As String)
+    Con_.Provider = "Microsoft.Jet.OLEDB.4.0"
+    Con_.Properties("Data Source") = aFolderPath
+    Con_.Properties("Extended Properties") = Join(Array("TEXT", "HDR=NO"), ";")
+    Con_.Open
+End Sub
+
+Public Sub InitTextHeader(ByVal aFolderPath As String)
+    Con_.Provider = "Microsoft.Jet.OLEDB.4.0"
+    Con_.Properties("Data Source") = aFolderPath
+    Con_.Properties("Extended Properties") = Join(Array("TEXT", "HDR=YES"), ";")
+    Con_.Open
+End Sub
+
+Public Sub InitAccess(ByVal aFilePath As String)
+    Con_.Provider = Ace
+    Con_.Properties("Data Source") = aFilePath
+    Con_.Open
+End Sub
+
+Public Sub InitExcel(ByVal aFilePath As String)
+
+    On Error GoTo ErrHdl
+
+    Dim fso As Object: Set fso = CreateObject("Scripting.FileSystemObject")
+
+    Dim dbTypeExcel As String
+    Select Case fso.GetExtensionName(aFilePath)
+        Case "xls"  ''' Excel5.0/95 Workbook(*.xls) or Excel97-2003 WorkBook(*.xls)
+            If InStr(fso.getFile(aFilePath).Type, 95) Then
+                dbTypeExcel = "Excel 5.0"
+            Else
+                dbTypeExcel = "Excel 8.0"
+            End If
+        Case "xlsb" ''' Excel binary Workbook(*.xlsb)
+            dbTypeExcel = "Excel 12.0"
+        Case "xlsm" ''' Excel Macro-Enabled Wrokbook(*.xlsm)
+            dbTypeExcel = "Excel 12.0 Macro"
+        Case "xlsx" ''' Excel Workbook(*.xlsx)
+            dbTypeExcel = "Excel 12.0 Xml"
+    End Select
+    
+    Con_.Provider = Ace
+    Con_.Properties("Data Source") = aFilePath
+    Con_.Properties("Extended Properties") = Join(Array(dbTypeExcel, "HDR=NO"), ";")
+    Con_.Open
+
+ErrHdl:
+    Set fso = Nothing
+End Sub
+
+Public Sub InitExcelHeader(ByVal aFilePath As String)
+
+    On Error GoTo ErrHdl
+
+    Dim fso As Object: Set fso = CreateObject("Scripting.FileSystemObject")
+
+    Dim dbTypeExcel As String
+    Select Case fso.GetExtensionName(aFilePath)
+        Case "xls"  ''' Excel5.0/95 Workbook(*.xls) or Excel97-2003 WorkBook(*.xls)
+            If InStr(fso.getFile(aFilePath).Type, 95) Then
+                dbTypeExcel = "Excel 5.0"
+            Else
+                dbTypeExcel = "Excel 8.0"
+            End If
+        Case "xlsb" ''' Excel binary Workbook(*.xlsb)
+            dbTypeExcel = "Excel 12.0"
+        Case "xlsm" ''' Excel Macro-Enabled Wrokbook(*.xlsm)
+            dbTypeExcel = "Excel 12.0 Macro"
+        Case "xlsx" ''' Excel Workbook(*.xlsx)
+            dbTypeExcel = "Excel 12.0 Xml"
+    End Select
+    
+    Con_.Provider = Ace
+    Con_.Properties("Data Source") = aFilePath
+    Con_.Properties("Extended Properties") = Join(Array(dbTypeExcel, "HDR=YES"), ";")
+    Con_.Open
+
+ErrHdl:
+    Set fso = Nothing
+End Sub
+
+
+
+
+
+
+'Public Sub Init(ByVal dbType As dbTypeEnum, Optional ByVal fPath As String = "", Optional isTableHeader As Boolean = True)
+'
+'On Error GoTo ErrHdl
+'
+'    Dim tableHeader As String: tableHeader = IIf(isTableHeader, "HDR=YES", "HDR=NO")
+'
+'    If Not dbType = dbTypeEnum.dbText Then GoTo Escape
+'    dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
+'
+'    Con_.Provider = dbEngine_
+'    Con_.Properties("Data Source") = fPath
+'    If dbType = dbCSV Then
+'        Con_.Properties("Extended Properties") = Join(Array("TEXT", tableHeader, "FMT=Delimited"), ";")
+'    Else
+'        Con_.Properties("Extended Properties") = Join(Array("TEXT", tableHeader), ";")
+'    End If
+'    Con_.Open
+'
+'    GoTo Escape
+'
+'ErrHdl:
+'    MsgBox "ÉGÉâÅ[Ç‚Ç≈"
+'
+'Escape:
+'End Sub
+
+'Public Sub Init(ByVal dbType As dbTypeEnum, Optional ByVal fPath As String = "", Optional isTableHeader As Boolean = True)
+'
+'    ''' File path is current excel book if not specify.
+''    If fPath = "" Then
+''        If dbType = dbAccess Then Err.Raise 76 ''' Path not found
+''        fPath = ThisWorkbook.Path & "\" & ThisWorkbook.Name
+''    Else
+''        fPath = fPath
+''    End If
+'
+'    ''' Table header is default yes.
+'    Dim tableHeader As String: tableHeader = IIf(isTableHeader, "HDR=YES", "HDR=NO")
+'dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
+'    ''' File extension
+''    Dim Fso As Object: Set Fso = CreateObject("Scripting.FileSystemObject")
+''    Dim fileExt As String: fileExt = LCase(Fso.GetExtensionName(fPath))
+''
+''    ''' I can't understand following. But real is real. :-(
+''    If fileExt = "dbf" Then dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
+''    If fileExt = "mdb" Then dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
+''    If fileExt = "txt" Then dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
+''    If fileExt = "csv" Then dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
+''    If fileExt = "xls" Then dbEngine_ = "Microsoft.Jet.OLEDB.4.0"
+'
+''    Dim Jet As Variant: Jet = Array( _
+''          "dbf" _
+''        , "mdb" _
+''        , "txt", "csv" _
+''        , "xls" _
+''    )
+''
+''    Dim Ace As Variant: Ace = Array( _
+''          "dbf", "ndx", "mdx" _
+''        , "mdb", "accdb" _
+''        , "txt", "csv" _
+''        , "xls", "xlsx", "xlsm", "xlsb" _
+''    )
+'
+'    ''' check for readable file type
+''    Dim xs As Variant, xFlag As Boolean
+''    If dbEngine_ = "Microsoft.Jet.OLEDB.4.0" Then
+''        For Each xs In Jet
+''            If xs = fileExt Then xFlag = True
+''        Next
+''        If xFlag = False Then GoTo Catch
+''    Else
+''        For Each xs In Ace
+''            If xs = fileExt Then xFlag = True
+''        Next
+''        If xFlag = False Then GoTo Catch
+''    End If
+'
+'    Con_.Provider = dbEngine_
+'    Con_.Properties("Data Source") = fPath
+'    Con_.Properties("Extended Properties") = Join(Array("TEXT", tableHeader, "FMT=Delimited"), ";")
+'    Con_.Open
+'
+'    Select Case dbType
+'
+'        Case 0: ''' DBF
+'
+'            Con_.Provider = dbEngine_
+'            Con_.Properties("Data Source") = fso.GetParentFolderName(fPath)
+'            Con_.Properties("Extended Properties") = Join(Array("dBASE IV"), ";")
+'            Con_.Open
+'
+''        Case 1: ''' Access
+''
+''            Con_.Provider = dbEngine_
+''            Con_.Properties("Data Source") = fPath
+''            Con_.Open
+''
+''        Case 2: ''' Text
+''
+''            Con_.Provider = dbEngine_
+''            Con_.Properties("Data Source") = Fso.GetParentFolderName(fPath)
+''            If fileExt = "csv" Then
+''                Con_.Properties("Extended Properties") = Join(Array("TEXT", tableHeader, "FMT=Delimited"), ";")
+''            Else
+''                Con_.Properties("Extended Properties") = Join(Array("TEXT", tableHeader), ";")
+''            End If
+''            Con_.Open
+''
+''        Case 3: ''' Excel
+'
+''            Dim dbTypeExcel As String
+''            Select Case fileExt
+''                Case "xls" ''' Excel5.0/95 Workbook(*.xls) or Excel97-2003 WorkBook(*.xls)
+''                    If InStr(Fso.getFile(fPath).Type, 95) Then
+''                        dbTypeExcel = "Excel 5.0"
+''                    Else
+''                        dbTypeExcel = "Excel 8.0"
+''                    End If
+''                Case "xlsb" ''' Excel binary Workbook(*.xlsb)
+''                    dbTypeExcel = "Excel 12.0"
+''                Case "xlsm" ''' Excel Macro-Enabled Wrokbook(*.xlsm)
+''                    dbTypeExcel = "Excel 12.0 Macro"
+''                Case "xlsx" ''' Excel Workbook(*.xlsx)
+''                    dbTypeExcel = "Excel 12.0 Xml"
+''            End Select
+''
+''            Con_.Provider = dbEngine_
+''            Con_.Properties("Data Source") = fPath
+''            Con_.Properties("Extended Properties") = Join(Array(dbTypeExcel, tableHeader), ";")
+''            Con_.Open
+''
+''    End Select
+'
+'    GoTo Escape
+'
+'Catch:
+'
+'    Class_TerminateImpl
+'
+'    If dbEngine_ = "Microsoft.Jet.OLEDB.4.0" Then
+'        Debug.Print "(AdoEX/Init) Jet can not read file. Please check file extension"
+'        Err.Raise 9999, , "(AdoEX/Init) Jet can not read file. Please check file extension"
+'    Else
+'        Debug.Print "(AdoEX/Init) Ace can not read file. Please check file extension"
+'        Err.Raise 9999, , "(AdoEX/Init) Ace can not read file. Please check file extension"
+'    End If
+'
+'Escape:
+'End Sub
 
 ''' @param sql As String
 ''' @return As Variant(Of Array(Of T, T))
@@ -199,12 +331,12 @@ Public Function ArraySelect(ByVal sql As String, _
     rcds.Open Source:=sql, ActiveConnection:=Con_, CursorType:=propCursorType, LockType:=propLockType, options:=propCommandType
 
     ''' Table header names
-    Dim fieldsCnt As Long: fieldsCnt = rcds.fields.Count
+    Dim fieldsCnt As Long: fieldsCnt = rcds.Fields.Count
     Dim tableHeaderNamesArray() As String: ReDim tableHeaderNamesArray(fieldsCnt - 1)
 
     Dim idx As Long
     For idx = 0 To (fieldsCnt - 1)
-        tableHeaderNamesArray(idx) = rcds.fields.Item(idx).Name
+        tableHeaderNamesArray(idx) = rcds.Fields.Item(idx).Name
     Next idx
 
     ''' array( array( Table Names ),  array( Table Values ) )
@@ -270,8 +402,8 @@ Private Function AceDirect() As String
 
     ''' The Ace Engine is the same place whether it is 32 bit OS or 64 bit OS
     ''' HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Microsoft.ACE.OLEDB.xx.0
-    Dim wmi        As Object: Set wmi = CreateObject("Wbemscripting.SWbemLocator")
-    Dim wmiSrv     As Object: Set wmiSrv = wmi.ConnectServer(".", "root\default")
+    Dim Wmi        As Object: Set Wmi = CreateObject("Wbemscripting.SWbemLocator")
+    Dim wmiSrv     As Object: Set wmiSrv = Wmi.ConnectServer(".", "root\default")
     Dim stdRegProv As Object: Set stdRegProv = wmiSrv.Get("StdRegProv")
 
     Const HKLM  As Long = &H80000002
@@ -292,7 +424,7 @@ Private Function AceDirect() As String
     Next v
 
 Escape:
-    Set wmi = Nothing
+    Set Wmi = Nothing
     Set wmiSrv = Nothing
     Set stdRegProv = Nothing
 End Function
@@ -307,11 +439,11 @@ Private Function AceOffice32ClickToRun() As String
     ''' Context Flags
     ''' https://docs.microsoft.com/en-us/windows/desktop/WmiSdk/requesting-wmi-data-on-a-64-bit-platform#context-flags
     Dim wmiCtx As Object: Set wmiCtx = CreateObject("WbemScripting.SWbemNamedValueSet")
-    wmiCtx.Add "__ProviderArchitecture", 64
-    wmiCtx.Add "__RequiredArchitecture", True
+    wmiCtx.add "__ProviderArchitecture", 64
+    wmiCtx.add "__RequiredArchitecture", True
 
-    Dim wmi        As Object: Set wmi = CreateObject("Wbemscripting.SWbemLocator")
-    Dim wmiSrv     As Object: Set wmiSrv = wmi.ConnectServer(strComputer, "root\default", "", "", , , , wmiCtx)
+    Dim Wmi        As Object: Set Wmi = CreateObject("Wbemscripting.SWbemLocator")
+    Dim wmiSrv     As Object: Set wmiSrv = Wmi.ConnectServer(strComputer, "root\default", "", "", , , , wmiCtx)
     Dim stdRegProv As Object: Set stdRegProv = wmiSrv.Get("StdRegProv")
 
     Const HKEY_LOCAL_MACHINE  As Long = &H80000002
@@ -319,7 +451,7 @@ Private Function AceOffice32ClickToRun() As String
     Dim v, officeVersionArray, clct As Collection: Set clct = New Collection
     stdRegProv.EnumKey HKEY_LOCAL_MACHINE, "SOFTWARE\Microsoft\Office\", officeVersionArray
     For Each v In ArrayRegexFilter(officeVersionArray, "\d\d\.\d")
-        clct.Add "SOFTWARE\Microsoft\Office\" & v & "\ClickToRun\REGISTRY\MACHINE\Software\Classes\"
+        clct.add "SOFTWARE\Microsoft\Office\" & v & "\ClickToRun\REGISTRY\MACHINE\Software\Classes\"
     Next v
 
     Dim subkey, i As Long, j As Long
@@ -334,7 +466,7 @@ Private Function AceOffice32ClickToRun() As String
     Next i
 
 Escape:
-    Set wmi = Nothing
+    Set Wmi = Nothing
     Set wmiSrv = Nothing
     Set stdRegProv = Nothing
     Set clct = Nothing
@@ -350,11 +482,11 @@ Private Function AceClickToRunOffice32() As String
     ''' Context Flags
     ''' https://docs.microsoft.com/en-us/windows/desktop/WmiSdk/requesting-wmi-data-on-a-64-bit-platform#context-flags
     Dim wmiCtx As Object: Set wmiCtx = CreateObject("WbemScripting.SWbemNamedValueSet")
-    wmiCtx.Add "__ProviderArchitecture", 64
-    wmiCtx.Add "__RequiredArchitecture", True
+    wmiCtx.add "__ProviderArchitecture", 64
+    wmiCtx.add "__RequiredArchitecture", True
 
-    Dim wmi        As Object: Set wmi = CreateObject("Wbemscripting.SWbemLocator")
-    Dim wmiSrv     As Object: Set wmiSrv = wmi.ConnectServer(strComputer, "root\default", "", "", , , , wmiCtx)
+    Dim Wmi        As Object: Set Wmi = CreateObject("Wbemscripting.SWbemLocator")
+    Dim wmiSrv     As Object: Set wmiSrv = Wmi.ConnectServer(strComputer, "root\default", "", "", , , , wmiCtx)
     Dim stdRegProv As Object: Set stdRegProv = wmiSrv.Get("StdRegProv")
 
     Const HKEY_LOCAL_MACHINE  As Long = &H80000002
@@ -371,7 +503,7 @@ Private Function AceClickToRunOffice32() As String
     Next i
 
 Escape:
-    Set wmi = Nothing
+    Set Wmi = Nothing
     Set wmiSrv = Nothing
     Set stdRegProv = Nothing
 End Function

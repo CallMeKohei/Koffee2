@@ -60,15 +60,15 @@ End Sub
 
 Public Sub ArrayBase0_Test()
     Dim arr(): ReDim arr(1 To 99)
-    ArrayBase0 arr
+    sArrayBase0 arr
     Assert.AreEqual 0&, LBound(arr)
 End Sub
 
-Public Sub ArrayBase0_2ndDimension_Test()
-    Dim arr(): ReDim arr(1 To 33, 1 To 44)
-    ArrayBase0_2ndDimension arr
-    Assert.AreEqual 0&, LBound(arr)
-End Sub
+'Public Sub ArrayBase0_2ndDimension_Test()
+'    Dim arr(): ReDim arr(1 To 33, 1 To 44)
+'    ArrayBase0_2ndDimension arr
+'    Assert.AreEqual 0&, LBound(arr)
+'End Sub
 
 Public Sub ArrayColumn_Test()
     Dim arr: arr = Array(Array(1, 2), Array(3, 4), Array(5, 6))
@@ -96,13 +96,14 @@ Public Sub ArrayTranspose_Test()
 
     ''' validation
     ''' not array
-    Assert.IsErrFunc 13, init(New Func, vbVariant, AddressOf ArrayTranspose, vbVariant), Array(0)
+    Dim arr
+    Assert.IsErrFunc 9, Init(New Func, vbVariant, AddressOf ArrayTranspose, vbVariant, vbVariant), Array(0), arr
     ''' not two dimensions
     Dim arr1d(0) As Variant
-    Assert.IsErrFunc 13, init(New Func, vbVariant, AddressOf ArrayTranspose, vbVariant), Array(arr1d)
+    Assert.IsErrFunc 9, Init(New Func, vbVariant, AddressOf ArrayTranspose, vbVariant, vbVariant), Array(arr1d), arr
     ''' not two dimensions
     Dim arr3D(0, 0, 0) As Variant
-    Assert.IsErrFunc 13, init(New Func, vbVariant, AddressOf ArrayTranspose, vbVariant), Array(arr3D)
+    Assert.IsErrFunc 9, Init(New Func, vbVariant, AddressOf ArrayTranspose, vbVariant, vbVariant), Array(arr3D), arr
 
     ''' Before ( Base 0 )
     Dim arr2D(1, 2) As Variant
@@ -123,7 +124,7 @@ Public Sub ArrayTranspose_Test()
     Assert.AreEqual 3, arr2D(1, 2)
 
     ''' After ( Base 0 )
-    Dim arr2DTrans As Variant: arr2DTrans = ArrayTranspose(arr2D)
+    Dim arr2DTrans As Variant: sArrayTranspose arr2D, arr2DTrans
 
     Assert.AreEqual "A", arr2DTrans(0, 0)
     Assert.AreEqual 1, arr2DTrans(0, 1)
@@ -146,7 +147,7 @@ Public Sub ArrayTranspose_Test()
     Assert.AreEqual 3#, arr2DBase1(2, 3)
 
     ''' After ( Base 1 )
-    Dim arr2DBase1Trans As Variant: arr2DBase1Trans = ArrayTranspose(arr2DBase1)
+    Dim arr2DBase1Trans As Variant: sArrayTranspose arr2DBase1, arr2DBase1Trans
 
     Assert.AreEqual "A", arr2DBase1Trans(1, 1)
     Assert.AreEqual 1#, arr2DBase1Trans(1, 2)
@@ -175,19 +176,31 @@ End Sub
 
 Public Sub ArrayWindow_Test()
     
-    Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf ArrayWindow, vbVariant, vbVariant), Array(Array(1, 2, 3), -99)
-    Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf ArrayWindow, vbVariant, vbVariant), Array(Array(1, 2, 3), 0)
-    Assert.AreEqualArr Array(1, 2, 3), ArrayWindow(Array(1, 2, 3), 1)(0)
-    Assert.AreEqualArr Array(2), ArrayWindow(Array(1, 2, 3), 99)(1)
+'    Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf ArrayWindow, vbVariant, vbVariant), Array(Array(1, 2, 3), -99)
+'    Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf ArrayWindow, vbVariant, vbVariant), Array(Array(1, 2, 3), 0)
     
-    Dim arr(): arr = Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    Dim arr
     
-    Assert.AreEqualArr Array(1, 2, 3, 4, 5), ArrayWindow(arr, 2)(0)
-    Assert.AreEqualArr Array(6, 7, 8, 9, 10), ArrayWindow(arr, 2)(1)
+    sArrayWindow Array(1, 2, 3), 1, arr
+    Assert.AreEqualArr Array(1, 2, 3), arr(0)
     
-    Assert.AreEqualArr Array(1, 2, 3, 4), ArrayWindow(arr, 3)(0)
-    Assert.AreEqualArr Array(5, 6, 7), ArrayWindow(arr, 3)(1)
-    Assert.AreEqualArr Array(8, 9, 10), ArrayWindow(arr, 3)(2)
+    arr = Empty
+    sArrayWindow Array(1, 2, 3), 99, arr
+    Assert.AreEqualArr Array(2), arr(1)
+    
+    
+    Dim ary(): ary = Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    
+    arr = Empty
+    sArrayWindow ary, 2, arr
+    Assert.AreEqualArr Array(1, 2, 3, 4, 5), arr(0)
+    Assert.AreEqualArr Array(6, 7, 8, 9, 10), arr(1)
+    
+    arr = Empty
+    sArrayWindow ary, 3, arr
+    Assert.AreEqualArr Array(1, 2, 3, 4), arr(0)
+    Assert.AreEqualArr Array(5, 6, 7), arr(1)
+    Assert.AreEqualArr Array(8, 9, 10), arr(2)
 
 End Sub
 
@@ -200,7 +213,7 @@ Public Sub ArrSheetsName_Test()
 
     Dim Wb As Workbook: Set Wb = Application.ThisWorkbook
 
-    Assert.AreEqual Wb.Worksheets.Count, ArrLen(arr)
+    Assert.AreEqual Wb.Worksheets.Count, ArrayLen(arr)
 
     Dim ws As Worksheet, i As Long
     For Each ws In Wb.Worksheets
@@ -224,7 +237,7 @@ End Sub
 Public Sub DeleteSheet_Test()
 
     Assert.AreEqual False, ExistsSheet("myTestTemporarySheet")
-    Application.ThisWorkbook.Worksheets.Add().Name = "myTestTemporarySheet"
+    Application.ThisWorkbook.Worksheets.add().Name = "myTestTemporarySheet"
     Assert.AreEqual True, ExistsSheet("myTestTemporarySheet")
     DeleteSheet "myTestTemporarySheet"
     Assert.AreEqual False, ExistsSheet("myTestTemporarySheet")
@@ -758,13 +771,13 @@ End Sub
 Public Sub Hankaku_Test()
 
     Dim ws As Worksheet: Set ws = AddSheet("myTestTemporarySheet")
-    ws.Range("A1").Value = "ã‚¢ã‚¤ã‚¦ã‚¨ã‚ª"
-    ws.Range("A2").Value = "ï¼¡ï¼¢ï¼£ï¼¤ï¼¥"
-    ws.Range("A3").Value = "ï¼‘ï¼’ï¼“ï¼”ï¼•"
+    ws.Range("A1").Value = "ƒAƒCƒEƒGƒI"
+    ws.Range("A2").Value = "‚`‚a‚b‚c‚d"
+    ws.Range("A3").Value = "‚P‚Q‚R‚S‚T"
 
     Hankaku ws
 
-    Assert.AreEqual "ï½±ï½²ï½³ï½´ï½µ", ws.Range("A1").Value
+    Assert.AreEqual "±²³´µ", ws.Range("A1").Value
     Assert.AreEqual "ABCDE", ws.Range("A2").Value
     Assert.AreEqual 12345#, ws.Range("A3").Value
 
@@ -802,7 +815,7 @@ Public Sub AdoEx_Test()
     '''   6 |            4
     '''   7 |            5                  600
 
-    Dim arr As Variant: arr = ArraySelect(dbExcel, "select * from [myTestTemporarySheet$B2:F7]")
+    Dim arr As Variant: arr = koffeeArray.SelectExcelHeader("select * from [myTestTemporarySheet$B2:F7]")
 
     Assert.AreEqualArr Array("Number", "Name", "Price", "Memo1", "Memo2"), arr(0)
 
@@ -841,7 +854,7 @@ Public Sub AdoExHeadless_Test()
     '''   6 |            4
     '''   7 |            5                  600
 
-    Dim arr As Variant: arr = ArraySelect(dbExcel, "select * from [myTestTemporarySheet$B2:F7]", , False)
+    Dim arr As Variant: arr = koffeeArray.SelectExcel("select * from [myTestTemporarySheet$B2:F7]")
 
     Assert.AreEqualArr Array("F1", "F2", "F3", "F4", "F5"), arr(0)
 

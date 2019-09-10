@@ -18,9 +18,9 @@ Option Base 0
 #End If
 
 Private Sub investigate_Time()
-    Dim startTime: startTime = Timer
+    Dim starttime: starttime = Timer
     ''' do something...
-    Debug.Print Format$(Timer - startTime, "0.00") & " seconds."
+    Debug.Print Format$(Timer - starttime, "0.00") & " seconds."
 End Sub
 
 ''' https://docs.microsoft.com/ja-jp/previous-versions/office/developer/office-2007/aa730921(v=office.12)

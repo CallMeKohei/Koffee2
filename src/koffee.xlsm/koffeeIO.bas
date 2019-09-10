@@ -64,8 +64,8 @@ Public Function CreateTextFile(ByVal aFilePath As String, ByVal aText As String)
 
     ''' create and override new error log file
 
-    Dim Fso As Object: Set Fso = CreateObject("Scripting.FileSystemObject")
-    With Fso.CreateTextFile( _
+    Dim fso As Object: Set fso = CreateObject("Scripting.FileSystemObject")
+    With fso.CreateTextFile( _
               FileName:=aFilePath _
             , overwrite:=True _
             , Unicode:=False _
@@ -74,7 +74,7 @@ Public Function CreateTextFile(ByVal aFilePath As String, ByVal aText As String)
         .Close
     End With
 
-    Set Fso = Nothing
+    Set fso = Nothing
 
     CreateTextFile = True
     Exit Function
@@ -87,9 +87,9 @@ Public Function AppendText(ByVal aFilePath As String, ByVal aText As String) As 
     On Error GoTo Err
 
     ''' append text to file
-    Dim Fso As Object: Set Fso = CreateObject("Scripting.FileSystemObject")
+    Dim fso As Object: Set fso = CreateObject("Scripting.FileSystemObject")
     Dim Ts As Object ''' Is TextStream
-    Set Ts = Fso.OpenTextFile( _
+    Set Ts = fso.OpenTextFile( _
           FileName:=aFilePath _
         , IOMode:=OpenFileEnum.ForAppending _
         , Create:=True _
@@ -101,7 +101,7 @@ Public Function AppendText(ByVal aFilePath As String, ByVal aText As String) As 
     End With
 
     Set Ts = Nothing
-    Set Fso = Nothing
+    Set fso = Nothing
 
     AppendText = True
     Exit Function
