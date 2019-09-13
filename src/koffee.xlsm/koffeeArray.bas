@@ -26,7 +26,9 @@ Ending:
     ArrayRank = boundIndex - 1
 End Function
 
-Public Function ArraySlice(ByRef aSource1DArray As Variant, Optional ByVal fst As Long, Optional ByVal lst As Long) As Variant
+Public Function ArraySlice(ByRef aSource1DArray As Variant, Optional ByVal fst As Variant, Optional ByVal lst As Variant) As Variant
+    If IsMissing(fst) Then fst = LBound(aSource1DArray)
+    If IsMissing(lst) Then lst = UBound(aSource1DArray)
     Dim arr
     sArraySlice aSource1DArray, arr, fst, lst
     ArraySlice = arr
@@ -279,12 +281,12 @@ End Function
 Public Function ArrayRegexFilter(ByVal arr As Variant, ByVal ptrn As String) As Variant
 
     Dim regx As Object: Set regx = CreateObject("VBScript.RegExp")
-    regx.Pattern = ptrn: regx.IgnoreCase = True: regx.Global = True
+    regx.Pattern = ptrn: regx.ignorecase = True: regx.Global = True
 
     Dim v, dict As Object: Set dict = CreateObject("Scripting.Dictionary")
     For Each v In arr
         If regx.test(v) Then
-            If Not dict.exists(v) Then dict.add v, ""
+            If Not dict.exists(v) Then dict.Add v, ""
         End If
     Next v
 
@@ -469,7 +471,7 @@ On Error GoTo Escape
     adox.InitAccess aFilePath
     Dim arr As Variant: arr = adox.ArraySelect(sql)
     If IsEmpty(arr) Then GoTo Escape
-    SelectText = Array(arr(0), arr(1))
+    SelectAccess = Array(arr(0), arr(1))
     
 Escape:
     Set adox = Nothing
@@ -478,7 +480,7 @@ End Function
 Public Function SelectExcel(ByVal sql As String, Optional ByVal aFilePath As String = "") As Variant
 On Error GoTo Escape
 
-    If aFilePath = "" Then aFilePath = ThisWorkbook.Path & "\" & ThisWorkbook.Name
+    If aFilePath = "" Then aFilePath = ThisWorkbook.Path & "\" & ThisWorkbook.name
 
     Dim adox As AdoEx: Set adox = New AdoEx
     adox.InitExcel aFilePath
@@ -493,7 +495,7 @@ End Function
 Public Function SelectExcelHeader(ByVal sql As String, Optional ByVal aFilePath As String = "") As Variant
 On Error GoTo Escape
 
-    If aFilePath = "" Then aFilePath = ThisWorkbook.Path & "\" & ThisWorkbook.Name
+    If aFilePath = "" Then aFilePath = ThisWorkbook.Path & "\" & ThisWorkbook.name
 
     Dim adox As AdoEx: Set adox = New AdoEx
     adox.InitExcelHeader aFilePath

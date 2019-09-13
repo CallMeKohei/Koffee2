@@ -336,7 +336,7 @@ Public Function ArraySelect(ByVal sql As String, _
 
     Dim idx As Long
     For idx = 0 To (fieldsCnt - 1)
-        tableHeaderNamesArray(idx) = rcds.Fields.Item(idx).Name
+        tableHeaderNamesArray(idx) = rcds.Fields.Item(idx).name
     Next idx
 
     ''' array( array( Table Names ),  array( Table Values ) )
@@ -402,8 +402,8 @@ Private Function AceDirect() As String
 
     ''' The Ace Engine is the same place whether it is 32 bit OS or 64 bit OS
     ''' HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Microsoft.ACE.OLEDB.xx.0
-    Dim Wmi        As Object: Set Wmi = CreateObject("Wbemscripting.SWbemLocator")
-    Dim wmiSrv     As Object: Set wmiSrv = Wmi.ConnectServer(".", "root\default")
+    Dim wmi        As Object: Set wmi = CreateObject("Wbemscripting.SWbemLocator")
+    Dim wmiSrv     As Object: Set wmiSrv = wmi.ConnectServer(".", "root\default")
     Dim stdRegProv As Object: Set stdRegProv = wmiSrv.Get("StdRegProv")
 
     Const HKLM  As Long = &H80000002
@@ -424,7 +424,7 @@ Private Function AceDirect() As String
     Next v
 
 Escape:
-    Set Wmi = Nothing
+    Set wmi = Nothing
     Set wmiSrv = Nothing
     Set stdRegProv = Nothing
 End Function
@@ -439,11 +439,11 @@ Private Function AceOffice32ClickToRun() As String
     ''' Context Flags
     ''' https://docs.microsoft.com/en-us/windows/desktop/WmiSdk/requesting-wmi-data-on-a-64-bit-platform#context-flags
     Dim wmiCtx As Object: Set wmiCtx = CreateObject("WbemScripting.SWbemNamedValueSet")
-    wmiCtx.add "__ProviderArchitecture", 64
-    wmiCtx.add "__RequiredArchitecture", True
+    wmiCtx.Add "__ProviderArchitecture", 64
+    wmiCtx.Add "__RequiredArchitecture", True
 
-    Dim Wmi        As Object: Set Wmi = CreateObject("Wbemscripting.SWbemLocator")
-    Dim wmiSrv     As Object: Set wmiSrv = Wmi.ConnectServer(strComputer, "root\default", "", "", , , , wmiCtx)
+    Dim wmi        As Object: Set wmi = CreateObject("Wbemscripting.SWbemLocator")
+    Dim wmiSrv     As Object: Set wmiSrv = wmi.ConnectServer(strComputer, "root\default", "", "", , , , wmiCtx)
     Dim stdRegProv As Object: Set stdRegProv = wmiSrv.Get("StdRegProv")
 
     Const HKEY_LOCAL_MACHINE  As Long = &H80000002
@@ -451,7 +451,7 @@ Private Function AceOffice32ClickToRun() As String
     Dim v, officeVersionArray, clct As Collection: Set clct = New Collection
     stdRegProv.EnumKey HKEY_LOCAL_MACHINE, "SOFTWARE\Microsoft\Office\", officeVersionArray
     For Each v In ArrayRegexFilter(officeVersionArray, "\d\d\.\d")
-        clct.add "SOFTWARE\Microsoft\Office\" & v & "\ClickToRun\REGISTRY\MACHINE\Software\Classes\"
+        clct.Add "SOFTWARE\Microsoft\Office\" & v & "\ClickToRun\REGISTRY\MACHINE\Software\Classes\"
     Next v
 
     Dim subkey, i As Long, j As Long
@@ -466,7 +466,7 @@ Private Function AceOffice32ClickToRun() As String
     Next i
 
 Escape:
-    Set Wmi = Nothing
+    Set wmi = Nothing
     Set wmiSrv = Nothing
     Set stdRegProv = Nothing
     Set clct = Nothing
@@ -482,11 +482,11 @@ Private Function AceClickToRunOffice32() As String
     ''' Context Flags
     ''' https://docs.microsoft.com/en-us/windows/desktop/WmiSdk/requesting-wmi-data-on-a-64-bit-platform#context-flags
     Dim wmiCtx As Object: Set wmiCtx = CreateObject("WbemScripting.SWbemNamedValueSet")
-    wmiCtx.add "__ProviderArchitecture", 64
-    wmiCtx.add "__RequiredArchitecture", True
+    wmiCtx.Add "__ProviderArchitecture", 64
+    wmiCtx.Add "__RequiredArchitecture", True
 
-    Dim Wmi        As Object: Set Wmi = CreateObject("Wbemscripting.SWbemLocator")
-    Dim wmiSrv     As Object: Set wmiSrv = Wmi.ConnectServer(strComputer, "root\default", "", "", , , , wmiCtx)
+    Dim wmi        As Object: Set wmi = CreateObject("Wbemscripting.SWbemLocator")
+    Dim wmiSrv     As Object: Set wmiSrv = wmi.ConnectServer(strComputer, "root\default", "", "", , , , wmiCtx)
     Dim stdRegProv As Object: Set stdRegProv = wmiSrv.Get("StdRegProv")
 
     Const HKEY_LOCAL_MACHINE  As Long = &H80000002
@@ -503,7 +503,7 @@ Private Function AceClickToRunOffice32() As String
     Next i
 
 Escape:
-    Set Wmi = Nothing
+    Set wmi = Nothing
     Set wmiSrv = Nothing
     Set stdRegProv = Nothing
 End Function

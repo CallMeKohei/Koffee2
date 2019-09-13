@@ -217,7 +217,7 @@ Public Sub ArrSheetsName_Test()
 
     Dim ws As Worksheet, i As Long
     For Each ws In Wb.Worksheets
-        Assert.AreEqual ws.Name, arr(i)
+        Assert.AreEqual ws.name, arr(i)
         i = i + 1
     Next ws
 
@@ -237,7 +237,7 @@ End Sub
 Public Sub DeleteSheet_Test()
 
     Assert.AreEqual False, ExistsSheet("myTestTemporarySheet")
-    Application.ThisWorkbook.Worksheets.add().Name = "myTestTemporarySheet"
+    Application.ThisWorkbook.Worksheets.Add().name = "myTestTemporarySheet"
     Assert.AreEqual True, ExistsSheet("myTestTemporarySheet")
     DeleteSheet "myTestTemporarySheet"
     Assert.AreEqual False, ExistsSheet("myTestTemporarySheet")
@@ -344,7 +344,7 @@ Public Sub PutVal_Test()
     Assert.AreEqual 1#, ws.Range("B2").Value
 
     ''' --------------------------------------------------------
-    ws.Cells.Clear
+    ws.Cells.clear
 
     PutVal Array(1#, 2#, 3#, Empty, "A", "B"), ws.Range("B2")
 
@@ -367,7 +367,7 @@ Public Sub PutVal_Test()
     Assert.AreEqual "B", ws.Range("G2").Value
 
     ''' ----------------------------------------------------
-    ws.Cells.Clear
+    ws.Cells.clear
 
     PutVal 1, ws.Range("B2"), True
 
@@ -384,7 +384,7 @@ Public Sub PutVal_Test()
     Assert.AreEqual 1#, ws.Range("B2").Value
 
     ''' --------------------------------------------------------
-    ws.Cells.Clear
+    ws.Cells.clear
 
     PutVal Array(1#, 2#, 3#, Empty, "A", "B"), ws.Range("B2"), True
 
@@ -406,7 +406,7 @@ Public Sub PutVal_Test()
     Assert.AreEqual "B", ws.Range("B7").Value
 
     ''' --------------------------------------------------------
-    ws.Cells.Clear
+    ws.Cells.clear
 
     PutVal Array( _
         Array(1, 2, 3, Empty, "a"), _
@@ -456,7 +456,7 @@ Public Sub PutVal_Test()
     Assert.AreEqual Empty, ws.Range("F6").Value
 
     ''' --------------------------------------------------------
-    ws.Cells.Clear
+    ws.Cells.clear
 
     PutVal Array( _
         Array(1, 2, 3, Empty, "a"), _
@@ -530,12 +530,12 @@ Public Sub PutValBase1_Test()
     Assert.AreEqual 1#, ws.Range("B2").Value
 
     ''' ----------------------------------------------------
-    ws.Cells.Clear
+    ws.Cells.clear
 
     PutVal Array(1#, 2#, 3#, Empty, "A", "B"), ws.Range("B2")
 
     arrBase1 = GetVal(ws.Range("B2:G2"))
-    ws.Cells.Clear
+    ws.Cells.clear
     PutVal arrBase1, ws.Range("B2")
 
     '    |  A   B   C   D   E   F   G
@@ -556,7 +556,7 @@ Public Sub PutValBase1_Test()
     Assert.AreEqual "B", ws.Range("G2").Value
 
     ''' --------------------------------------------------------
-    ws.Cells.Clear
+    ws.Cells.clear
 
     PutVal 1, ws.Range("B2"), True
 
@@ -573,12 +573,12 @@ Public Sub PutValBase1_Test()
     Assert.AreEqual 1#, ws.Range("B2").Value
 
     ''' --------------------------------------------------------
-    ws.Cells.Clear
+    ws.Cells.clear
 
     PutVal Array(1#, 2#, 3#, Empty, "A", "B"), ws.Range("B2"), True
 
     arrBase1 = GetVal(ws.Range("B2:B7"))
-    ws.Cells.Clear
+    ws.Cells.clear
     PutVal arrBase1, ws.Range("B2")
 
     '    |  A   B   C   D   E   F   G
@@ -599,7 +599,7 @@ Public Sub PutValBase1_Test()
     Assert.AreEqual "B", ws.Range("B7").Value
 
     ''' ----------------------------------------------------
-    ws.Cells.Clear
+    ws.Cells.clear
 
     PutVal Array( _
         Array(1, 2, 3, Empty, "a"), _
@@ -610,7 +610,7 @@ Public Sub PutValBase1_Test()
     ), ws.Range("B2")
 
     arrBase1 = GetVal(ws.Range("B2:F6"))
-    ws.Cells.Clear
+    ws.Cells.clear
     PutVal arrBase1, ws.Range("B2")
 
     '    |  A   B   C   D   E   F
@@ -653,7 +653,7 @@ Public Sub PutValBase1_Test()
     Assert.AreEqual Empty, ws.Range("F6").Value
 
     ''' ----------------------------------------------------
-    ws.Cells.Clear
+    ws.Cells.clear
 
     PutVal Array( _
         Array(1, 2, 3, Empty, "a"), _
@@ -664,7 +664,7 @@ Public Sub PutValBase1_Test()
     ), ws.Range("B2"), True
 
     arrBase1 = GetVal(ws.Range("B2:F6"))
-    ws.Cells.Clear
+    ws.Cells.clear
     PutVal arrBase1, ws.Range("B2")
 
     '    |  A   B   C   D   E   F
@@ -795,7 +795,7 @@ Public Sub AdoEx_Test()
     Else
         Set ws = Worksheets("myTestTemporarySheet")
     End If
-    ws.Cells.Clear
+    ws.Cells.clear
 
     PutVal Array( _
         Array("Number", 1, 2, 3, 4, 5), _
@@ -834,7 +834,7 @@ Public Sub AdoExHeadless_Test()
     ''' Header as data
 
     Dim ws As Worksheet: Set ws = AddSheet("myTestTemporarySheet")
-    ws.Cells.Clear
+    ws.Cells.clear
 
     PutVal Array( _
         Array("Number", 1, 2, 3, 4, 5), _

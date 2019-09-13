@@ -46,7 +46,7 @@ Public Function ArrSheetsName(Optional ByVal Wb As Workbook = Nothing) As Varian
 
     Dim ws As Worksheet, i As Long
     For Each ws In Wb.Worksheets
-        arr(i) = ws.Name
+        arr(i) = ws.name
         i = i + 1
     Next ws
 
@@ -93,7 +93,7 @@ End Sub
 Public Function AddSheet(ByVal SheetName As String, Optional ByVal Wb As Workbook = Nothing) As Worksheet
     If TypeName(Wb) = "Nothing" Then Set Wb = Application.ThisWorkbook
     If ExistsSheet(SheetName, Wb) Then GoTo Catch
-    Wb.Worksheets.add(after:=Worksheets(Wb.Worksheets.Count)).Name = SheetName
+    Wb.Worksheets.Add(after:=Worksheets(Wb.Worksheets.Count)).name = SheetName
     Set AddSheet = Wb.Worksheets(SheetName)
     GoTo Escape
 Catch:
@@ -118,7 +118,7 @@ Public Function CopySheet( _
 
     srcWb.Worksheets(srcWsName).Copy after:=dstWb.Worksheets(dstWb.Sheets.Count)
     If Not (dstWsName = "") Then
-        dstWb.ActiveSheet.Name = dstWsName
+        dstWb.ActiveSheet.name = dstWsName
         Set CopySheet = dstWb.Worksheets(dstWsName)
         GoTo Escape
     Else
@@ -155,7 +155,7 @@ Public Function MoveSheet( _
 
     srcWb.Worksheets(srcWsName).Move after:=dstWb.Worksheets(dstWb.Sheets.Count)
     If Not (dstWsName = "") Then
-        dstWb.ActiveSheet.Name = dstWsName
+        dstWb.ActiveSheet.name = dstWsName
         Set MoveSheet = dstWb.Worksheets(dstWsName)
         GoTo Escape
     Else
