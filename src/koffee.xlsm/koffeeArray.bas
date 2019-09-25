@@ -322,12 +322,12 @@ Public Function ArrayRemoveEmpties(ByVal aSourceArray As Variant) As Variant
     Dim i As Variant, arrx As ArrayEx: Set arrx = New ArrayEx
 
     For i = LBound(aSourceArray) To UBound(aSourceArray)
-        If Not (aSourceArray(i) = "" Or IsEmpty(aSourceArray(i))) Then
-            If IsObject(i) Then
-                arrx.AddObj aSourceArray(i)
-            Else
-                arrx.AddVal aSourceArray(i)
-            End If
+        If IsObject(i) Then
+            arrx.AddObj aSourceArray(i)
+        ElseIf IsArray(aSourceArray(i)) Then
+            arrx.AddVal aSourceArray(i)
+        ElseIf Not (aSourceArray(i) = "" Or IsEmpty(aSourceArray(i))) Then
+            arrx.AddVal aSourceArray(i)
         End If
     Next i
     ArrayRemoveEmpties = arrx.ToArray
